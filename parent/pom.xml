@@ -223,14 +223,14 @@
   <!-- mvn deploy的发布地址 -->
   <distributionManagement>
     <repository>
-	  <id>releases</id>
+	  <id>nexus-releases</id>
       <name>Nexus Release Repository</name>
-      <url>http://localhost:8081/nexus/content/repositories/releases</url>
+      <url>http://localhost:8081/repository/pisces-dev-releases/</url>
 	</repository>
 	<snapshotRepository>
-	  <id>snapshots</id>
+	  <id>nexus-snapshots</id>
       <name>Nexus Snapshot Repository</name>
-      <url>http://localhost:8081/nexus/content/repositories/snapshots</url>
+      <url>http://localhost:8081/repository/pisces-dev-snapshots/</url>
 	  <uniqueVersion>true</uniqueVersion>
 	</snapshotRepository>
   </distributionManagement>
