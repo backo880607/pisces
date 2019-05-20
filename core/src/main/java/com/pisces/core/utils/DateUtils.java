@@ -1,0 +1,394 @@
+package com.pisces.core.utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+public class DateUtils {
+	public static final long MIN;
+	public static final long MAX = Long.MAX_VALUE;
+	public static final long PER_SECOND = 1000;
+	public static final long PER_MINUTE = 60000;
+	public static final long PER_HOUR = 3600000;
+	public static final long PER_DAY = 86400000;
+	private static long ZoneTime = 0;
+	
+	static {
+		Calendar cal = Calendar.getInstance();
+		ZoneTime = cal.get(Calendar.ZONE_OFFSET);
+		cal.set(1970, 0, 1, 0, 0, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		MIN = cal.getTimeInMillis();
+	}
+	
+	private static ThreadLocal<Calendar> calendarLocal = new ThreadLocal<>();
+	private static Calendar getCalendar(Date date) {
+		Calendar calendar = calendarLocal.get();
+		if (calendar == null) {
+			calendar = Calendar.getInstance();
+			calendarLocal.set(calendar);
+		}
+		calendar.setTime(date);
+		return calendar;
+	}
+	
+	private static ThreadLocal<Map<String, SimpleDateFormat>> formatLocal = new ThreadLocal<>();
+	private static SimpleDateFormat getSimpleDateFormat(String format) {
+		Map<String,SimpleDateFormat> formatMap = formatLocal.get();
+		if (formatMap == null) {
+			formatMap = new HashMap<>();
+			formatLocal.set(formatMap);
+		}
+		SimpleDateFormat simpleDateFormat = formatMap.get(format);
+		if (simpleDateFormat == null) {
+			simpleDateFormat = new SimpleDateFormat(format);
+			formatMap.put(format, simpleDateFormat);
+		}
+		return simpleDateFormat;
+	}
+	
+	public static long getZoneTime() {
+		return ZoneTime;
+	}
+	
+	/**
+	 * 使用format格式化日期
+	 * @param date 日期
+	 * @param format 日期格式(例："yyyy-MM-dd")
+	 * @return String
+	 */
+	public static String format(Date date, String format){
+		return getSimpleDateFormat(format).format(date);
+	}
+	
+	/**
+	 * 返回今天是周几
+	 * 返回值：1/2/3/4/5/6/7
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getDayOfWeek(Date date) {
+		int week = getCalendar(date).get(Calendar.DAY_OF_WEEK);
+		switch (week) {
+		case 1:
+			week = 7;
+			break;
+		case 2:
+			week = 1;
+			break;
+		case 3:
+			week = 2;
+			break;
+		case 4:
+			week = 3;
+			break;
+		case 5:
+			week = 4;
+			break;
+		case 6:
+			week = 5;
+			break;
+		case 7:
+			week = 6;
+			break;
+		}
+		return week;
+	}
+	
+	/**
+	 * 返回这一年的第几天
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getDayOfYear(Date date) {
+		return getCalendar(date).get(Calendar.DAY_OF_YEAR);
+	}
+	
+	/**
+	 * 返回这个月的第几周  (1号开始 ,7天为一周)
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getDayOfWeekInMonth(Date date) {
+		return getCalendar(date).get(Calendar.DAY_OF_WEEK_IN_MONTH);
+	}
+	
+	/**
+	 * 返回这个月的第几周 (周一开始,到周日为一周)
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getWeekOfMonth(Date date) {
+		return getCalendar(date).get(Calendar.WEEK_OF_MONTH);
+	}
+	
+	/**
+	 * 返回这一年的第几周 (1月1日开始,7天为一周)
+	 * @param date
+	 * @return
+	 */
+	public static int getWeekOfYear(Date date) {
+		return getCalendar(date).get(Calendar.WEEK_OF_YEAR);
+	}
+	
+	/**
+	 * 返回上午还是下午
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getAmPm(Date date) {
+		return getCalendar(date).get(Calendar.AM_PM);
+	}
+	
+	/**
+	 * 返回这一天的第几个小时
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getHourOfDay(Date date) {
+		return getCalendar(date).get(Calendar.HOUR_OF_DAY);
+	}
+	
+	/**
+	 * 返回年份
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getYear(Date date) {
+		return getCalendar(date).get(Calendar.YEAR);
+	}
+	
+	/**
+	 * 返回月份
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getMonth(Date date) {
+		return getCalendar(date).get(Calendar.MONTH) + 1;
+	}
+	
+	/**
+	 * 返回一个月中的第几天
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getDay(Date date) {
+		return getCalendar(date).get(Calendar.DAY_OF_MONTH);
+	}
+	
+	/**
+	 * 返回小时
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getHour(Date date) {
+		return getCalendar(date).get(Calendar.HOUR);
+	}
+	
+	/**
+	 * 返回分钟
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getMinute(Date date) {
+		return getCalendar(date).get(Calendar.MINUTE);
+	}
+	
+	/**
+	 * 返回秒数
+	 * @param date 日期
+	 * @return int
+	 */
+	public static int getSecond(Date date) {
+		return getCalendar(date).get(Calendar.SECOND);
+	}
+	
+	/**
+	 * 返回  年份+月份
+	 * @param date 日期
+	 * @return int
+	 */
+	public static Date getYearMonth(Date date) {
+		long result = ((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime;
+		return new Date(result - (getDay(date) - 1) * PER_DAY);
+	}
+	
+	/**
+	 * 返回 年份+月份+日期
+	 * @param date 日期
+	 * @return int
+	 */
+	public static Date getYearMonthDay(Date date) {
+		return new Date(((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime);
+	}
+	
+	/**
+	 * 返回  小时+分钟+秒数
+	 * @param date 日期
+	 * @return int
+	 */
+	public static Date getHourMinuteSecond(Date date) {
+		long result = ((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime;
+		return new Date(date.getTime() - result - ZoneTime);
+	}
+	
+	/**
+	 * 增加天数
+	 * @param date 日期
+	 * @param value 加的值
+	 * @return Date
+	 */
+	public static Date addDay(Date date, int value) {
+		return new Date(date.getTime() + value * PER_DAY);
+	}
+	
+	/**
+	 * 增加小时
+	 * @param date 日期
+	 * @param value 加的值
+	 * @return Date
+	 */
+	public static Date addHour(Date date, int value) {
+		return new Date(date.getTime() + value * PER_HOUR);
+	}
+	
+	/**
+	 * 增加分钟
+	 * @param date 日期
+	 * @param value 加的值
+	 * @return Date
+	 */
+	public static Date addMinute(Date date, int value) {
+		return new Date(date.getTime() + value * PER_MINUTE);
+	}
+	
+	/**
+	 * 增加秒数
+	 * @param date 日期
+	 * @param value 加的值
+	 * @return Date
+	 */
+	public static Date addSeconds(Date date, int value) {
+		return new Date(date.getTime() + value * PER_SECOND);
+	}
+	
+	/**
+	 * 减少天数
+	 * @param date 日期
+	 * @param value 减的值
+	 * @return Date
+	 */
+	public static Date subDay(Date date, int value) {
+		return new Date(date.getTime() - value * PER_DAY);
+	}
+	
+	/**
+	 * 减少小时
+	 * @param date 日期
+	 * @param value 减的值
+	 * @return Date
+	 */
+	public static Date subHour(Date date,int value) {
+		return new Date(date.getTime() - value * PER_HOUR);
+	}
+	
+	/**
+	 * 减少分钟
+	 * @param date 日期
+	 * @param value 减的值
+	 * @return Date
+	 */
+	public static Date subMinute(Date date,int value) {
+		return new Date(date.getTime() - value * PER_MINUTE);
+	}
+	
+	/**
+	 * 减少秒数
+	 * @param date 日期
+	 * @param value 减的值
+	 * @return Date
+	 */
+	public static Date subSecond(Date date,int value) {
+		return new Date(date.getTime() - value * PER_SECOND);
+	}
+	
+	/**
+	 * 判断after相差before多少天
+	 * @param date1
+	 * @param date2
+	 * @return
+	 */
+	public static int differentDays(long before, long after) {
+		Calendar cal1 = Calendar.getInstance();
+        cal1.setTimeInMillis(before);
+        
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTimeInMillis(after);
+        int day1= cal1.get(Calendar.DAY_OF_YEAR);
+        int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+        
+        int year1 = cal1.get(Calendar.YEAR);
+        int year2 = cal2.get(Calendar.YEAR);
+        if(year1 != year2) { // 非同一年
+            int timeDistance = 0 ;
+            for(int i = year1 ; i < year2 ; i ++) {
+                if(i%4==0 && i%100!=0 || i%400==0) { // 闰年
+                    timeDistance += 366;
+                } else { //不是闰年
+                    timeDistance += 365;
+                }
+            }
+            
+            return timeDistance + (day2-day1) ;
+        }
+        return day2-day1;
+	}
+	
+	/**
+	 * 判断after相差before多少周
+	 * @param date1
+	 * @param date2
+	 * @return
+	 */
+	public static int differentWeeks(long before, long after) {
+		Calendar cal1 = Calendar.getInstance();
+        cal1.setTimeInMillis(before);
+        
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTimeInMillis(after);
+        int week1= cal1.get(Calendar.WEEK_OF_YEAR);
+        int week2 = cal2.get(Calendar.WEEK_OF_YEAR);
+        
+        int year1 = cal1.get(Calendar.YEAR);
+        int year2 = cal2.get(Calendar.YEAR);
+        
+        int weeks = week2 - week1;
+        for (int i = 0; i < year2-year1; i++) {
+            weeks += cal1.getActualMaximum(Calendar.WEEK_OF_YEAR);
+            cal1.add(Calendar.YEAR, 1);
+        }
+        return weeks;
+	}
+	
+	/**
+	 * 判断after相差before多少月
+	 * @param date1
+	 * @param date2
+	 * @return
+	 */
+	public static int differentMonths(long before, long after) {
+		Calendar cal1 = Calendar.getInstance();
+        cal1.setTimeInMillis(before);
+        
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTimeInMillis(after);
+        int month1= cal1.get(Calendar.MONTH);
+        int month2 = cal2.get(Calendar.MONTH);
+        
+        int year1 = cal1.get(Calendar.YEAR);
+        int year2 = cal2.get(Calendar.YEAR);
+        return 12*(year2 - year1) + (month2 - month1);
+	}
+}

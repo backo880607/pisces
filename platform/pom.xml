@@ -1,0 +1,74 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+  	<groupId>com.pisces</groupId>
+  	<artifactId>parent</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+  	<relativePath>../parent/pom.xml</relativePath> <!-- lookup parent from repository -->
+  </parent>
+
+  <artifactId>platform</artifactId>
+  <packaging>jar</packaging>
+
+  <name>platform</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <user.version>0.0.1-SNAPSHOT</user.version>
+    <integration.version>0.0.1-SNAPSHOT</integration.version>
+    <language.version>0.0.1-SNAPSHOT</language.version>
+    <report.version>0.0.1-SNAPSHOT</report.version>
+    <nosql.version>0.0.1-SNAPSHOT</nosql.version>
+  </properties>
+
+  <dependencies>
+	<dependency>
+  	  <groupId>com.pisces</groupId>
+	  <artifactId>user</artifactId>
+	  <version>${user.version}</version>
+	</dependency>
+	<dependency>
+  	  <groupId>com.pisces</groupId>
+	  <artifactId>integration</artifactId>
+	  <version>${integration.version}</version>
+	</dependency>
+	<dependency>
+  	  <groupId>com.pisces</groupId>
+	  <artifactId>language</artifactId>
+	  <version>${language.version}</version>
+	</dependency>
+	<dependency>
+	  <groupId>com.pisces</groupId>
+	  <artifactId>nosql</artifactId>
+	  <version>${nosql.version}</version>
+	</dependency>
+	<dependency>
+	  <groupId>com.pisces</groupId>
+	  <artifactId>report</artifactId>
+	  <version>${report.version}</version>
+	</dependency>
+  </dependencies>
+  
+  <build>
+	<plugins>
+	 <plugin>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-maven-plugin</artifactId>
+		<configuration>
+		  <mainClass>${start-class}</mainClass>
+		  <layout>NONE</layout>	<!-- 表示没有主类 -->
+		</configuration>
+		<executions>
+		  <execution>
+			<id>spring boot</id>
+			<phase>package</phase>
+			<goals>
+			  <goal>repackage</goal>
+			</goals>
+		  </execution>
+		</executions>
+	  </plugin>
+	</plugins>
+  </build>
+</project>
