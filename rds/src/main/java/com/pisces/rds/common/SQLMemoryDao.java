@@ -31,8 +31,6 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 	protected void initDao() throws Exception {
 		DaoManager.register(this);
 	}
-	
-	public SQLDao<T> getMapper() { return mapper; }
 
 	@Override
 	public T select() {

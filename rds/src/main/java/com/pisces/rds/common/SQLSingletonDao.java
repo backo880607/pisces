@@ -15,12 +15,14 @@ import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.SingletonModifyDaoImpl;
 import com.pisces.core.entity.EntityObject;
 
+import tk.mybatis.mapper.common.Mapper;
+
 public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSupport implements BaseDao<T> {
 	private ThreadLocal<SingletonModifyDaoImpl<T>> impl = new ThreadLocal<>();
 	private Class<T> entityClass;
 	
 	@Autowired
-	private SQLDao<T> mapper;
+	private Mapper<T> mapper;
 	
 	@SuppressWarnings("unchecked")
 	public SQLSingletonDao() {
@@ -36,8 +38,6 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
 	protected void initDao() throws Exception {
 		DaoManager.register(this);
 	}
-	
-	public SQLDao<T> getMapper() { return mapper; }
 	
 	@Override
 	public T select() {
