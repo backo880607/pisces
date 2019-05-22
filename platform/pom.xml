@@ -50,14 +50,14 @@
 	</dependency>
   </dependencies>
   
-  <build>
+  <!-- <build>
 	<plugins>
 	 <plugin>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-maven-plugin</artifactId>
 		<configuration>
 		  <mainClass>${start-class}</mainClass>
-		  <layout>NONE</layout>	<!-- 表示没有主类 -->
+		  <layout>JAR</layout>	表示没有主类
 		</configuration>
 		<executions>
 		  <execution>
@@ -70,5 +70,5 @@
 		</executions>
 	  </plugin>
 	</plugins>
-  </build>
+  </build> -->
 </project>
