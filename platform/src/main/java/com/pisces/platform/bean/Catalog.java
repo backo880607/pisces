@@ -11,4 +11,14 @@ public class Catalog extends EntityObject {
 	@Relation(clazz = "Catalog", sign = "childs", type = Type.OneToMulti, owner = true)
 	public static final Sign parent = sign();
 	public static final Sign childs = sign();
+	
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

@@ -16,13 +16,39 @@ class PropertyServiceImpl extends EntityServiceImpl<Property, PropertyDao> imple
 
 	@Override
 	public Property getByCode(Class<? extends EntityObject> clazz, String code) {
-		return select((Property temp) -> {
-			return temp.belongClazz == clazz && temp.getCode().equals(code);
-		});
+		Property property = EntityUtils.getProperty(clazz, code);
+		if (property != null) {
+			return property;
+		}
+		// find user property
+		Class<? extends EntityObject> superClazz = clazz;
+		while (superClazz != null) {
+			final String superClassName = superClazz.getSimpleName();
+			property = select((Property temp) -> {
+				return temp.getBelongName().equals(superClassName) && temp.getCode().equals(code);
+			});
+			if (property != null) {
+				break;
+			}
+			superClazz = EntityUtils.getSuperClass(superClazz);
+		}
+		
+		return property;
 	}
 
 	@Override
 	public List<Property> getByClass(Class<? extends EntityObject> clazz) {
-		return EntityUtils.getProperties(clazz);
+		List<Property> result = EntityUtils.getProperties(clazz);
+		// find user properties
+		Class<? extends EntityObject> superClazz = clazz;
+		while (superClazz != null) {
+			final String superClassName = superClazz.getSimpleName();
+			result.addAll(selectList((Property temp) -> {
+				return temp.getBelongName().equals(superClassName);
+			}));
+			
+			superClazz = EntityUtils.getSuperClass(superClazz);
+		}
+		return result;
 	}
 }

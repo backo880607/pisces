@@ -1,6 +1,7 @@
 package com.pisces.core.converter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -56,28 +57,43 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 		JsonNode node = p.getCodec().readTree(p);
 		Class<? extends EntityObject> propertyClazz = property.sign.getEntityClass();
 		EntityService<EntityObject> service = ServiceManager.getService(propertyClazz);
+		List<Long> relaIds = new ArrayList<Long>();
 		if (node.isArray()) {
+			StringBuffer primaryExp = new StringBuffer();
 			for (JsonNode subNode : node) {
-				if (subNode.has("id")) {
-					JsonNode idNode = subNode.get("id");
-					long id = 0;
-					if (idNode instanceof TextNode) {
-						id = Long.valueOf(idNode.textValue());
-					} else if (idNode instanceof LongNode) {
-						id = idNode.longValue();
-					}
-					if (id > 0) {
-						EntityObject relaEntity = EntityUtils.getInherit(propertyClazz, id);
-						Ioc.set(entity, property.sign, relaEntity);
-						try {
+				if (subNode.isContainerNode()) {
+					if (subNode.has("id")) {
+						JsonNode idNode = subNode.get("id");
+						relaIds.add(getEntityId(idNode));
+						/*long id = ;
+						if (id > 0) {
+							EntityObject relaEntity = EntityUtils.getInherit(propertyClazz, id);
+							Ioc.set(entity, property.sign, relaEntity);
 							service.update(relaEntity);
-						} catch (Exception e) {
-							e.printStackTrace();
+						}*/
+					} else {
+						List<Property> primaries = EntityUtils.getPrimaries(propertyClazz);
+						for (Property primary : primaries) {
+							JsonNode keyNode = subNode.get(primary.getName());
+							if (keyNode == null) {	// 缺少主键
+								
+							}
+							
+							primaryExp.append(propertyClazz.getSimpleName()).append(".").append(primary.getName());
+							primaryExp.append("=='").append(keyNode.textValue()).append("'&&");
 						}
+						if (primaryExp.length() > 0) {
+							primaryExp.delete(primaryExp.length() - 2, primaryExp.length());
+						}
+						
+						primaryExp.append("||");
 					}
 				} else {
-					List<Property> primaries = EntityUtils.getPrimaries(propertyClazz);
+					relaIds.add(getEntityId(subNode));
 				}
+			}
+			if (primaryExp.length() > 0) {
+				primaryExp.delete(primaryExp.length() - 2, primaryExp.length());
 			}
 		} else if (node.isObject()) {
 			final long id = getEntityId(node.get("id"));
@@ -88,6 +104,8 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 				}
 				Ioc.set(entity, property.sign, relaEntity);
 			}
+		} else {
+			relaIds.add(getEntityId(node));
 		}
 		
 		return true;

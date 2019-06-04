@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
+import com.pisces.core.converter.DateDurDeserializer;
+import com.pisces.core.converter.DateDurSerializer;
 import com.pisces.core.converter.DateJsonDeserializer;
 import com.pisces.core.converter.DateJsonSerializer;
 import com.pisces.core.converter.SignFieldHandler;
@@ -58,18 +60,17 @@ public class EntityUtils {
 			initImpl(clazz);
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private static void initImpl(Class<? extends EntityObject> clazz) {
-		if (clazz == EntityObject.class) {
-			return;
-		}
 		if (!classes.containsKey(clazz.getSimpleName())) {
 			classes.put(clazz.getSimpleName(), clazz);
 			properties.put(clazz, new ConcurrentHashMap<>());
 			primaries.put(clazz, new LinkedList<>());
 		}
-		@SuppressWarnings("unchecked")
-		Class<? extends EntityObject> superClass = (Class<? extends EntityObject>) clazz.getSuperclass();
-		initImpl(superClass);
+		Class<?> superClass = clazz.getSuperclass();
+		if (superClass != Object.class) {
+			initImpl((Class<? extends EntityObject>)superClass);
+		}
 	}
 	
 	public static List<Class<? extends EntityObject>> getEntityClasses() {
@@ -83,9 +84,13 @@ public class EntityUtils {
 	public static Class<? extends EntityObject> getEntityClass(String name) {
 		Class<? extends EntityObject> clazz = classes.get(name);
 		if (clazz == null) {
-			throw new RegisteredException(name + " has not registered!");
+			throw new RegisteredException("enitty class name:" + name + " has not registered!");
 		}
 		return clazz;
+	}
+	
+	public static Class<? extends EntityObject> getSuperClass(Class<? extends EntityObject> clazz) {
+		return Primary.get().getSuperClass(clazz);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -111,6 +116,17 @@ public class EntityUtils {
 	
 	public static <T extends EntityObject> List<T> getInherit(Class<T> clazz, List<Long> ids) {
 		List<T> result = new ArrayList<>();
+		
+		return result;
+	}
+	
+	public static List<Property> getProperties() {
+		List<Property> result = new ArrayList<>();
+		for (Entry<Class<? extends EntityObject>, Map<String, Property>> entry : properties.entrySet()) {
+			for (Entry<String, Property> entryProperty : entry.getValue().entrySet()) {
+				result.add(entryProperty.getValue());
+			}
+		}
 		
 		return result;
 	}
@@ -443,6 +459,8 @@ public class EntityUtils {
         module.addDeserializer(Date.class, new DateJsonDeserializer());
         module.addSerializer(java.sql.Date.class, new SqlDateJsonSerializer());
         module.addDeserializer(java.sql.Date.class, new SqlDateJsonDeserializer());
+        module.addSerializer(DateDur.class, new DateDurSerializer());
+        module.addDeserializer(DateDur.class, new DateDurDeserializer());
         mapper.addHandler(new SignFieldHandler());
         mapper.registerModule(module);
         return mapper;

@@ -1,11 +1,16 @@
 package com.pisces.nosql.dao;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.pisces.core.dao.BaseDao;
@@ -17,7 +22,8 @@ import com.pisces.nosql.utils.RedisUtils;
 
 public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 	private Class<T> clazz;
-	private RedisTemplate<Long, T> redisTemplate;
+	private RedisTemplate<String, T> redisTemplate;
+	private BoundHashOperations<String, Long, T> operation;
 	
 	@Autowired
 	private RedisConnectionFactory factory;
@@ -29,15 +35,16 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 		DaoManager.register(this);
 	}
 	
-	private RedisTemplate<Long, T> obtain() {
-		if (redisTemplate == null) {
+	private BoundHashOperations<String, Long, T> obtain() {
+		if (operation == null) {
 			synchronized (this) {
-				if (redisTemplate == null) {
+				if (operation == null) {
 					redisTemplate = RedisUtils.obtainTemplate(this.clazz, factory);
+					operation = redisTemplate.boundHashOps("");
 				}
 			}
 		}
-		return redisTemplate;
+		return operation;
 	}
 
 	@Override
@@ -47,43 +54,57 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 
 	@Override
 	public List<T> selectAll() {
-		return null;
+		List<T> result = new ArrayList<>();
+		Map<Long, T> records = obtain().entries();
+		if (records != null) {
+			for (Entry<Long, T> entry : records.entrySet()) {
+				result.add(entry.getValue());
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
 	public T selectByPrimaryKey(Object key) {
-		return obtain().opsForValue().get(key);
+		return obtain().get(key);
 	}
 
 	@Override
 	public boolean existsWithPrimaryKey(Object key) {
-		return obtain().hasKey((Long)key);
+		return obtain().hasKey(key);
 	}
 
 	@Override
 	public int insert(T record) {
-		obtain().opsForValue().set(record.getId(), record);
+		obtain().put(record.getId(), record);
 		return 1;
 	}
 
 	@Override
 	public int insertList(Collection<T> recordList) {
-		return 0;
+		Map<Long, T> records = new HashMap<>();
+		for (T record : recordList) {
+			records.put(record.getId(), record);
+		}
+		obtain().putAll(records);
+		return recordList.size();
 	}
 
 	@Override
 	public int updateByPrimaryKey(T record) {
-		return 0;
+		obtain().put(record.getId(), record);
+		return 1;
 	}
 
 	@Override
 	public int delete(T record) {
-		return obtain().delete(record.getId()) ? 1 : 0;
+		return obtain().delete(record.getId()) != null ? 1 : 0;
 	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
-		return obtain().delete((Long)key) ? 1 : 0;
+		return obtain().delete(key) != null ? 1 : 0;
 	}
 
 	@Override

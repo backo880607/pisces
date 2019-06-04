@@ -10,15 +10,15 @@ import com.pisces.core.utils.EntityUtils;
 
 public class RedisUtils {
 	
-	public static <T> RedisTemplate<Long, T> obtainTemplate(Class<T> clazz, RedisConnectionFactory factory) {
-		RedisTemplate<Long, T> redisTemplate = new RedisTemplate<Long, T>();
+	public static <T> RedisTemplate<String, T> obtainTemplate(Class<T> clazz, RedisConnectionFactory factory) {
+		RedisTemplate<String, T> redisTemplate = new RedisTemplate<String, T>();
 		redisTemplate.setConnectionFactory(factory);
 		redisTemplate.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
-		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         // 解决查询缓存转换异常的问题
         Jackson2JsonRedisSerializer<T> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<T>(clazz);
         jackson2JsonRedisSerializer.setObjectMapper(EntityUtils.defaultObjectMapper());
-        redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
         return redisTemplate;
 	}
 }

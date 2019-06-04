@@ -31,7 +31,7 @@ public class AppUtils {
 	}
 	
 	public static String getUsername() {
-		return curUserData.get().username;
+		return curUserData.get() == null ? "system" : curUserData.get().username;
 	}
 	
 	public static String getProperty(String name) {

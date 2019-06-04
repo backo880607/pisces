@@ -27,6 +27,7 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	public MongoDao() {
 		this.clazz = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		EntityUtils.registerEntityClass(clazz);
+		
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	@Override
 	public int insert(T record) {
 		mongoTemplate.save(record);
-		return 0;
+		return 1;
 	}
 
 	@Override

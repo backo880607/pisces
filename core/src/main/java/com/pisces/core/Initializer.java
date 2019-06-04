@@ -8,7 +8,6 @@ package com.pisces.core;
 import java.util.List;
 
 import com.pisces.core.locale.LocaleManager;
-import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.Primary;
 
 public class Initializer {
@@ -75,7 +74,6 @@ public class Initializer {
 	public static void execute() {
 		try {
 			Primary.get().init();
-			ServiceManager.init();
 			LocaleManager.init();
 			//load(EntityUtil.getEntityClasses());
 		} catch (Exception e) {
