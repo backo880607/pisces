@@ -11,6 +11,11 @@ public class ValueEnum extends ValueAbstract {
 	public Type getType() {
 		return Type.EnumType;
 	}
+	
+	@Override
+	public Class<?> getReturnClass() {
+		return Enum.class;
+	}
 
 	@Override
 	public Object getValue() {

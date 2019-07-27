@@ -1,37 +1,12 @@
 package com.pisces.core.primary.expression.function;
 
-import com.pisces.core.exception.OperandException;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueDouble;
-import com.pisces.core.primary.expression.value.ValueInt;
-import com.pisces.core.primary.expression.value.ValueNull;
+import com.pisces.core.annotation.ELFunction;
+import com.pisces.core.annotation.ELParm;
 
 class MathFunction {
 	
 	static void register(FunctionManager manager) {
-		manager.registerFunction(MathFunction.class, "ABS");
-		manager.registerFunction(MathFunction.class, "SIN");
-		manager.registerFunction(MathFunction.class, "SINH");
-		manager.registerFunction(MathFunction.class, "COS");
-		manager.registerFunction(MathFunction.class, "TAN");
-		manager.registerFunction(MathFunction.class, "TANH");
-		manager.registerFunction(MathFunction.class, "ASIN");
-		manager.registerFunction(MathFunction.class, "ACOS");
-		manager.registerFunction(MathFunction.class, "ATAN");
-		manager.registerFunction(MathFunction.class, "CBRT");
-		manager.registerFunction(MathFunction.class, "CEIL");
-		manager.registerFunction(MathFunction.class, "EXP");
-		manager.registerFunction(MathFunction.class, "FLOOR");
-		manager.registerFunction(MathFunction.class, "LOG");
-		manager.registerFunction(MathFunction.class, "LOG10");
-		manager.registerFunction(MathFunction.class, "LOG1P");
-		manager.registerFunction(MathFunction.class, "POW");
-		manager.registerUserFunction(MathFunction.class, "RANDOM");
-		manager.registerFunction(MathFunction.class, "ROUND");
-		manager.registerFunction(MathFunction.class, "SIGNUM");
-		manager.registerFunction(MathFunction.class, "SQRT");
-		manager.registerFunction(MathFunction.class, "TODEGREES");
-		manager.registerFunction(MathFunction.class, "TORADIANS");
+		manager.registerUserFunction(MathFunction.class);
 	}
 	
 	/**
@@ -39,17 +14,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funAbs(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueInt(Math.abs(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.abs(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("abs is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funAbs(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.abs(value);
 	}
 	
 	/**
@@ -57,17 +25,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funSin(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.sin(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.sin(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("sin is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funSin(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.sin(value);
 	}
 	
 	/**
@@ -75,17 +36,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funSinh(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.sinh(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.sinh(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("sinh is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funSinh(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.sinh(value);
 	}
 	
 	/**
@@ -93,17 +47,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funCos(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.cos(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.cos(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("cos is not supported for " + param.getValue());
+	@ELFunction()
+	static Double funCos(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.cos(value);
 	}
 	
 	/**
@@ -111,17 +58,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funTan(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.tan(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.tan(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("tan is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funTan(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.tan(value);
 	}
 	
 	/**
@@ -129,17 +69,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funTanh(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.tanh(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.tanh(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("tanh is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funTanh(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.tanh(value);
 	}
 	
 	/**
@@ -147,17 +80,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funASin(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.asin(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.asin(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("asin is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funASin(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.asin(value);
 	}
 	
 	/**
@@ -165,17 +91,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funACos(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.acos(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.acos(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("acos is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funACos(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.acos(value);
 	}
 	
 	/**
@@ -183,17 +102,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funATan(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.atan(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.atan(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("atan is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funATan(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.atan(value);
 	}
 	
 	/**
@@ -201,17 +113,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funToDegrees(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.toDegrees(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.toDegrees(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("toDegrees is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funToDegrees(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.toDegrees(value);
 	}
 	
 	/**
@@ -219,17 +124,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funToRadians(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.toRadians(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.toRadians(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("toRadians is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funToRadians(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.toRadians(value);
 	}
 	
 	/**
@@ -237,17 +135,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funExp(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.exp(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.exp(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("exp is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funExp(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.exp(value);
 	}
 	
 	/**
@@ -255,17 +146,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funLog(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.log(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.log(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("log is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funLog(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.log(value);
 	}
 	
 	/**
@@ -273,17 +157,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funLog10(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.log10(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.log10(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("log10 is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funLog10(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.log10(value);
 	}
 	
 	/**
@@ -291,17 +168,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funLog1p(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.log1p(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.log1p(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("log1p is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funLog1p(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.log1p(value);
 	}
 	
 	/**
@@ -309,35 +179,25 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funFloor(ValueAbstract param1, ValueAbstract param2) {
-		double digits = 0;
-		if (param2.getClass() != ValueNull.class) {
-			switch (param2.getType()) {
-			case LONG:
-				digits = ((ValueInt)param2).value;
-				break;
-			case DOUBLE:
-				digits = ((ValueDouble)param2).value;
-				break;
-			default:
-				return null;
+	@ELFunction(returnBy = 1, options = 2)
+	public static Object funFloor(@ELParm(clazz = {Long.class, Double.class}) Object param, Long digits) {
+		double multiply = Math.pow(10.0, digits != null ? digits : 0.0);
+		double value = 0.0;
+		if (param.getClass() == Long.class) {
+			value = (Long)param;
+		} else if (param.getClass() == Double.class) {
+			value = (Double)param;
+		}
+		value = Math.floor(value*multiply);
+		if (digits != null) {
+			if (digits > 0) {
+				value /= digits;
+			} else if (digits < 0) {
+				value /= -digits;
 			}
 		}
-		digits = Math.pow(10.0, digits);
-		double value = 0.0;
-		switch (param1.getType()) {
-		case LONG:
-			value = ((ValueInt)param1).value;
-			break;
-		case DOUBLE:
-			value = ((ValueDouble)param1).value;
-			break;
-		default:
-			return null;
-		}
 		
-		value = Math.floor(value*digits) / digits;
-		return param2.getClass() == ValueNull.class ? new ValueInt((long)value) : new ValueDouble(value);
+		return param.getClass() == Long.class ? (long)value : value;
 	}
 	
 	/**
@@ -345,35 +205,24 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funCeil(ValueAbstract param1, ValueAbstract param2) {
-		double digits = 0;
-		if (param2.getClass() != ValueNull.class) {
-			switch (param2.getType()) {
-			case LONG:
-				digits = ((ValueInt)param2).value;
-				break;
-			case DOUBLE:
-				digits = ((ValueDouble)param2).value;
-				break;
-			default:
-				return null;
+	@ELFunction(returnBy = 1, options = 2)
+	public static Object funCeil(@ELParm(clazz = {Long.class, Double.class}) Object param, Long digits) {
+		double multiply = Math.pow(10.0, digits != null ? digits : 0.0);
+		double value = 0.0;
+		if (param.getClass() == Long.class) {
+			value = (Long)param;
+		} else if (param.getClass() == Double.class) {
+			value = (Double)param;
+		}
+		value = Math.ceil(value*multiply);
+		if (digits != null) {
+			if (digits > 0) {
+				value /= digits;
+			} else if (digits < 0) {
+				value /= -digits;
 			}
 		}
-		digits = Math.pow(10.0, digits);
-		double value = 0.0;
-		switch (param1.getType()) {
-		case LONG:
-			value = ((ValueInt)param1).value;
-			break;
-		case DOUBLE:
-			value = ((ValueDouble)param1).value;
-			break;
-		default:
-			return null;
-		}
-		
-		value = Math.ceil(value*digits) / digits;
-		return param2.getClass() == ValueNull.class ? new ValueInt((long)value) : new ValueDouble(value);
+		return param.getClass() == Long.class ? (long)value : value;
 	}
 	
 	/**
@@ -381,35 +230,24 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funRound(ValueAbstract param1, ValueAbstract param2) {
-		double digits = 0;
-		if (param2.getClass() != ValueNull.class) {
-			switch (param2.getType()) {
-			case LONG:
-				digits = ((ValueInt)param2).value;
-				break;
-			case DOUBLE:
-				digits = ((ValueDouble)param2).value;
-				break;
-			default:
-				return null;
+	@ELFunction(returnBy = 1, options = 2)
+	public static Object funRound(@ELParm(clazz = {Long.class, Double.class}) Object param, Long digits) {
+		double multiply = Math.pow(10.0, digits != null ? digits : 0.0);
+		double value = 0.0;
+		if (param.getClass() == Long.class) {
+			value = (Long)param;
+		} else if (param.getClass() == Double.class) {
+			value = (Double)param;
+		}
+		value = Math.round(value*multiply);
+		if (digits != null) {
+			if (digits > 0) {
+				value /= digits;
+			} else if (digits < 0) {
+				value /= -digits;
 			}
 		}
-		digits = Math.pow(10.0, digits);
-		double value = 0.0;
-		switch (param1.getType()) {
-		case LONG:
-			value = ((ValueInt)param1).value;
-			break;
-		case DOUBLE:
-			value = ((ValueDouble)param1).value;
-			break;
-		default:
-			return null;
-		}
-		
-		value = Math.round(value*digits) / digits;
-		return param2.getClass() == ValueNull.class ? new ValueInt((long)value) : new ValueDouble(value);
+		return param.getClass() == Long.class ? (long)value : value;
 	}
 	
 	/**
@@ -417,17 +255,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funSqrt(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.sqrt(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.sqrt(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("sqrt is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funSqrt(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.sqrt(value);
 	}
 	
 	/**
@@ -435,17 +266,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funCbrt(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.cbrt(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.cbrt(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("cbrt is not supported for " + param.getValue());
+	@ELFunction()
+	public static Double funCbrt(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.cbrt(value);
 	}
 	
 	/**
@@ -453,10 +277,12 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funPow(ValueAbstract param1, ValueAbstract param2) {
-		double value1 = (Double)param1.getValue();
-		double value2 = (Double)param2.getValue();
-		return new ValueDouble(Math.pow(value1, value2));
+	@ELFunction()
+	public static Double funPow(@ELParm(clazz = {Long.class, Double.class}) Object param1, 
+			@ELParm(clazz = {Long.class, Double.class}) Object param2) {
+		double value1 = param1.getClass() == Long.class ? (Long)param1 : (Double)param1;
+		double value2 = param2.getClass() == Long.class ? (Long)param2 : (Double)param2;
+		return Math.pow(value1, value2);
 	}
 	
 	/**
@@ -464,17 +290,10 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract funSignum(ValueAbstract param) {
-		switch (param.getType()) {
-		case LONG:
-			return new ValueDouble(Math.signum(((ValueInt)param).value));
-		case DOUBLE:
-			return new ValueDouble(Math.signum(((ValueDouble)param).value));
-		default:
-			break;
-		}
-		
-		throw new OperandException("cbrt is not supported for " + param.getValue());
+	@ELFunction()
+	static Double funSignum(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
+		return Math.signum(value);
 	}
 	
 	/**
@@ -482,7 +301,8 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	static double funRandom() {
+	@ELFunction()
+	public static Double funRandom() {
 		return Math.random();
 	}
 }

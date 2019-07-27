@@ -22,7 +22,6 @@ public class MeCalculate implements Calculate {
 				String name = str.substring(temp, index);
 				clazz = EntityUtils.getEntityClass(name);
 				if (clazz == null) {
-					//ApplicationUtil.log.error(str + " 未定义该类名：" + name);
 					return -1;
 				}
 				return index;

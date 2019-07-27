@@ -28,16 +28,17 @@ public class ValueDateTime extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return Date.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return this.value;
 	}
 
 	@Override
 	public ValueAbstract add(ValueAbstract rhs) {
-		if (this.value == null) {
-			return new ValueInt(0);
-		}
-		
 		switch (rhs.getType()) {
 		case LONG:
 			return this.addImpl((ValueInt)rhs);
@@ -66,10 +67,6 @@ public class ValueDateTime extends ValueAbstract {
 
 	@Override
 	public ValueAbstract sub(ValueAbstract rhs) {
-		if (this.value == null) {
-			return new ValueInt(0);
-		}
-		
 		switch (rhs.getType()) {
 		case LONG:
 			return this.subImpl((ValueInt)rhs);
@@ -118,7 +115,7 @@ public class ValueDateTime extends ValueAbstract {
 			return new ValueBoolean(this.value.getTime() > temp.getTime());
 		} catch (ParseException e) {
 		}
-		return null;
+		return new ValueBoolean(true);
 	}
 
 	@Override
@@ -143,7 +140,7 @@ public class ValueDateTime extends ValueAbstract {
 			return new ValueBoolean(this.value.getTime() >= temp.getTime());
 		} catch (ParseException e) {
 		}
-		return null;
+		return new ValueBoolean(true);
 	}
 
 	@Override
@@ -168,7 +165,7 @@ public class ValueDateTime extends ValueAbstract {
 			return new ValueBoolean(this.value.getTime() < temp.getTime());
 		} catch (ParseException e) {
 		}
-		return null;
+		return new ValueBoolean(false);
 	}
 
 	@Override
@@ -193,7 +190,7 @@ public class ValueDateTime extends ValueAbstract {
 			return new ValueBoolean(this.value.getTime() <= temp.getTime());
 		} catch (ParseException e) {
 		}
-		return null;
+		return new ValueBoolean(false);
 	}
 
 	@Override
@@ -218,7 +215,7 @@ public class ValueDateTime extends ValueAbstract {
 			return new ValueBoolean(this.value.getTime() == temp.getTime());
 		} catch (ParseException e) {
 		}
-		return null;
+		return new ValueBoolean(false);
 	}
 
 	@Override
@@ -243,7 +240,7 @@ public class ValueDateTime extends ValueAbstract {
 			return new ValueBoolean(this.value.getTime() != temp.getTime());
 		} catch (ParseException e) {
 		}
-		return null;
+		return new ValueBoolean(true);
 	}
 
 	@Override

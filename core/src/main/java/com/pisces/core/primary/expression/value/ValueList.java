@@ -17,6 +17,11 @@ public class ValueList extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return RefBase.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return this.value;
 	}

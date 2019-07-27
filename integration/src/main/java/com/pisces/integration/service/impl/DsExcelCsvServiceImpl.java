@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.util.Collection;
 
 import org.springframework.stereotype.Service;
 
 import com.opencsv.CSVReader;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsExcelCsv;
+import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.dao.DsExcelCsvDao;
 import com.pisces.integration.service.DsExcelCsvService;
 
@@ -73,6 +75,18 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 		}
 		this.reader = null;
 	}
+	
+	@Override
+	public boolean checkTableStructure(DataSource dataSource, String tableName, Collection<FieldInfo> fields)
+			throws Exception {
+		return false;
+	}
+	
+	@Override
+	public boolean executeQuery(DataSource dataSource, String tableName, Collection<FieldInfo> fields)
+			throws Exception {
+		return false;
+	}
 
 	@Override
 	public boolean step() throws Exception {
@@ -94,5 +108,4 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 	public void write(Field field, String data) throws Exception {
 		
 	}
-
 }

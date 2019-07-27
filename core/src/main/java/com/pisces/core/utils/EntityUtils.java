@@ -148,7 +148,7 @@ public class EntityUtils {
 			return;
 		}
 		
-		for (Entry<String, Property> entry : properties.get(clazz).entrySet()) {
+		for (Entry<String, Property> entry : temp.entrySet()) {
 			result.add(entry.getValue());
 		}
 	}

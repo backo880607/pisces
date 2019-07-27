@@ -30,7 +30,7 @@ class FactoryHelp {
 	
 	private static void initRelationData(Class<? extends EntityObject> clazz) {
 		EntityFactory factory = FactoryManager.getFactory(clazz);
-		if (factory.maxSign > 0) {	// 已经初始化过
+		if (factory.relations != null) {	// 已经初始化过
 			return;
 		}
 		// 先初始化父类
@@ -42,7 +42,7 @@ class FactoryHelp {
 		// 父类全初始化完毕后，初始化本类
 		factory.maxSign = superFactory != null ? superFactory.maxSign : 0;
 		List<RelationData> datas = new ArrayList<>();
-		Field[] fields = clazz.getFields();
+		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			if (!Modifier.isStatic(field.getModifiers())) {
 				continue;

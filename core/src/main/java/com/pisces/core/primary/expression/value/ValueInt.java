@@ -13,6 +13,11 @@ public class ValueInt extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return Long.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return (Long)this.value;
 	}

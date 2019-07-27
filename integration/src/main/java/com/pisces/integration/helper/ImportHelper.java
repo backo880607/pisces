@@ -17,27 +17,31 @@ public class ImportHelper extends IOHelper {
 	public void execute(Collection<Scheme> schemes) {
 		for (Scheme scheme : schemes) {
 			if (scheme.getDataSource() == null) {
-				throw new ExistedException("Scheme " + scheme.getName() + " datasource is empty!");
+				throw new ExistedException("missing datasource configuration in Scheme " + scheme.getName());
 			}
 			try {
 				switchDataSourceService(scheme.getDataSource());
-				if (!dataSourceService.validConnection(scheme.getDataSource(), scheme.getInName())) {
+				if (!dataSourceService.validConnection(scheme.getDataSource(), scheme.getOutName())) {
 					throw new DataSourceException("datasource " + scheme.getDataSource().getName() + " connection failed!");
 				}
-			} catch (Exception e) {
-				dataSourceService.close();
+				
+				//dataSourceService.checkTableStructure(scheme.getDataSource(), tableName, fields)
+				checkPrimaryKey(scheme);
+				checkProperties(scheme);
+			} catch (Exception ex) {
+				if (dataSourceService != null) {
+					dataSourceService.close();
+				}
 			}
-
-			checkPrimaryKey(scheme);
 		}
 		
 		for (Scheme scheme : schemes) {
 			try {
 				switchDataSourceService(scheme.getDataSource());
 				dataSourceService.open(scheme.getDataSource(), scheme.getOutName());
-				@SuppressWarnings("unchecked")
-				Class<? extends EntityObject> clazz = (Class<? extends EntityObject>) Class.forName(scheme.getInName());
+				Class<? extends EntityObject> clazz = EntityUtils.getEntityClass(scheme.getInName());
 				Collection<FieldInfo> fields = scheme.getFields();
+				dataSourceService.executeQuery(scheme.getDataSource(), scheme.getOutName(), fields);
 				while (dataSourceService.step()) {
 					EntityObject entity = createEntity(clazz);
 					if (entity == null) {
@@ -54,7 +58,9 @@ public class ImportHelper extends IOHelper {
 					}
 				}
 			} catch (Exception e) {
-				dataSourceService.close();
+				if (dataSourceService != null) {
+					dataSourceService.close();
+				}
 			}
 		}
 	}

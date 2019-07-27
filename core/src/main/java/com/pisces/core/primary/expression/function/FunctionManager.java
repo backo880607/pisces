@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import javax.validation.ValidationException;
+
 import com.pisces.core.annotation.ELFunction;
+import com.pisces.core.annotation.ELParm;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.OperType;
 import com.pisces.core.primary.expression.exception.FunctionException;
-import com.pisces.core.primary.expression.value.Type;
 import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueNull;
 import com.pisces.core.service.EntityService;
 
 public class FunctionManager {
@@ -24,8 +25,7 @@ public class FunctionManager {
 		public Method method;
 		public int returnBy = 0;
 		public int optionals = 0;
-		Map<Integer, Set<Class<?>>> paramClazzs = new HashMap<>();
-		public Map<Integer, Boolean> nullables = new HashMap<>();
+		Map<Integer, Class<?>[]> paramClazzs = new HashMap<>();
 	}
 	
 	public static class InnerData extends Data {
@@ -123,13 +123,20 @@ public class FunctionManager {
 	public void check(Data fun, List<Class<?>> argumentClazzs) {
 		Class<?>[] parameterClazzs =  fun.method.getParameterTypes();
 		if (argumentClazzs.size() > parameterClazzs.length) {
-			throw new FunctionException("Invalid parameter type: ");
+			throw new FunctionException("Too many parameters: ");
 		}
 		int index = 0;
 		for (Class<?> argClazz : argumentClazzs) {
-			Set<Class<?>> specifyClses = fun.paramClazzs.get(index);
+			Class<?>[] specifyClses = fun.paramClazzs.get(index);
 			if (specifyClses != null) {
-				if (!specifyClses.contains(argClazz)) {
+				boolean bMatch = false;
+				for (Class<?> specifyCls : specifyClses) {
+					if (specifyCls == argClazz) {
+						bMatch = true;
+						break;
+					}
+				}
+				if (!bMatch) {
 					throw new FunctionException("Invalid parameter type: " + argClazz.getName());
 				}
 			} else if (parameterClazzs[index] != argClazz) {
@@ -142,12 +149,12 @@ public class FunctionManager {
 		}
 	}
 	
-	public void registerFunction(Class<?> cls, String name) {
+	/*public void registerFunction(Class<?> cls, String name) {
 		for (Method method : cls.getMethods()) {
 			if (Modifier.isStatic(method.getModifiers()) && method.getName().equals(name)) {
 				InnerData data = new InnerData();
 				data.method = method;
-				Class<?>[] paramClses =  method.getParameterTypes();
+				Class<?>[] paramClses = method.getParameterTypes();
 				if (paramClses.length == 1 && paramClses[0] == List.class) {
 				}
 				ELFunction funAnno = method.getAnnotation(ELFunction.class);
@@ -167,10 +174,41 @@ public class FunctionManager {
 				break;
 			}
 		}
-	}
+	}*/
 	
-	public void registerUserFunction(Class<?> clazz, String name) {
-		
+	public void registerUserFunction(Class<?> clazz) {
+		for (Method method : clazz.getMethods()) {
+			ELFunction funAnno = method.getAnnotation(ELFunction.class);
+			if (funAnno == null) {
+				continue;
+			}
+			
+			if (!Modifier.isStatic(method.getModifiers())) {
+				// 自定义函数表达式必须为静态类型
+				continue;
+			}
+			
+			InnerData data = new InnerData();
+			data.method = method;
+			data.returnBy = funAnno.returnBy();
+			data.optionals = funAnno.options();
+			
+			Annotation[][] paramAnnoes = method.getParameterAnnotations();
+			for (int i = 0; i < paramAnnoes.length; ++i) {
+				if (paramAnnoes[i] == null || paramAnnoes[i].length == 0 || paramAnnoes[i][0].annotationType() != ELParm.class) {
+					continue;
+				}
+				
+				ELParm paramAnno = (ELParm)paramAnnoes[i][0];
+				data.paramClazzs.put(i, paramAnno.clazz());
+			}
+			
+			String methodName = method.getName().toUpperCase();
+			if (methodName.startsWith("FUN")) {
+				methodName = methodName.substring(3);
+			}
+			functions.put(methodName, data);
+		}
 	}
 	
 	public ValueAbstract invoke(Data fun, List<ValueAbstract> params, Class<?> returnClass) {
@@ -191,14 +229,14 @@ public class FunctionManager {
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			}
 		}
-		return ValueNull.get(returnClass);
+		throw new ValidationException();
 	}
 	
 	private ValueAbstract invokeInner(InnerData fun, List<ValueAbstract> params) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Object value = null;
 		if (fun.optionals > 0) {
 			for (int i = params.size() + 1; i <= fun.paramClazzs.size(); ++i) {
-				params.add(new ValueNull(Type.None));
+				params.add(null);
 			}
 		}
 		switch (params.size()) {

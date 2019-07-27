@@ -14,7 +14,6 @@ import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueBoolean;
 import com.pisces.core.primary.expression.value.ValueList;
 import com.pisces.core.primary.expression.value.ValueListAbstract;
-import com.pisces.core.primary.expression.value.ValueNull;
 import com.pisces.core.primary.expression.value.ValueObject;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.RefList;
@@ -34,13 +33,10 @@ public class FunctionCalculate implements Calculate {
 			return FunctionManager.instance.invoke(data, params, returnClass);
 		}
 		
-		int index = 1;
+		//int index = 1;
 		Iterator<Expression> iter = paramExps.iterator();
 		Expression exp = iter.next();
 		ValueAbstract paramValue = exp.getValueAbstract(entity);
-		if (paramValue.getClass() == ValueNull.class && !data.nullables.get(index)) {
-			return ValueNull.get(returnClass);
-		}
 		if (this.isLastChain) {
 			return funLastChain(paramValue, paramExps.get(1));
 		} else if (this.isIF) {
@@ -56,52 +52,36 @@ public class FunctionCalculate implements Calculate {
 		params.add(paramValue);
 		if (EntityObject.class.isAssignableFrom(paramValue.getClass())) {
 			while (iter.hasNext()) {
-				++index;
+				//++index;
 				exp = iter.next();
-				paramValue = exp.getValueAbstract(entity);
-				if (paramValue.getClass() == ValueNull.class && !data.nullables.get(index)) {
-					return ValueNull.get(returnClass);
-				}
-				params.add(paramValue);
+				params.add(exp.getValueAbstract(entity));
 			}
 		} else if (RefBase.class.isAssignableFrom(paramValue.getClass())) {
 			@SuppressWarnings("unchecked")
 			Collection<EntityObject> objects = (Collection<EntityObject>)paramValue;
 			while (iter.hasNext()) {
-				++index;
+				//++index;
 				exp = iter.next();
 				if (!exp.hasField) {
-					paramValue = exp.getValueAbstract(null);
-					if (paramValue.getClass() == ValueNull.class && !data.nullables.get(index)) {
-						return ValueNull.get(returnClass);
-					}
-					params.add(paramValue);
+					params.add(exp.getValueAbstract(null));
 					continue;
 				}
 				ValueListAbstract abstracts = new ValueListAbstract();
 				for (EntityObject temp : objects) {
-					paramValue = exp.getValueAbstract(temp);
-					abstracts.value.put(temp.getId(), paramValue);
+					abstracts.value.put(temp.getId(), exp.getValueAbstract(temp));
 				}
 				
 				params.add(abstracts);
 			}
 		} else {
 			while (iter.hasNext()) {
-				++index;
+				//++index;
 				exp = iter.next();
-				paramValue = exp.getValueAbstract(entity);
-				if (paramValue.getClass() == ValueNull.class && !data.nullables.get(index)) {
-					return ValueNull.get(returnClass);
-				}
-				params.add(paramValue);
+				params.add(exp.getValueAbstract(entity));
 			}
 		}
 		
 		ValueAbstract result = FunctionManager.instance.invoke(data, params, returnClass);
-		if (result.getClass() == ValueNull.class) {
-			return ValueNull.get(returnClass);
-		}
 		if (this.fieldCalc != null && EntityObject.class.isAssignableFrom(result.getClass())) {
 			return this.fieldCalc.GetValue(((ValueObject)result).value);
 		}
@@ -121,9 +101,6 @@ public class FunctionCalculate implements Calculate {
 		
 		String name = str.substring(temp, index);
 		this.data = FunctionManager.instance.getFunction(name);
-		if (this.data == null) {
-			return -1;
-		}
 		this.isLastChain = name.equalsIgnoreCase("LastChain");
 		this.isIF = name.equalsIgnoreCase("if");
 		
@@ -163,6 +140,13 @@ public class FunctionCalculate implements Calculate {
 				++temp;
 			}
 		}
+		
+		// 检查函数是否有效
+		List<Class<?>> paramClazzs = new ArrayList<Class<?>>();
+		for (Expression exp : paramExps) {
+			paramClazzs.add(exp.getReturnClass());
+		}
+		FunctionManager.instance.check(data, paramClazzs);
 		return index;
 	}
 

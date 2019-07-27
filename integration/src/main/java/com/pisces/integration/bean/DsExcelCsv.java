@@ -1,5 +1,8 @@
 package com.pisces.integration.bean;
 
+import javax.persistence.Table;
+
+@Table(name = "integration_ds_excel_csv")
 public class DsExcelCsv extends DataSource {
 	private String path;
 

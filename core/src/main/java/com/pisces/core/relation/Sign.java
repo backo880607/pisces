@@ -50,4 +50,9 @@ public class Sign implements Comparable<Sign> {
 	public int compareTo(Sign o) {
 		return Integer.compare(this.value, o.value);
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 }

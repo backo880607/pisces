@@ -1,18 +1,18 @@
 package com.pisces.core.primary.expression.function;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import com.pisces.core.annotation.ELFunction;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.value.Type;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueBoolean;
 import com.pisces.core.primary.expression.value.ValueList;
 import com.pisces.core.primary.expression.value.ValueListAbstract;
-import com.pisces.core.primary.expression.value.ValueNull;
 import com.pisces.core.primary.expression.value.ValueObject;
 import com.pisces.core.primary.expression.value.ValueText;
 import com.pisces.core.relation.RefBase;
@@ -20,48 +20,26 @@ import com.pisces.core.relation.RefList;
 
 class ObjectFunction {
 	static void register(FunctionManager manager) {
-		manager.registerFunction(ObjectFunction.class, "GET");
-		manager.registerFunction(ObjectFunction.class, "GETLIST");
-		manager.registerFunction(ObjectFunction.class, "GETSORTEDLIST");
-		manager.registerFunction(ObjectFunction.class, "GETMAX");
-		manager.registerFunction(ObjectFunction.class, "GETMIN");
-		manager.registerFunction(ObjectFunction.class, "FIRST");
-		manager.registerFunction(ObjectFunction.class, "LAST");
-		manager.registerFunction(ObjectFunction.class, "JOIN");
-		manager.registerFunction(ObjectFunction.class, "ISTYPE");
-		manager.registerFunction(ObjectFunction.class, "ASTYPE");
-		manager.registerFunction(ObjectFunction.class, "LASTLIST");
-		manager.registerFunction(ObjectFunction.class, "ANY");
-		manager.registerFunction(ObjectFunction.class, "ALL");
+		manager.registerUserFunction(ObjectFunction.class);
 	}
 	
-	static ValueAbstract funGet(ValueAbstract param1, ValueAbstract param2) {
-		RefBase entities = ((ValueList)param1).value;
-		if (param2.getClass() == ValueNull.class) {
-			return new ValueObject(entities.get());
-		}
-		
-		ValueListAbstract filter = (ValueListAbstract)param2;
+	@ELFunction
+	public static EntityObject funGet(RefBase entities, Map<Long, ValueAbstract> filter) {
 		for (EntityObject entity : entities) {
-			ValueAbstract subFilter = filter.value.get(entity.getId());
+			ValueAbstract subFilter = filter.get(entity.getId());
 			if (subFilter.getType() != Type.BOOLEAN) {
 				continue;
 			}
 			
 			if (((ValueBoolean)subFilter).value) {
-				return new ValueObject(entity);
+				return entity;
 			}
 		}
 		return null;
 	}
 	
 	static ValueAbstract funGetList(ValueAbstract param1, ValueAbstract param2) {
-		if (param2.getClass() == ValueNull.class) {
-			return param1;
-		}
-		
 		RefBase entities = ((ValueList)param1).value;
-		
 		ValueList result = new ValueList(new RefList());
 		ValueListAbstract filter = (ValueListAbstract)param2;
 		for (EntityObject entity : entities) {
@@ -80,7 +58,7 @@ class ObjectFunction {
 	static ValueAbstract funGetSortedList(ValueAbstract param1, ValueAbstract param2, ValueAbstract param3) {
 		RefBase entities = ((ValueList)param1).value;
 		
-		if (param3.getClass() != ValueNull.class) {
+		if (param3 != null) {
 			ValueListAbstract filter = (ValueListAbstract)param3;
 			Iterator<EntityObject> iter = entities.iterator();
 			while (iter.hasNext()) {
@@ -134,7 +112,7 @@ class ObjectFunction {
 	static ValueAbstract funJoin(ValueAbstract param1, ValueAbstract param2, ValueAbstract param3, ValueAbstract param4) {
 		RefBase entities = ((ValueList)param1).value;
 		List<EntityObject> result = new ArrayList<>();
-		if (param4.getClass() != ValueNull.class) {
+		if (param4 != null) {
 			ValueListAbstract filter = (ValueListAbstract)param4;
 			for (EntityObject entity : entities) {
 				ValueAbstract subFilter = filter.value.get(entity.getId());
@@ -156,10 +134,6 @@ class ObjectFunction {
 		ValueText split = (ValueText)param3;
 		for (EntityObject entity : result) {
 			ValueAbstract subValue = attr.value.get(entity.getId());
-			if (subValue.getClass() == ValueNull.class) {
-				continue;
-			}
-			
 			ValueText text = subValue.toText();
 			if (text != null && !text.value.isEmpty()) {
 				if (!bFirst) {
@@ -197,7 +171,7 @@ class ObjectFunction {
 		RefBase entities = ((ValueList)param1).value;
 		
 		ValueListAbstract condition = (ValueListAbstract)param2;
-		if (param3.getClass() != ValueNull.class) {
+		if (param3 != null) {
 			ValueListAbstract filter = (ValueListAbstract)param3;
 			Iterator<EntityObject> iter = entities.iterator();
 			while (iter.hasNext()) {
@@ -224,7 +198,7 @@ class ObjectFunction {
 	static ValueAbstract funAll(ValueAbstract param1, ValueAbstract param2, ValueAbstract param3) {
 		RefBase entities = ((ValueList)param1).value;
 		ValueListAbstract condition = (ValueListAbstract)param2;
-		if (param3.getClass() != ValueNull.class) {
+		if (param3 != null) {
 			ValueListAbstract filter = (ValueListAbstract)param3;
 			Iterator<EntityObject> iter = entities.iterator();
 			while (iter.hasNext()) {

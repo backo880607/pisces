@@ -6,9 +6,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 
 import com.pisces.core.dao.BaseDao;
 import com.pisces.integration.bean.DataSource;
+import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.SqlDataSource;
 import com.pisces.integration.service.SqlDataSourceService;
 
@@ -43,10 +45,7 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 		SqlDataSource ds = (SqlDataSource)dataSource;
 		Class.forName(getDriverName());
 		this.conn = DriverManager.getConnection(getConnection(ds), ds.getUsername(), ds.getPassword());
-		this.stmt = this.conn.createStatement();
-		
-		this.resultSet = this.stmt.executeQuery("");
-		return !this.resultSet.isClosed();
+		return !this.conn.isClosed();
 	}
 
 	@Override
@@ -57,6 +56,27 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 			this.conn.close();
 		} catch (SQLException e) {
 		}
+	}
+	
+	@Override
+	public boolean checkTableStructure(DataSource dataSource, String tableName, Collection<FieldInfo> fields) throws Exception {
+		return true;
+	}
+	
+	@Override
+	public boolean executeQuery(DataSource dataSource, String tableName, Collection<FieldInfo> fields) throws Exception {
+		if (this.conn == null || fields.isEmpty()) {
+			return false;
+		}
+		StringBuilder builder = new StringBuilder("SELECT ");
+		for (FieldInfo field : fields) {
+			builder.append(field.getExternName()).append(",");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		builder.append(" FROM ").append(tableName);
+		this.stmt = this.conn.createStatement();
+		this.resultSet = this.stmt.executeQuery(builder.toString());
+		return !this.resultSet.isClosed();
 	}
 
 	@Override

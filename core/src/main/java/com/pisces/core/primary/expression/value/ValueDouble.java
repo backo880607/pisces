@@ -14,6 +14,11 @@ public class ValueDouble extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return Double.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return (Double)this.value;
 	}
@@ -49,7 +54,7 @@ public class ValueDouble extends ValueAbstract {
 		default:
 				break;
 		}
-		return null;
+		return super.sub(rhs);
 	}
 	private ValueAbstract subImpl(ValueInt rhs) {
 		this.value -= rhs.value;

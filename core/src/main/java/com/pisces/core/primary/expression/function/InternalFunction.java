@@ -1,34 +1,20 @@
 package com.pisces.core.primary.expression.function;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import com.pisces.core.annotation.ELFunction;
+import com.pisces.core.annotation.ELParm;
 import com.pisces.core.exception.OperandException;
 import com.pisces.core.primary.expression.value.*;
 import com.pisces.core.relation.RefBase;
 
+import ch.qos.logback.core.util.Duration;
+
 class InternalFunction {
 	static void register(FunctionManager manager) {
-		manager.registerFunction(InternalFunction.class, "toStr");
-		manager.registerFunction(InternalFunction.class, "toInt");
-		manager.registerFunction(InternalFunction.class, "toDouble");
-		manager.registerFunction(InternalFunction.class, "include");
-		manager.registerFunction(InternalFunction.class, "startsWith");
-		manager.registerFunction(InternalFunction.class, "endsWith");
-		manager.registerFunction(InternalFunction.class, "isInt");
-		manager.registerFunction(InternalFunction.class, "isDouble");
-		manager.registerFunction(InternalFunction.class, "isDigit");
-		manager.registerFunction(InternalFunction.class, "isBool");
-		manager.registerFunction(InternalFunction.class, "isDateTime");
-		manager.registerFunction(InternalFunction.class, "isStr");
-		manager.registerFunction(InternalFunction.class, "isEmpty");
-		manager.registerFunction(InternalFunction.class, "max");
-		manager.registerFunction(InternalFunction.class, "min");
-		manager.registerFunction(InternalFunction.class, "count");
-		manager.registerFunction(InternalFunction.class, "average");
-		manager.registerFunction(InternalFunction.class, "sum");
-		manager.registerFunction(InternalFunction.class, "guard");
+		manager.registerUserFunction(InternalFunction.class);
 	}
 
 	/**
@@ -148,7 +134,7 @@ class InternalFunction {
 			throw new OperandException(params.get(0) + " || " + params.get(1) + " is not supported!");
 		}
 		
-		boolean result = ((ValueBoolean)param1).value && ((ValueBoolean)param2).value;
+		boolean result = ((ValueBoolean)param1).value || ((ValueBoolean)param2).value;
 		return new ValueBoolean(result);
 	}
 	
@@ -169,8 +155,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract toStr(ValueAbstract param) {
-		return param.toText();
+	@ELFunction
+	public static String toStr(Object param) {
+		return ValueHelp.get(param).toText().value;
 	}
 	
 	/**
@@ -178,8 +165,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract toInt(ValueAbstract param) {
-		return param.toInt();
+	@ELFunction
+	public static Long toInt(@ELParm(clazz = {Boolean.class, Date.class, Double.class, Duration.class, Enum.class, Long.class, String.class}) Object param) {
+		return ValueHelp.get(param).toInt().value;
 	}
 	
 	/**
@@ -187,8 +175,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract toDouble(ValueAbstract param) {
-		return param.toDouble();
+	@ELFunction
+	public static Double toDouble(@ELParm(clazz = {Boolean.class, Date.class, Double.class, Duration.class, Enum.class, Long.class, String.class}) Object param) {
+		return ValueHelp.get(param).toDouble().value;
 	}
 	
 	/**
@@ -196,7 +185,8 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static boolean include(String param1, String param2) {
+	@ELFunction
+	public static Boolean include(String param1, String param2) {
 		return param1.indexOf(param2) >= 0;
 	}
 	
@@ -205,7 +195,8 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static boolean startsWith(String param1, String param2) {
+	@ELFunction
+	public static Boolean startsWith(String param1, String param2) {
 		return param1.startsWith(param2);
 	}
 	
@@ -214,7 +205,8 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static boolean endsWith(String param1, String param2) {
+	@ELFunction
+	public static Boolean endsWith(String param1, String param2) {
 		return param1.endsWith(param2);
 	}
 	
@@ -223,8 +215,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract isInt(ValueAbstract param) {
-		return new ValueBoolean(param.getType() == Type.LONG);
+	@ELFunction
+	public static Boolean isInt(Object param) {
+		return param.getClass() == Long.class;
 	}
 	
 	/**
@@ -232,8 +225,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract isDouble(ValueAbstract param) {
-		return new ValueBoolean(param.getType() == Type.DOUBLE);
+	@ELFunction
+	public static Boolean isDouble(Object param) {
+		return param.getClass() == Double.class;
 	}
 	
 	/**
@@ -241,8 +235,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract isDigit(ValueAbstract param) {
-		return new ValueBoolean(param.getType() == Type.LONG || param.getType() == Type.DOUBLE);
+	@ELFunction
+	public static Boolean isDigit(Object param) {
+		return param.getClass() == Long.class || param.getClass() == Double.class;
 	}
 	
 	/**
@@ -250,8 +245,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract isDateTime(ValueAbstract param) {
-		return new ValueBoolean(param.getType() == Type.DATETIME);
+	@ELFunction
+	public static Boolean isDateTime(Object param) {
+		return param.getClass() == Date.class;
 	}
 	
 	/**
@@ -259,8 +255,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract isBool(ValueAbstract param) {
-		return new ValueBoolean(param.getType() == Type.BOOLEAN);
+	@ELFunction
+	public static Boolean isBool(Object param) {
+		return param.getClass() == Boolean.class;
 	}
 	
 	/**
@@ -268,8 +265,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract isStr(ValueAbstract param) {
-		return new ValueBoolean(param.getType() == Type.TEXT);
+	@ELFunction
+	public static Boolean isStr(Object param) {
+		return param.getClass() == String.class;
 	}
 	
 	/**
@@ -277,8 +275,9 @@ class InternalFunction {
 	 * @param params
 	 * @return
 	 */
-	static ValueAbstract isEmpty(ValueAbstract param) {
-		return new ValueBoolean(param.getType() == Type.EnumType);
+	@ELFunction
+	public static Boolean isEmpty(String value) {
+		return value.isEmpty();
 	}
 	
 	/**
@@ -294,10 +293,6 @@ class InternalFunction {
 			return ((ValueListAbstract)params.get(1)).value.get(entities.last().getId());
 		} else {
 			for (ValueAbstract context : params) {
-				if (context.getClass() == ValueNull.class) {
-					continue;
-				}
-				
 				if (result == null) {
 					result = context;
 				} else {
@@ -324,10 +319,6 @@ class InternalFunction {
 			return ((ValueListAbstract)params.get(1)).value.get(entities.first().getId());
 		} else {
 			for (ValueAbstract context : params) {
-				if (context.getClass() == ValueNull.class) {
-					continue;
-				}
-				
 				if (result == null) {
 					result = context;
 				} else {
@@ -348,13 +339,12 @@ class InternalFunction {
 	 */
 	static ValueAbstract count(ValueAbstract param1, ValueAbstract param2) {
 		int count = 0;
-		if (param2.getClass() == ValueNull.class) {
+		if (param2 == null) {
 			count = ((ValueList)param1).value.size();
 		} else {
 			Collection<ValueAbstract> values = ((ValueListAbstract)param2).value.values();
 			for (ValueAbstract context : values) {
-				if (context.getClass() != ValueNull.class && context.getType() == Type.BOOLEAN &&
-						((ValueBoolean)context).value) {
+				if (context.getType() == Type.BOOLEAN && ((ValueBoolean)context).value) {
 					++count;
 				}
 			}
@@ -381,9 +371,6 @@ class InternalFunction {
 		ValueAbstract result = null;
 		final int count = values.size();
 		for (ValueAbstract context : values) {
-			if (context.getClass() == ValueNull.class) {
-				continue;
-			}
 			if (result == null) {
 				result = context;
 			} else {
@@ -410,9 +397,6 @@ class InternalFunction {
 		}
 		ValueAbstract result = null;
 		for (ValueAbstract context : values) {
-			if (context.getClass() == ValueNull.class) {
-				continue;
-			}
 			if (result == null) {
 				result = context;
 			} else {
@@ -429,7 +413,7 @@ class InternalFunction {
 	 * @return
 	 */
 	static ValueAbstract guard(ValueAbstract param1, ValueAbstract param2) {
-		if (param1.getClass() == ValueNull.class) {
+		if (param1 == null) {
 			return param2;
 		} else if (param1.getType() == Type.TEXT && ((ValueText)param1).value.isEmpty()) {
 			return param2;

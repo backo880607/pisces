@@ -23,7 +23,7 @@ import com.pisces.core.primary.expression.exception.FunctionException;
 import com.pisces.core.primary.expression.value.Type;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueBoolean;
-import com.pisces.core.primary.expression.value.ValueNull;
+import com.pisces.core.primary.expression.value.ValueHelp;
 import com.pisces.core.primary.expression.value.ValueText;
 import com.pisces.core.utils.IExpression;
 
@@ -47,7 +47,7 @@ public class Expression implements IExpression {
 		}
 		
 		this.root = entry.getValue();
-		return this.root != null;
+		return getReturnClass() != null;
 	}
 	
 	/**
@@ -132,25 +132,44 @@ public class Expression implements IExpression {
 		
 		List<ValueAbstract> params = new ArrayList<>();
 		if (node.lchild != null) {
-			ValueAbstract param1 = this.getValue(node.lchild, entity);
-			if (param1.getClass() == ValueNull.class) {
-				return param1;
-			}
-			params.add(param1);
+			params.add(this.getValue(node.lchild, entity));
 		}
 		if (node.rchild != null) {
-			ValueAbstract param2 = this.getValue(node.rchild, entity);
-			if (param2.getClass() == ValueNull.class) {
-				return param2;
-			}
-			params.add(param2);
+			params.add(this.getValue(node.rchild, entity));
 		}
 		
 		return node.<OperTypeCalculate>getCalculate().GetValue(params, entity);
 	}
 	
 	public Class<?> getReturnClass() {
-		return root != null ? root.calculate.getReturnClass() : null;
+		if (root == null) {
+			return null;
+		}
+		return getReturnClassImpl(root);
+	}
+	
+	private Class<?> getReturnClassImpl(ExpressionNode node) {
+		if (node.type == OperType.DATA) {
+			return node.calculate.getReturnClass();
+		}
+		
+		List<ValueAbstract> params = new ArrayList<>();
+		if (node.lchild != null) {
+			Class<?> param1 = this.getReturnClassImpl(node.lchild);
+			if (param1 == null) {
+				return null;
+			}
+			params.add(ValueHelp.get(param1));
+		}
+		if (node.rchild != null) {
+			Class<?> param2 = this.getReturnClassImpl(node.rchild);
+			if (param2 == null) {
+				return null;
+			}
+			params.add(ValueHelp.get(param2));
+		}
+		
+		return node.<OperTypeCalculate>getCalculate().GetValue(params, null).getReturnClass();
 	}
 	
 	public Entry<Integer, ExpressionNode> Create(String str, int index, boolean bFun) {

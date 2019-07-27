@@ -2,6 +2,7 @@ package com.pisces.user.bean;
 
 import java.util.Collection;
 
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ import com.pisces.core.relation.RelationKind;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
 
+@Table(name = "user_account")
 @PrimaryKey(fields={"username"})
 public class Account extends EntityObject {
 	private String username;
@@ -39,7 +41,7 @@ public class Account extends EntityObject {
     
     @Relation(clazz = "Tenant", sign = "user", type = Type.MultiToMulti)
     @PropertyMeta(kind = RelationKind.Sequence)
-    public static final Sign tenant = sign();
+    public static final Sign tenants = sign();
     
     @Relation(clazz = "Role", type=Type.MultiToMulti)
     @PropertyMeta(kind = RelationKind.Set)
@@ -129,7 +131,7 @@ public class Account extends EntityObject {
 	}
 	
 	public Collection<Tenant> getTenants() {
-		return getEntities(tenant);
+		return getEntities(tenants);
 	}
 
 	public EffectTaskType getType() {

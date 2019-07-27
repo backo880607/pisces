@@ -10,7 +10,9 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.PropertyType;
 import com.pisces.core.exception.ExpressionException;
+import com.pisces.core.primary.expression.exception.EntityAccessException;
 import com.pisces.core.primary.expression.exception.ValueException;
+import com.pisces.core.primary.expression.value.InvalidEnum;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueBoolean;
 import com.pisces.core.primary.expression.value.ValueDateTime;
@@ -19,7 +21,6 @@ import com.pisces.core.primary.expression.value.ValueDuration;
 import com.pisces.core.primary.expression.value.ValueEnum;
 import com.pisces.core.primary.expression.value.ValueInt;
 import com.pisces.core.primary.expression.value.ValueList;
-import com.pisces.core.primary.expression.value.ValueNull;
 import com.pisces.core.primary.expression.value.ValueObject;
 import com.pisces.core.primary.expression.value.ValueText;
 import com.pisces.core.relation.RefBase;
@@ -32,45 +33,67 @@ public class FieldCalculate implements Calculate {
 	private boolean isList = false;
 	
 	private Object getValueImpl(EntityObject entity) {
+		Object value = null;
 		try {
-			Object val = entity != null ? this.property.getInherent() ? this.property.getMethod.invoke(entity) :
-				this.property.getMethod.invoke(entity, this.property.getCode()) : null;
-				
-			return val;
+			value = this.property.getInherent() ? this.property.getMethod.invoke(entity) :
+				this.property.getMethod.invoke(entity, this.property.getCode());
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+			throw new EntityAccessException(e.getMessage());
 		}
 		
-		return null;
+		return value;
 	}
 	
 	private ValueAbstract convertValue(Object value) {
 		if (value == null) {
-			return ValueNull.get(this.property);
-		}
-		switch (property.getType()) {
-		case Boolean:
-			return new ValueBoolean((boolean)value);
-		case Short:
-		case Integer:
-		case Long:
-			return new ValueInt((long)value);
-		case Double:
-			return new ValueDouble((double)value);
-		case Date:
-			return new ValueDateTime((Date)value);
-		case Duration:
-			return new ValueDuration((String)value);
-		case Enum:
-			return new ValueEnum((Enum<?>)value);
-		case String:
-			return new ValueText((String)value);
-		case Object:
-			return new ValueObject((EntityObject)value);
-		case List:
-			return new ValueList((RefBase)value);
-		default:
-			break;
+			switch (property.getType()) {
+			case Boolean:
+				return new ValueBoolean(false);
+			case Short:
+			case Integer:
+			case Long:
+				return new ValueInt(0);
+			case Double:
+				return new ValueDouble(0.0);
+			case Date:
+				return new ValueDateTime(new Date(0));
+			case Duration:
+				return new ValueDuration("");
+			case Enum:
+				return new ValueEnum(InvalidEnum.NONE);
+			case String:
+				return new ValueText("");
+			case Object:
+			case List:
+				throw new ValueException("property type must not be object type: " + property.getType());
+			default:
+				break;
+			}
+		} else {
+			switch (property.getType()) {
+			case Boolean:
+				return new ValueBoolean((boolean)value);
+			case Short:
+			case Integer:
+			case Long:
+				return new ValueInt((long)value);
+			case Double:
+				return new ValueDouble((double)value);
+			case Date:
+				return new ValueDateTime((Date)value);
+			case Duration:
+				return new ValueDuration((String)value);
+			case Enum:
+				return new ValueEnum((Enum<?>)value);
+			case String:
+				return new ValueText((String)value);
+			case Object:
+				return new ValueObject((EntityObject)value);
+			case List:
+				return new ValueList((RefBase)value);
+			default:
+				break;
+			}
 		}
 		
 		throw new ValueException(this.property.getType() + " is not supported!");
@@ -101,7 +124,7 @@ public class FieldCalculate implements Calculate {
 					}
 				}
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				e.printStackTrace();
+				throw new EntityAccessException(e.getMessage());
 			}
 		}
 	}
@@ -129,18 +152,17 @@ public class FieldCalculate implements Calculate {
 		if (this.isList) {
 			return new ValueList(GetListValue(entity));
 		}
+		EntityObject nextEntity = entity;
 		try {
-			EntityObject nextEntity = entity;
 			for (Property path : this.paths) {
 				nextEntity = (EntityObject)path.getMethod.invoke(nextEntity);
 				if (nextEntity == null) {
-					break;
+					throw new NullPointerException();
 				}
 			}
-			convertValue(getValueImpl(nextEntity));
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 		}
-		return convertValue(null);
+		return convertValue(getValueImpl(nextEntity));
 	}
 	
 	@Override

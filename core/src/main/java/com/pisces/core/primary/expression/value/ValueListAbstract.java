@@ -16,6 +16,11 @@ public class ValueListAbstract extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return Map.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return this.value;
 	}

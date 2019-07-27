@@ -15,6 +15,11 @@ public class ValueObject extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return EntityObject.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return this.value;
 	}

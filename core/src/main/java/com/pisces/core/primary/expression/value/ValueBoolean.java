@@ -10,6 +10,11 @@ public class ValueBoolean extends ValueAbstract {
 	public Type getType() {
 		return Type.BOOLEAN;
 	}
+	
+	@Override
+	public Class<?> getReturnClass() {
+		return Boolean.class;
+	}
 
 	@Override
 	public Object getValue() {
@@ -27,10 +32,7 @@ public class ValueBoolean extends ValueAbstract {
         return super.greater(rhs);
 	}
 	private ValueBoolean greaterImpl(ValueBoolean rhs) {
-		if (this.value && !rhs.value) {
-			return new ValueBoolean(true);
-		}
-		return new ValueBoolean(false);
+		return new ValueBoolean(this.value && !rhs.value);
 	}
 
 	@Override
@@ -61,10 +63,7 @@ public class ValueBoolean extends ValueAbstract {
         return super.less(rhs);
     }
 	private ValueBoolean lessImpl(ValueBoolean rhs) {
-	    if (!this.value && rhs.value) {
-	        return new ValueBoolean(true);
-	    }
-	    return new ValueBoolean(false);
+	    return new ValueBoolean(!this.value && rhs.value);
     }
 
 	@Override

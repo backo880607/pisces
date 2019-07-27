@@ -13,6 +13,11 @@ public class ValueText extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return String.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return this.value;
 	}
@@ -25,7 +30,7 @@ public class ValueText extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.add(rhs);
 	}
 	private ValueAbstract addImpl(ValueText rhs) {
 		this.value += rhs.value;
@@ -40,7 +45,7 @@ public class ValueText extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.greater(rhs);
 	}
 	private ValueBoolean greaterImpl(ValueText rhs) {
 		return new ValueBoolean(this.value.compareTo(rhs.value) > 0);
@@ -54,7 +59,7 @@ public class ValueText extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.greaterEqual(rhs);
 	}
 	private ValueBoolean greaterEqualImpl(ValueText rhs) {
 		return new ValueBoolean(this.value.compareTo(rhs.value) >= 0);
@@ -68,7 +73,7 @@ public class ValueText extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.less(rhs);
 	}
 	private ValueBoolean lessImpl(ValueText rhs) {
 		return new ValueBoolean(this.value.compareTo(rhs.value) < 0);
@@ -82,7 +87,7 @@ public class ValueText extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.lessEqual(rhs);
 	}
 	private ValueBoolean lessEqualImpl(ValueText rhs) {
 		return new ValueBoolean(this.value.compareTo(rhs.value) <= 0);
@@ -100,7 +105,7 @@ public class ValueText extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.equal(rhs);
 	}
 	private ValueBoolean equalImpl(ValueText rhs) {
 		return new ValueBoolean(this.value.compareTo(rhs.value) == 0);
@@ -124,7 +129,7 @@ public class ValueText extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.notEqual(rhs);
 	}
 	private ValueBoolean notEqualImpl(ValueText rhs) {
 		return new ValueBoolean(this.value.compareTo(rhs.value) != 0);

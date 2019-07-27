@@ -2,6 +2,7 @@ package com.pisces.integration.bean;
 
 import java.util.Collection;
 
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
 import com.pisces.core.annotation.Relation;
@@ -10,6 +11,7 @@ import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
 import com.pisces.integration.enums.ImportType;
 
+@Table(name = "integration_scheme")
 public class Scheme extends EntityCoding {
 	private ImportType importType = ImportType.ReplaceImport;
 	private String filter;

@@ -34,7 +34,7 @@ public class RelationEntityResolve extends DefaultEntityResolve {
 		for (Field field : fields) {
 			if (Modifier.isStatic(field.getModifiers()) && field.getType() == Sign.class) {
 				EntityColumn column = new EntityColumn(table);
-				column.setColumn(field.getName());
+				column.setColumn("fk_" + field.getName());
 				column.setProperty(field.getName());
 				column.setJavaType(String.class);
 				column.setTypeHandler(SignTypeHandler.class);

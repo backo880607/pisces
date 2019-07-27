@@ -22,6 +22,11 @@ public class ValueDuration extends ValueAbstract {
 	}
 	
 	@Override
+	public Class<?> getReturnClass() {
+		return Long.class;
+	}
+	
+	@Override
 	public Object getValue() {
 		return this.value;
 	}
@@ -126,7 +131,7 @@ public class ValueDuration extends ValueAbstract {
 		default:
 			break;
 		}
-		return null;
+		return super.equal(rhs);
 	}
 	private ValueBoolean equalImpl(ValueDuration rhs) {
 		return new ValueBoolean(this.value == rhs.value);
