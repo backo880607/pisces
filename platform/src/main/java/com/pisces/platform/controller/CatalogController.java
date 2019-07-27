@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pisces.core.entity.Property;
 import com.pisces.core.service.PropertyService;
 import com.pisces.core.utils.EntityUtils;
+import com.pisces.core.utils.IExpression;
+import com.pisces.core.utils.Primary;
 import com.pisces.platform.bean.Catalog;
 import com.pisces.platform.service.CatalogService;
 import com.pisces.web.controller.EntityController;
@@ -24,6 +26,12 @@ public class CatalogController extends EntityController<Catalog, CatalogService>
 	@GetMapping("/loadDefault")
 	public ResponseData loadDefault(String tableName) {
 		List<Property> properties = propertyService.getByClass(EntityUtils.getEntityClass(tableName));
+		String exp = "2+2.0";
+		IExpression expression = Primary.get().createExpression(exp);
+		if (expression != null)
+		{
+			
+		}
 		return succeed(properties);
 	}
 }
