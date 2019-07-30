@@ -1,5 +1,6 @@
 package com.pisces.core.relation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -105,36 +106,6 @@ public class RefSingleton implements RefBase {
 	}
 
 	@Override
-	public Object[] toArray() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public <T> T[] toArray(T[] a) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends EntityObject> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public EntityObject first() {
 		ensureCached();
 		if (entity == null) {
@@ -151,5 +122,18 @@ public class RefSingleton implements RefBase {
 		}
 		return entity;
 	}
+	
+	@Override
+	public boolean addAll(Collection<? extends EntityObject> c) {
+		throw new UnsupportedOperationException();
+	}
 
+	@Override
+	public Collection<EntityObject> collection() {
+		Collection<EntityObject> result = new ArrayList<EntityObject>();
+		if (this.entity != null) {
+			result.add(this.entity);
+		}
+		return result;
+	}
 }

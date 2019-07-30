@@ -15,6 +15,15 @@ public class PivotGroupSetting extends EntityObject {
 	private String filter;
 	
 	private String sort;
+	
+	@Override
+	public void init() {
+		super.init();
+		code = "";
+		name = "";
+		filter = "";
+		sort = "";
+	}
 
 	public String getCode() {
 		return code;

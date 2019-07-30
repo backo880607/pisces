@@ -1,6 +1,7 @@
 package com.pisces.core.relation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
@@ -96,5 +97,10 @@ public class RefSet extends TreeSet<EntityObject> implements RefBase {
 	public Iterator<EntityObject> iterator() {
 		ensureCached();
 		return super.iterator();
+	}
+
+	@Override
+	public Collection<EntityObject> collection() {
+		return this;
 	}
 }

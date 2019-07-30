@@ -20,7 +20,6 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.web.converter.StringToLong;
 import com.pisces.web.interceptor.CORSInterceptor;
-import com.pisces.web.interceptor.LocaleInterceptor;
 import com.pisces.web.interceptor.LogInterceptor;
 
 @Configuration
@@ -30,7 +29,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new CORSInterceptor()).addPathPatterns("/**");
-		registry.addInterceptor(new LocaleInterceptor());
 		registry.addInterceptor(new LogInterceptor()).addPathPatterns("/**");
 	}
 	
@@ -54,11 +52,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Bean
 	public LocaleResolver localeResolver() {
 		final CookieLocaleResolver cookieLocaleResolver = new CookieLocaleResolver();
-		cookieLocaleResolver.setDefaultLocale(Locale.ENGLISH);
+		cookieLocaleResolver.setDefaultLocale(Locale.SIMPLIFIED_CHINESE);
 		cookieLocaleResolver.setCookieName("language");
 		return cookieLocaleResolver;
 	}
 	
+	// 跨域访问控制
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**");

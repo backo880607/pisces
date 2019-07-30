@@ -48,6 +48,6 @@ public class Language extends EntityObject {
 			}
 		}
 		
-		return ERROR;
+		return key;
 	}
 }

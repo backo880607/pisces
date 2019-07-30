@@ -1,7 +1,6 @@
 package com.pisces.core.dao;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.List;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.SingletonDaoImpl;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.exception.NotImplementedException;
 import com.pisces.core.utils.EntityUtils;
 
 public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
@@ -36,18 +36,12 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 
 	@Override
 	public T selectByPrimaryKey(Object key) {
-		return key.equals(impl.get().record.getId()) ? impl.get().record : null;
+		return select();
 	}
 	
 	@Override
 	public List<T> selectMap(Collection<Long> ids) {
-		List<T> result = new ArrayList<>();
-		final T record = this.select();
-		if (ids.size() == 1 && ids.contains(record.getId())) {
-			result.add(record);
-		}
-		
-		return result;
+		return selectAll();
 	}
 
 	@Override
@@ -57,27 +51,31 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 
 	@Override
 	public int insert(T record) {
-		return 0;
+		throw new NotImplementedException("insert Singleton entity is not allowed");
 	}
 
 	@Override
 	public int insertList(Collection<T> recordList) {
-		return 0;
+		throw new NotImplementedException("insert Singleton entity is not allowed");
 	}
 
 	@Override
-	public int updateByPrimaryKey(T record) {
-		return 0;
+	public int update(T record) {
+		T oldRecord = select();
+		if (oldRecord != record) {
+			EntityUtils.copyIgnoreNull(record, oldRecord);
+		}
+		return 1;
 	}
 
 	@Override
 	public int delete(T record) {
-		return 0;
+		throw new NotImplementedException("delete Singleton entity is not allowed");
 	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
-		return 0;
+		throw new NotImplementedException("delete Singleton entity is not allowed");
 	}
 
 	@Override

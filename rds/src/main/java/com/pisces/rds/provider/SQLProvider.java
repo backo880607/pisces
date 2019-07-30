@@ -213,4 +213,13 @@ public class SQLProvider extends BaseProvider {
         sql.append("</foreach>");
         return sql.toString();
     }
+    
+    public String update(MappedStatement ms) {
+        Class<?> entityClass = getEntityClass(ms);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.updateSetColumns(entityClass, null, true, isNotEmpty()));
+        sql.append(SqlHelper.wherePKColumns(entityClass, true));
+        return sql.toString();
+    }
 }

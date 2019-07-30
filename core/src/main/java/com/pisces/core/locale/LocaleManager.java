@@ -1,5 +1,6 @@
 package com.pisces.core.locale;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -36,5 +37,13 @@ public class LocaleManager {
 		if (getLangugeManager() != null) {
 			getLangugeManager().init();
 		}
+	}
+	
+	public static Locale getLocale() {
+		if (getLangugeManager() != null) {
+			return getLangugeManager().getLocale();
+		}
+		
+		return Locale.getDefault();
 	}
 }

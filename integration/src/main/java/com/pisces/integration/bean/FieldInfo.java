@@ -15,6 +15,13 @@ public class FieldInfo extends EntityCoding {
 	
 	public static final Sign scheme = sign();
 	
+	@Override
+	public void init() {
+		super.init();
+		name = "";
+		externName = "";
+	}
+	
 	public final String getName() {
 		return name;
 	}

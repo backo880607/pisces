@@ -3,7 +3,6 @@ package com.pisces.core.relation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -66,7 +65,7 @@ public class Ioc {
 	@SuppressWarnings("unchecked")
 	public static <T extends EntityObject> Collection<T> getList(EntityObject entity, Predicate<T> filter, Sign sign,
 			Sign... args) {
-		Collection<EntityObject> result = new RefSequence();
+		Collection<EntityObject> result = new ArrayList<>();
 		Collection<EntityObject> relaEntities = getList(entity, sign);
 		for (EntityObject relaEntity : relaEntities) {
 			getListImpl(result, relaEntity, filter, args, 0);
@@ -75,8 +74,8 @@ public class Ioc {
 		return (Collection<T>) result;
 	}
 	
-	public static <T extends EntityObject> List<T> getListEx(EntityObject entity, Sign sign, Class<T> cls) {
-		List<T> result = new ArrayList<>();
+	public static <T extends EntityObject> Collection<T> getListEx(EntityObject entity, Sign sign, Class<T> cls) {
+		Collection<T> result = new ArrayList<>();
 		Collection<T> relaEntities = getList(entity, sign);
 		for (T relaEntity : relaEntities) {
 			if (relaEntity.getClass() == cls) {
@@ -135,9 +134,9 @@ public class Ioc {
 	}
 	
 	private static void setImpl(EntityObject entity, Sign sign, EntityObject relaEntity, Sign reverseSign) {
-		entity.getEntities(sign).add(relaEntity);
+		entity.getRelations().get(sign).add(relaEntity);
 		if (reverseSign != null) {
-			relaEntity.getEntities(reverseSign).add(entity);
+			relaEntity.getRelations().get(reverseSign).add(entity);
 		}
 	}
 	
@@ -148,10 +147,10 @@ public class Ioc {
 		Sign reverse = Primary.get().getRelationReverse(entity.getClass(), sign);
 		if (reverse != null) {
 			for (EntityObject relaEntity : entity.getEntities(sign)) {
-				relaEntity.getEntities(reverse).remove(entity);
+				relaEntity.getRelations().get(reverse).remove(entity);
 			}
 		}
-		entity.getEntities(sign).clear();
+		entity.getRelations().get(sign).clear();
 	}
 	
 	public static void remove(EntityObject entity, Sign sign) {
@@ -159,19 +158,19 @@ public class Ioc {
 		if (reverse != null) {
 			for (EntityObject relaEntity : entity.getEntities(sign)) {
 				if (relaEntity != null) {
-					relaEntity.getEntities(reverse).remove(entity);
+					relaEntity.getRelations().get(reverse).remove(entity);
 				}
 			}
 		}
-		entity.getEntities(sign).clear();
+		entity.getRelations().get(sign).clear();
 	}
 	
 	public static void remove(EntityObject entity, Sign sign, EntityObject relaEntity) {
 		Sign reverse = Primary.get().getRelationReverse(entity.getClass(), sign);
 		if (reverse != null) {
-			relaEntity.getEntities(reverse).remove(entity);
+			relaEntity.getRelations().get(reverse).remove(entity);
 		}
-		entity.getEntities(sign).remove(relaEntity);
+		entity.getRelations().get(sign).remove(relaEntity);
 	}
 	
 	public static void delete(EntityObject entity) {
@@ -193,7 +192,7 @@ public class Ioc {
 			if (reverse != null) {
 				List<EntityObject> relaEntities = new ArrayList<>(Ioc.getList(entity, sign));
 				for (EntityObject relaEntity : relaEntities) {
-					relaEntity.getEntities(reverse).remove(entity);
+					relaEntity.getRelations().get(reverse).remove(entity);
 				}
 			}
 		}
@@ -231,9 +230,9 @@ public class Ioc {
 		}
 	}
 	
-	private static <T extends EntityObject> LinkedList<T> compareImpl(EntityObject entity, Predicate<T> filter,
+	private static <T extends EntityObject> ArrayList<T> compareImpl(EntityObject entity, Predicate<T> filter,
 			Comparator<T> comp, Sign sign, Sign... args) {
-		LinkedList<T> entities = (LinkedList<T>) getList(entity, filter, sign, args);
+		ArrayList<T> entities = (ArrayList<T>) getList(entity, filter, sign, args);
 		entities.sort(comp);
 		return entities;
 	}
@@ -245,8 +244,8 @@ public class Ioc {
 	
 	public static <T extends EntityObject> T getMax(EntityObject entity, Predicate<T> filter, Comparator<T> comp,
 			Sign sign, Sign... args) {
-		LinkedList<T> entities = compareImpl(entity, filter, comp, sign, args);
-		return entities.isEmpty() ? null : entities.getLast();
+		ArrayList<T> entities = compareImpl(entity, filter, comp, sign, args);
+		return entities.isEmpty() ? null : entities.get(entities.size() - 1);
 	}
 	
 	public static <T extends EntityObject> T getMin(EntityObject entity, Comparator<T> comp, Sign sign,
@@ -256,7 +255,7 @@ public class Ioc {
 	
 	public static <T extends EntityObject> T getMin(EntityObject entity, Predicate<T> filter, Comparator<T> comp,
 			Sign sign, Sign... args) {
-		LinkedList<T> entities = compareImpl(entity, filter, comp, sign, args);
-		return entities.isEmpty() ? null : entities.getFirst();
+		ArrayList<T> entities = compareImpl(entity, filter, comp, sign, args);
+		return entities.isEmpty() ? null : entities.get(0);
 	}
 }

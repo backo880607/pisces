@@ -17,6 +17,8 @@ import javax.naming.ConfigurationException;
 
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.pisces.core.annotation.PrimaryKey;
@@ -25,6 +27,7 @@ import com.pisces.core.converter.DateDurDeserializer;
 import com.pisces.core.converter.DateDurSerializer;
 import com.pisces.core.converter.DateJsonDeserializer;
 import com.pisces.core.converter.DateJsonSerializer;
+import com.pisces.core.converter.NullValueSerializer;
 import com.pisces.core.converter.SignFieldHandler;
 import com.pisces.core.converter.SqlDateJsonDeserializer;
 import com.pisces.core.converter.SqlDateJsonSerializer;
@@ -241,7 +244,6 @@ public class EntityUtils {
 				if (meta != null) {
 					property.setEditType(meta.editType() != EditType.NONE ? meta.editType() : getDefaultEditType(property.getType()));
 					property.setModifiable(meta.modifiable());
-					property.setNullable(meta.nullable());
 					property.setDisplay(meta.display());
 				} else {
 					property.setEditType(getDefaultEditType(property.getType()));
@@ -408,14 +410,18 @@ public class EntityUtils {
 		return editType;
 	}
 	
-	public static String getValue(EntityObject entity, Property property) {
-		String value = "";
+	public static Object getValue(EntityObject entity, Property property) {
 		if (property.getMethod == null) {
-			return value;
+			return null;
 		}
 		
+		Object value = null;
 		try {
-			value = property.getMethod.invoke(entity).toString();
+			if (property.getInherent()) {
+				value = property.getMethod.invoke(entity).toString();
+			} else {
+				value = property.getMethod.invoke(entity, property.getName());
+			}
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
@@ -423,10 +429,29 @@ public class EntityUtils {
 		return value;
 	}
 	
-	public static void setValue(EntityObject entity, Property property, String str) {
+	
+	public static String getTextValue(EntityObject entity, Property property) {
+		Object value = getValue(entity, property);
+		return value != null ? value.toString() : "";
+	}
+	
+	public static void setValue(EntityObject entity, Property property, Object value) {
 		if (property.setMethod == null) {
 			return;
 		}
+		
+		try {
+			if (property.getInherent()) {
+				property.setMethod.invoke(entity, value);
+			} else {
+				property.setMethod.invoke(entity, property.getName(), value);
+			}
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void setTextValue(EntityObject entity, Property property, String str) {
 		Object value = null;
 		switch (property.getType()) {
 		case Boolean:
@@ -437,15 +462,7 @@ public class EntityUtils {
 		default:
 			break;
 		}
-		try {
-			if (property.getInherent()) {
-				property.setMethod.invoke(entity, value);
-			} else {
-				property.setMethod.invoke(entity, property.getName(), value);
-			}
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
+		setValue(entity, property, value);
 	}
 	
 	/**
@@ -462,7 +479,25 @@ public class EntityUtils {
         module.addSerializer(DateDur.class, new DateDurSerializer());
         module.addDeserializer(DateDur.class, new DateDurDeserializer());
         mapper.addHandler(new SignFieldHandler());
+        mapper.getSerializerProvider().setNullValueSerializer(new NullValueSerializer());
         mapper.registerModule(module);
+        mapper.setDefaultSetterInfo(JsonSetter.Value.construct(Nulls.SKIP, Nulls.SKIP));
         return mapper;
+	}
+	
+	public static <T extends EntityObject> void copyIgnoreNull(T src, T target) {
+		if (src.getClass() != target.getClass()) {
+			return;
+		}
+		
+		List<Property> properties = getProperties(src.getClass());
+		for (Property property : properties) {
+			Object srcValue = getValue(src, property);
+			if (srcValue == null) {
+				continue;
+			}
+			
+			setValue(target, property, srcValue);
+		}
 	}
 }

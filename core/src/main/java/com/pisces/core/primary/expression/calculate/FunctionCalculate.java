@@ -169,15 +169,14 @@ public class FunctionCalculate implements Calculate {
 		return new ValueList(result);
 	}
 	
-	private void funLastChainImpl(EntityObject entity, Expression exp, Collection<EntityObject> result) {
+	private void funLastChainImpl(EntityObject entity, Expression exp, RefBase result) {
 		Object above = exp.getValue(entity);
 		if (above == null) {
 			result.add(entity);
 			return;
 		}
-		if (Collection.class.isAssignableFrom(above.getClass())) {
-			@SuppressWarnings("unchecked")
-			Collection<EntityObject> value = (Collection<EntityObject>)above;
+		if (RefBase.class.isAssignableFrom(above.getClass())) {
+			RefBase value = (RefBase)above;
 			if (value.isEmpty()) {
 				result.add(entity);
 			} else {

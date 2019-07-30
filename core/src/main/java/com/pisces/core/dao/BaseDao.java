@@ -14,7 +14,7 @@ public interface BaseDao<T extends EntityObject> {
 	boolean existsWithPrimaryKey(Object key);
 	int insert(T record);
 	int insertList(Collection<T> recordList);
-	int updateByPrimaryKey(T record);
+	int update(T record);
 	int delete(T record);
 	int deleteByPrimaryKey(Object key);
 	

@@ -92,7 +92,7 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public int updateByPrimaryKey(T record) {
+	public int update(T record) {
 		obtain().put(record.getId(), record);
 		return 1;
 	}

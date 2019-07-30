@@ -21,33 +21,22 @@ public class PrimaryKeyValidator implements ConstraintValidator<PrimaryKey, Enti
 	public boolean isValid(EntityObject value, ConstraintValidatorContext context) {
 		List<Property> properties = EntityUtils.getPrimaries(value.getClass());
 		String key = StringUtils.join(properties, "\t", (Property property) -> {
-			return EntityUtils.getValue(value, property);
+			return EntityUtils.getTextValue(value, property);
 		});
 		
-		Set<String> primaryKeys = getPrimaryKeys(value.getClass());
-		if (primaryKeys.contains(key)) {
-			return false;
-		}
-		return true;
-	}
-
-	private Set<String> getPrimaryKeys(Class<? extends EntityObject> clazz) {
 		Set<String> primaryKeys = new HashSet<>();
-		EntityService<? extends EntityObject> service = ServiceManager.getService(clazz);
-		if (service == null) {
-			return primaryKeys;
+		EntityService<? extends EntityObject> service = ServiceManager.getService(value.getClass());
+		if (service != null) {
+			List<? extends EntityObject> entities = service.selectAll();
+			for (EntityObject entity : entities) {
+				String temp = StringUtils.join(properties, "\t", (Property property) -> {
+					return EntityUtils.getTextValue(entity, property);
+				});
+				
+				primaryKeys.add(temp);
+			}
 		}
 		
-		List<Property> properties = EntityUtils.getPrimaries(clazz);
-		List<? extends EntityObject> entities = service.selectAll();
-		for (EntityObject entity : entities) {
-			String key = StringUtils.join(properties, "\t", (Property property) -> {
-				return EntityUtils.getValue(entity, property);
-			});
-			
-			primaryKeys.add(key);
-		}
-		
-		return primaryKeys;
+		return !primaryKeys.contains(key);
 	}
 }

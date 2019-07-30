@@ -3,6 +3,7 @@ package com.pisces.language;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.pisces.core.BasicProperties;
 import com.pisces.core.annotation.LanguageAnnotation;
-import com.pisces.core.entity.EntityObject;
 import com.pisces.core.locale.ILanguageManager;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.language.service.LanguageService;
@@ -35,6 +35,11 @@ public class LanguageManager implements ILanguageManager {
 		}
 	}
 	
+	@Override
+	public Locale getLocale() {
+		return langService.getLocale();
+	}
+	
 	public List<LanguageAnnotation> getResources() {
 		return this.resources;
 	}
@@ -50,7 +55,7 @@ public class LanguageManager implements ILanguageManager {
 	}
 
 	@Override
-	public String get(Class<? extends EntityObject> clazz) {
+	public String get(Class<?> clazz) {
 		return langService.get(clazz);
 	}
 
@@ -58,9 +63,14 @@ public class LanguageManager implements ILanguageManager {
 	public String get(Field field) {
 		return langService.get(field);
 	}
+	
+	@Override
+	public String get(Class<?> clazz, String field) {
+		return langService.get(clazz, field);
+	}
 
 	@Override
-	public String getTips(Class<? extends EntityObject> clazz) {
+	public String getTips(Class<?> clazz) {
 		return langService.getTips(clazz);
 	}
 

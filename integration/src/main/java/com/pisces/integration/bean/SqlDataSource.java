@@ -5,7 +5,17 @@ public class SqlDataSource extends DataSource {
 	private Integer port;
 	private String username;
 	private String password;
-	private String dbName;
+	private String dataBase;
+	
+	@Override
+	public void init() {
+		super.init();
+		ip = "";
+		port = 0;
+		username = "";
+		password = "";
+		dataBase = "";
+	}
 	
 	public final String getIp() {
 		return ip;
@@ -39,12 +49,12 @@ public class SqlDataSource extends DataSource {
 		this.password = password;
 	}
 
-	public final String getDbName() {
-		return dbName;
+	public final String getDataBase() {
+		return dataBase;
 	}
 
-	public final void setDbName(String dbName) {
-		this.dbName = dbName;
+	public final void setDataBase(String dataBase) {
+		this.dataBase = dataBase;
 	}
 
 }

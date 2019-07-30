@@ -2,7 +2,6 @@ package com.pisces.core.primary.expression.calculate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -129,7 +128,6 @@ public class FieldCalculate implements Calculate {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	private RefBase GetListValue(EntityObject entity) {
 		List<EntityObject> entities = new ArrayList<>();
 		getListImpl(entities, entity, paths, 0);
@@ -142,7 +140,7 @@ public class FieldCalculate implements Calculate {
 			if (this.property.getType() == PropertyType.Object) {
 				result.add((EntityObject)val);
 			} else if (this.property.getType() == PropertyType.List) {
-				result.addAll((Collection<EntityObject>)val);
+				result.addAll(((RefBase)val).collection());
 			}
 		}
 		return result;
@@ -198,7 +196,7 @@ public class FieldCalculate implements Calculate {
 					return -1;
 				}
 				
-				if (Collection.class.isAssignableFrom(propertyClazz)) {
+				if (RefBase.class.isAssignableFrom(propertyClazz)) {
 					this.isList = true;
 				} else if (!EntityObject.class.isAssignableFrom(propertyClazz)) {
 					return -1;
@@ -223,7 +221,7 @@ public class FieldCalculate implements Calculate {
 				return -1;
 			}
 			if (!this.isList) {
-				this.isList = Collection.class.isAssignableFrom(propertyClazz);
+				this.isList = RefBase.class.isAssignableFrom(propertyClazz);
 			}
 			
 			return index;

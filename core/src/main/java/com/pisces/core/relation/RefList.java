@@ -1,6 +1,7 @@
 package com.pisces.core.relation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -110,14 +111,9 @@ public class RefList extends ArrayList<EntityObject> implements RefBase {
 		ensureCached();
 		return super.iterator();
 	}
-	
-	@Override
-	public Object[] toArray() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
-	public <T> T[] toArray(T[] a) {
-		throw new UnsupportedOperationException();
+	public Collection<EntityObject> collection() {
+		return this;
 	}
 }

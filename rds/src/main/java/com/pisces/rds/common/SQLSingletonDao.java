@@ -14,6 +14,8 @@ import com.pisces.core.dao.DaoManager;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.SingletonModifyDaoImpl;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.exception.NotImplementedException;
+import com.pisces.core.utils.EntityUtils;
 
 import tk.mybatis.mapper.common.Mapper;
 
@@ -53,18 +55,12 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
 
 	@Override
 	public T selectByPrimaryKey(Object key) {
-		return key.equals(impl.get().record.getId()) ? impl.get().record : null;
+		return select();
 	}
 
 	@Override
 	public List<T> selectMap(Collection<Long> ids) {
-		List<T> result = new ArrayList<>();
-		final T record = this.select();
-		if (ids.size() == 1 && ids.contains(record.getId())) {
-			result.add(record);
-		}
-		
-		return result;
+		return selectAll();
 	}
 
 	@Override
@@ -74,32 +70,33 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
 
 	@Override
 	public int insert(T record) {
-		return 0;
+		throw new NotImplementedException("insert Singleton entity is not allowed");
 	}
 
 	@Override
 	public int insertList(Collection<T> recordList) {
-		return 0;
+		throw new NotImplementedException("insert Singleton entity is not allowed");
 	}
 
 	@Override
-	public int updateByPrimaryKey(T record) {
-		if (record.getId() == impl.get().record.getId()) {
-			impl.get().modified = true;
-			return 1;
+	public int update(T record) {
+		T oldRecord = select();
+		if (oldRecord != record) {
+			EntityUtils.copyIgnoreNull(record, oldRecord);
 		}
-
-		return 0;
+		
+		impl.get().modified = true;
+		return 1;
 	}
 
 	@Override
 	public int delete(T record) {
-		return 0;
+		throw new NotImplementedException("delete Singleton entity is not allowed");
 	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
-		return 0;
+		throw new NotImplementedException("delete Singleton entity is not allowed");
 	}
 
 	@Override
@@ -119,6 +116,7 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
 		if (objects.isEmpty()) {
 			try {
 				this.impl.get().record = entityClass.newInstance();
+				this.impl.get().record.init();
 			} catch (InstantiationException | IllegalAccessException e) {
 				e.printStackTrace();
 			}

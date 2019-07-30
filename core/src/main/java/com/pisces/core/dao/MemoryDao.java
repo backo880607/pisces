@@ -10,7 +10,9 @@ import java.util.Map.Entry;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.MemoryDaoImpl;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.exception.ExistedException;
 import com.pisces.core.utils.EntityUtils;
+import com.pisces.core.utils.IDGenerator;
 
 public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 	private ThreadLocal<MemoryDaoImpl<T>> impl = new ThreadLocal<>();
@@ -57,6 +59,9 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 
 	@Override
 	public int insert(T record) {
+		if (record.getId() == null || record.getId() == 0) {
+			record.setId(IDGenerator.instance.getID());
+		}
 		impl.get().records.put(record.getId(), record);
 		return 1;
 	}
@@ -64,24 +69,27 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 	@Override
 	public int insertList(Collection<T> recordList) {
 		for (T record : recordList) {
-			impl.get().records.put(record.getId(), record);
+			insert(record);
 		}
 		return recordList.size();
 	}
 
 	@Override
-	public int updateByPrimaryKey(T record) {
-		if (impl.get().records.containsKey(record.getId())) {
-			impl.get().records.put(record.getId(), record);
-			return 1;
+	public int update(T record) {
+		T oldRecord = selectByPrimaryKey(record.getId());
+		if (oldRecord == null) {
+			throw new ExistedException("update a not existed entity");
 		}
-		return 0;
+		
+		if (oldRecord != record) {
+			EntityUtils.copyIgnoreNull(record, oldRecord);
+		}
+		return 1;
 	}
 
 	@Override
 	public int delete(T record) {
-		impl.get().records.remove(record.getId());
-		return 1;
+		return deleteByPrimaryKey(record.getId());
 	}
 
 	@Override

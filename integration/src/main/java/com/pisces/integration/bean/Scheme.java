@@ -13,7 +13,7 @@ import com.pisces.integration.enums.ImportType;
 
 @Table(name = "integration_scheme")
 public class Scheme extends EntityCoding {
-	private ImportType importType = ImportType.ReplaceImport;
+	private ImportType importType;
 	private String filter;
 	private String orderBy;
 	@NotBlank
@@ -27,6 +27,16 @@ public class Scheme extends EntityCoding {
 	
 	@Relation(clazz="FieldInfo", sign="scheme", type=Type.OneToMulti, owner=true)
 	public static final Sign fields = sign();
+	
+	@Override
+	public void init() {
+		super.init();
+		importType = ImportType.ReplaceImport;
+		filter = "";
+		orderBy = "";
+		outName = "";
+		inName = "";
+	}
 	
 	public final ImportType getImportType() {
 		return importType;

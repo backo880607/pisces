@@ -12,10 +12,16 @@ import com.pisces.integration.enums.SchemeType;
 
 @Table(name = "integration_scheme_group")
 public class SchemeGroup extends EntityCoding {
-	private SchemeType type = SchemeType.Export;
+	private SchemeType type;
 	
 	@Relation(clazz="Scheme", sign="schemeGroup", type=Type.OneToMulti, owner=true)
 	public static final Sign schemes = sign();
+	
+	@Override
+	public void init() {
+		super.init();
+		type = SchemeType.Export;
+	}
 
 	public final SchemeType getType() {
 		return type;

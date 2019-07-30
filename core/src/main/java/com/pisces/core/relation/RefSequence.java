@@ -1,6 +1,7 @@
 package com.pisces.core.relation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,5 +103,10 @@ public class RefSequence extends LinkedList<EntityObject> implements RefBase {
 	public Iterator<EntityObject> iterator() {
 		ensureCached();
 		return super.iterator();
+	}
+
+	@Override
+	public Collection<EntityObject> collection() {
+		return this;
 	}
 }

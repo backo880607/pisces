@@ -64,7 +64,7 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public int updateByPrimaryKey(T record) {
+	public int update(T record) {
 		Query query = new Query(Criteria.where("id").is(record.getId()));
         Update update= new Update();
         List<Property> properties = EntityUtils.getProperties(this.clazz);

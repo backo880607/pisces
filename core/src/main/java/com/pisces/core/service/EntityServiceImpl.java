@@ -56,6 +56,7 @@ protected Logger log = LoggerFactory.getLogger(this.getClass());
 	@Override
 	public T create() throws InstantiationException, IllegalAccessException {
 		T entity = getEntityClass().newInstance();
+		entity.init();
 		return entity;
 	}
 
@@ -137,7 +138,7 @@ protected Logger log = LoggerFactory.getLogger(this.getClass());
 	public int update(T entity) {
 		entity.setUpdateBy(AppUtils.getUsername());
 		entity.setUpdateDate(new Date());
-		return this.dao.updateByPrimaryKey(entity);
+		return this.dao.update(entity);
 	}
 
 	@Override

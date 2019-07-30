@@ -13,6 +13,7 @@ public class DateUtils {
 	public static final long PER_MINUTE = 60000;
 	public static final long PER_HOUR = 3600000;
 	public static final long PER_DAY = 86400000;
+	public static final Date INVALID_DATE = new Date(0);
 	private static long ZoneTime = 0;
 	
 	static {

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.pisces.core.annotation.LanguageAnnotation;
-import com.pisces.core.entity.EntityObject;
 import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.language.LanguageManager;
 import com.pisces.language.bean.Language;
@@ -53,7 +52,7 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 	}
 
 	@Override
-	public String get(Class<? extends EntityObject> clazz) {
+	public String get(Class<?> clazz) {
 		if (clazz == null) {
 			return Language.ERROR;
 		}
@@ -67,9 +66,17 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		}
 		return select().get(field.getDeclaringClass().getSimpleName() + "." + field.getName());
 	}
+	
+	@Override
+	public String get(Class<?> clazz, String field) {
+		if (clazz == null) {
+			return Language.ERROR;
+		}
+		return select().get(clazz.getSimpleName() + "." + field);
+	}
 
 	@Override
-	public String getTips(Class<? extends EntityObject> clazz) {
+	public String getTips(Class<?> clazz) {
 		if (clazz == null) {
 			return Language.ERROR;
 		}

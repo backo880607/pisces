@@ -9,8 +9,10 @@ import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pisces.core.enums.CreateUpdateType;
+import com.pisces.core.exception.ExistedException;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.Sign;
+import com.pisces.core.utils.DateUtils;
 import com.pisces.core.utils.IDGenerator;
 import com.pisces.core.utils.Primary;
 
@@ -31,21 +33,14 @@ public class EntityObject implements Comparable<EntityObject> {
 	private transient Map<Sign, RefBase> relations;
 	private transient Map<String, Object> userFields = new HashMap<>();
 	
-	@JsonIgnore
 	private String createBy;
-	@JsonIgnore
 	private String updateBy;
-	@JsonIgnore
 	private Date createDate;
-	@JsonIgnore
 	private Date updateDate;
-	@JsonIgnore
-	private CreateUpdateType createType = CreateUpdateType.AUTO;
-	@JsonIgnore
-	private CreateUpdateType updateType = CreateUpdateType.AUTO;
+	private CreateUpdateType createType;
+	private CreateUpdateType updateType;
 	
 	public EntityObject() {
-		id = IDGenerator.instance.getID();
 		Primary.get().createRelation(this);
 	}
 	
@@ -60,6 +55,16 @@ public class EntityObject implements Comparable<EntityObject> {
 	@Override
 	public int hashCode() {
 		return Long.hashCode(this.id);
+	}
+	
+	public void init() {
+		id = IDGenerator.instance.getID();
+		createBy = "";
+		updateBy = "";
+		createDate = DateUtils.INVALID_DATE;
+		updateDate = DateUtils.INVALID_DATE;
+		createType = CreateUpdateType.SYSTEM;
+		updateType = CreateUpdateType.SYSTEM;
 	}
 	
 	public Long getId() {
@@ -101,14 +106,20 @@ public class EntityObject implements Comparable<EntityObject> {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends EntityObject> Collection<T> getEntities(Sign sign) {
-		return (Collection<T>)this.relations.get(sign);
+		return (Collection<T>)this.relations.get(sign).collection();
 	}
 	
 	public Object getUserFields(String name) {
+		if (!this.userFields.containsKey(name)) {
+			throw new ExistedException("user field`s name: " + name + " is not existed");
+		}
 		return this.userFields.get(name);
 	}
 	
 	public void setUserFields(String name, Object value) {
+		if (!this.userFields.containsKey(name)) {
+			throw new ExistedException("user field`s name: " + name + " is not existed");
+		}
 		this.userFields.put(name, value);
 	}
 	

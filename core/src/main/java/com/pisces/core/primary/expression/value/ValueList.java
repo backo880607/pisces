@@ -28,7 +28,7 @@ public class ValueList extends ValueAbstract {
 	
 	@Override
 	public ValueText toText() {
-		return new ValueText(StringUtils.join(this.value, ";", (EntityObject entity) -> { 
+		return new ValueText(StringUtils.join(this.value.collection(), ";", (EntityObject entity) -> { 
 			return String.valueOf(entity.getId()); 
 		}));
 	}

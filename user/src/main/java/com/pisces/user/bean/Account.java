@@ -5,7 +5,6 @@ import java.util.Collection;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
@@ -32,23 +31,34 @@ public class Account extends EntityObject {
 	private Boolean disabled;
 	@Email
 	private String email;
-	@Pattern(regexp = "^1(3|4|5|7|8)\\d{9}$",message = "手机号码格式错误")
-    @NotBlank(message = "手机号码不能为空")
+	@Pattern(regexp = "^1(3|4|5|7|8)\\d{9}$")
+    @NotBlank()
     private String telephone;
-	@NotNull
     private Boolean sex;
     private EffectTaskType type = new EffectTaskType(EffectTaskType.Impl.Manuf);
     
     @Relation(clazz = "Tenant", sign = "user", type = Type.MultiToMulti)
-    @PropertyMeta(kind = RelationKind.Sequence)
+    @PropertyMeta(kind = RelationKind.Set)
     public static final Sign tenants = sign();
     
     @Relation(clazz = "Role", type=Type.MultiToMulti)
     @PropertyMeta(kind = RelationKind.Set)
     public static final Sign roles = sign();
     
-    public Account() {
-	}
+    @Override
+    public void init() {
+    	super.init();
+    	username = "";
+    	password = "";
+    	salt = "";
+    	accountExpired = false;
+    	accountLocked = false;
+    	credentialsExpired = false;
+    	disabled = false;
+    	email = "";
+    	telephone = "";
+    	sex = true;
+    }
     
 	public String getUsername() {
 		return username;

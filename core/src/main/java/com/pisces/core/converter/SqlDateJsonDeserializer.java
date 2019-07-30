@@ -21,5 +21,4 @@ public class SqlDateJsonDeserializer extends JsonDeserializer<Date> {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

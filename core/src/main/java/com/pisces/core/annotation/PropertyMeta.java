@@ -16,7 +16,6 @@ public @interface PropertyMeta {
 	boolean internal() default false;
 	boolean unique() default false;
 	boolean modifiable() default true;
-	boolean nullable() default false;
 	boolean display() default true;
 	EditType editType() default EditType.NONE;
 	RelationKind kind() default RelationKind.None;

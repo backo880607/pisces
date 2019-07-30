@@ -1,10 +1,9 @@
 package com.pisces.core.converter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,10 +12,8 @@ import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.exception.ExistedException;
+import com.pisces.core.enums.PropertyType;
 import com.pisces.core.relation.Ioc;
-import com.pisces.core.service.EntityService;
-import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.EntityUtils;
 
 public class SignFieldHandler extends DeserializationProblemHandler {
@@ -41,71 +38,47 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 		return super.handleUnknownProperty(ctxt, p, deserializer, beanOrClass, propertyName);
 	}
 	
-	private long getEntityId(JsonNode idNode) {
+	private EntityObject getRelaEntity(JsonNode node, Class<? extends EntityObject> clazz) {
+		EntityObject entity = null;
 		long id = 0;
-		if (idNode != null) {
-			if (idNode instanceof TextNode) {
-				id = Long.valueOf(idNode.textValue());
-			} else if (idNode instanceof LongNode) {
-				id = idNode.longValue();
+		if (node instanceof TextNode) {
+			try {
+				id = Long.valueOf(node.textValue());
+			} catch (NumberFormatException e) {
+				
+			}
+		} else if (node instanceof LongNode) {
+			id = node.longValue();
+		}
+		if (id > 0) {
+			try {
+				entity = clazz.newInstance();
+				entity.setId(id);
+			} catch (InstantiationException | IllegalAccessException e) {
+				e.printStackTrace();
 			}
 		}
-		return id;
+		return entity;
 	}
 	
 	private boolean handleRelationProperty(EntityObject entity, Property property, JsonParser p) throws IOException {
-		JsonNode node = p.getCodec().readTree(p);
 		Class<? extends EntityObject> propertyClazz = property.sign.getEntityClass();
-		EntityService<EntityObject> service = ServiceManager.getService(propertyClazz);
-		List<Long> relaIds = new ArrayList<Long>();
-		if (node.isArray()) {
-			StringBuffer primaryExp = new StringBuffer();
-			for (JsonNode subNode : node) {
-				if (subNode.isContainerNode()) {
-					if (subNode.has("id")) {
-						JsonNode idNode = subNode.get("id");
-						relaIds.add(getEntityId(idNode));
-						/*long id = ;
-						if (id > 0) {
-							EntityObject relaEntity = EntityUtils.getInherit(propertyClazz, id);
-							Ioc.set(entity, property.sign, relaEntity);
-							service.update(relaEntity);
-						}*/
-					} else {
-						List<Property> primaries = EntityUtils.getPrimaries(propertyClazz);
-						for (Property primary : primaries) {
-							JsonNode keyNode = subNode.get(primary.getName());
-							if (keyNode == null) {	// 缺少主键
-								
-							}
-							
-							primaryExp.append(propertyClazz.getSimpleName()).append(".").append(primary.getName());
-							primaryExp.append("=='").append(keyNode.textValue()).append("'&&");
-						}
-						if (primaryExp.length() > 0) {
-							primaryExp.delete(primaryExp.length() - 2, primaryExp.length());
-						}
-						
-						primaryExp.append("||");
-					}
-				} else {
-					relaIds.add(getEntityId(subNode));
-				}
-			}
-			if (primaryExp.length() > 0) {
-				primaryExp.delete(primaryExp.length() - 2, primaryExp.length());
-			}
-		} else if (node.isObject()) {
-			final long id = getEntityId(node.get("id"));
-			if (id > 0) {
-				EntityObject relaEntity = EntityUtils.getInherit(propertyClazz, id);
-				if (relaEntity == null) {
-					throw new ExistedException(propertyClazz.getName() + " or subclass has not entity for id " + id);
-				}
+		try {
+			if (property.getType() == PropertyType.Object) {
+				EntityObject relaEntity = EntityUtils.defaultObjectMapper().readValue(p, propertyClazz);
 				Ioc.set(entity, property.sign, relaEntity);
+				return true;
+			}
+		} catch (JsonProcessingException ex) {
+		}
+		
+		JsonNode node = p.getCodec().readTree(p);
+		if (node.isArray()) {
+			for (JsonNode subNode : node) {
+				Ioc.set(entity, property.sign, getRelaEntity(subNode, propertyClazz));
 			}
 		} else {
-			relaIds.add(getEntityId(node));
+			Ioc.set(entity, property.sign, getRelaEntity(node, propertyClazz));
 		}
 		
 		return true;
@@ -113,7 +86,7 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 	
 	private boolean handleUserProperty(EntityObject entity, Property property, JsonParser p) throws IOException {
 		JsonNode node = p.getCodec().readTree(p);
-		EntityUtils.setValue(entity, property, node.textValue());
+		EntityUtils.setTextValue(entity, property, node.textValue());
 		return true;
 	}
 }

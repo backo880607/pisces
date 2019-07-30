@@ -1,15 +1,16 @@
 package com.pisces.core.locale;
 
 import java.lang.reflect.Field;
-
-import com.pisces.core.entity.EntityObject;
+import java.util.Locale;
 
 public interface ILanguageManager {
 	public void init();
+	public Locale getLocale();
 	public String get(Enum<?> key, Object ...arguments);
 	public String get(String key, Object ...arguments);
-	public String get(Class<? extends EntityObject> clazz);
+	public String get(Class<?> clazz);
 	public String get(Field field);
-	public String getTips(Class<? extends EntityObject> clazz);
+	public String get(Class<?> clazz, String field);
+	public String getTips(Class<?> clazz);
 	public String getTips(Field field);
 }

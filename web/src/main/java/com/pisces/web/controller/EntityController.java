@@ -19,6 +19,7 @@ import com.pisces.core.validator.UpdateGroup;
 import com.pisces.web.annotation.ExceptionMessage;
 import com.pisces.web.config.WebMessage;
 
+@Validated
 public abstract class EntityController<T extends EntityObject, S extends EntityService<T>> extends BaseController {
 	@Autowired
 	private S service;

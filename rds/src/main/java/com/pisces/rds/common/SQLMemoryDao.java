@@ -12,9 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pisces.core.dao.BaseDao;
 import com.pisces.core.dao.DaoManager;
-import com.pisces.core.dao.impl.MemoryModifyDaoImpl;
 import com.pisces.core.dao.impl.DaoImpl;
+import com.pisces.core.dao.impl.MemoryModifyDaoImpl;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.exception.ExistedException;
+import com.pisces.core.utils.EntityUtils;
+import com.pisces.core.utils.IDGenerator;
 
 public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport implements BaseDao<T> {
 	private ThreadLocal<MemoryModifyDaoImpl<T>> impl = new ThreadLocal<>();
@@ -67,6 +70,9 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 
 	@Override
 	public int insert(T record) {
+		if (record.getId() == null || record.getId() == 0) {
+			record.setId(IDGenerator.instance.getID());
+		}
 		impl.get().records.put(record.getId(), record);
 		record.setCreated(true);
 		return 1;
@@ -75,33 +81,31 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 	@Override
 	public int insertList(Collection<T> recordList) {
 		for (T record : recordList) {
-			impl.get().records.put(record.getId(), record);
-			record.setCreated(true);
+			insert(record);
 		}
 		return recordList.size();
 	}
 
 	@Override
-	public int updateByPrimaryKey(T record) {
-		T existed = impl.get().records.get(record.getId());
-		if (existed == null) {
-			return 0;
-		}
-		if (record != existed) {
-			
+	public int update(T record) {
+		T oldRecord = selectByPrimaryKey(record.getId());
+		if (oldRecord == null) {
+			throw new ExistedException("update a not existed entity");
 		}
 		
-		if (!existed.getCreated()) {
-			existed.setModified(true);
+		if (oldRecord != record) {
+			EntityUtils.copyIgnoreNull(record, oldRecord);
+		}
+		
+		if (!oldRecord.getCreated()) {
+			oldRecord.setModified(true);
 		}
 		return 1;
 	}
 
 	@Override
 	public int delete(T record) {
-		impl.get().records.remove(record.getId());
-		impl.get().deleteds.add(record.getId());
-		return 1;
+		return deleteByPrimaryKey(record.getId());
 	}
 
 	@Override

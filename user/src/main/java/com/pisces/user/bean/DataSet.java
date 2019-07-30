@@ -9,6 +9,11 @@ import com.pisces.core.entity.EffectTaskType;
 @Table(name = "user_data_set")
 public class DataSet extends EntityCoding {
 	private EffectTaskType type;
+	
+	@Override
+	public void init() {
+		super.init();
+	}
 
 	public EffectTaskType getType() {
 		return type;

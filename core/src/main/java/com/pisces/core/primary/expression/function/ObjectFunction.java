@@ -125,7 +125,7 @@ class ObjectFunction {
 				}
 			}
 		} else {
-			result.addAll(entities);
+			result.addAll(entities.collection());
 		}
 		
 		boolean bFirst = true;

@@ -38,4 +38,15 @@ public class MultiEnumDeserializer extends JsonDeserializer<MultiEnum<? extends 
 		return deser;
 	}
 
+	@Override
+	public MultiEnum<? extends Enum<?>> getNullValue(DeserializationContext ctxt) throws JsonMappingException {
+		MultiEnum<? extends Enum<?>> result = null;
+		try {
+			result = clazz.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
 }

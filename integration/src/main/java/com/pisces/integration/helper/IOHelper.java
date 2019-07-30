@@ -65,7 +65,6 @@ public abstract class IOHelper {
 	}
 	
 	protected void write(EntityObject entity, Property property, String value) {
-		
-		EntityUtils.setValue(entity, property, value);
+		EntityUtils.setTextValue(entity, property, value);
 	}
 }

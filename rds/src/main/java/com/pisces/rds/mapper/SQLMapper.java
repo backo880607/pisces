@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 
 import com.pisces.rds.provider.SQLProvider;
 
@@ -25,4 +26,7 @@ public interface SQLMapper<T> {
 	
 	@DeleteProvider(type = SQLProvider.class, method = "dynamicSQL")
 	int deleteList(Collection<Long> recordList);
+	
+	@UpdateProvider(type = SQLProvider.class, method = "dynamicSQL")
+    int update(T record);
 }

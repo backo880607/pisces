@@ -20,6 +20,16 @@ public class PivotGroupContent extends EntityObject {
 	
 	private Boolean limitZero;
 
+	@Override
+	public void init() {
+		super.init();
+		code = "";
+		name = "";
+		textColor = "";
+		backgroundColor = "";
+		limitZero = false;
+	}
+	
 	public String getCode() {
 		return code;
 	}

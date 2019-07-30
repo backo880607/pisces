@@ -18,7 +18,7 @@ class DsMySqlServiceImpl extends SqlDataSourceServiceImpl<DsMySql, DsMySqlDao> i
 	@Override
 	protected String getConnection(SqlDataSource dataSource) {
 		StringBuffer buffer = new StringBuffer("jdbc:mysql://");
-		buffer.append(dataSource.getIp()).append(":").append(dataSource.getPort()).append("/").append(dataSource.getDbName());
+		buffer.append(dataSource.getIp()).append(":").append(dataSource.getPort()).append("/").append(dataSource.getDataBase());
 		buffer.append("?zeroDateTimeBehavior=convertToNull&characterEncoding=utf-8&amp;allowMultiQueries=true");
 		return buffer.toString();
 	}
@@ -26,7 +26,7 @@ class DsMySqlServiceImpl extends SqlDataSourceServiceImpl<DsMySql, DsMySqlDao> i
 	@Override
 	protected String existed(SqlDataSource dataSource, String tableName) {
 		StringBuffer buffer = new StringBuffer("select * from information_schema.TABLES t where t.TABLE_SCHEMA ='");
-		buffer.append(dataSource.getDbName()).append("' and t.TABLE_NAME ='").append(tableName).append("'");
+		buffer.append(dataSource.getDataBase()).append("' and t.TABLE_NAME ='").append(tableName).append("'");
 		return buffer.toString();
 	}
 }
