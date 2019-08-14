@@ -2,6 +2,8 @@ package com.pisces.core.utils;
 
 import java.util.Date;
 
+import com.pisces.core.entity.DateDur;
+
 public class Guard {
 	public static byte value(Byte arg) {
 		return arg != null ? arg : 0;
@@ -68,7 +70,7 @@ public class Guard {
 	}
 	
 	public static long value(Date arg) {
-		return arg != null ? arg.getTime() : DateUtils.MIN;
+		return arg != null ? arg.getTime() : DateUtils.MIN.getTime();
 	}
 	
 	public static long value(Date arg, long def) {
@@ -91,7 +93,7 @@ public class Guard {
 		} else if (cls == String.class) {
 			return "";
 		} else if (cls == Date.class) {
-			return new Date(DateUtils.MIN);
+			return DateUtils.INVALID;
 		} else if (cls == Short.class) {
 			Short result = 0;
 			return result;
@@ -100,6 +102,8 @@ public class Guard {
 			return result;
 		} else if (cls == Character.class) {
 			return Character.valueOf((char)0);
+		} else if (cls == DateDur.class) {
+			return DateDur.INVALID;
 		}
 		
 		return arg;

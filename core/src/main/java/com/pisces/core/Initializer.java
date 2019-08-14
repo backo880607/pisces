@@ -8,6 +8,7 @@ package com.pisces.core;
 import java.util.List;
 
 import com.pisces.core.locale.LocaleManager;
+import com.pisces.core.primary.expression.EnumHelper;
 import com.pisces.core.utils.Primary;
 
 public class Initializer {
@@ -73,6 +74,7 @@ public class Initializer {
 	
 	public static void execute() {
 		try {
+			EnumHelper.init();
 			Primary.get().init();
 			LocaleManager.init();
 			//load(EntityUtil.getEntityClasses());

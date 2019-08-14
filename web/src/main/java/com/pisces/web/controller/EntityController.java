@@ -19,6 +19,7 @@ import com.pisces.core.validator.UpdateGroup;
 import com.pisces.web.annotation.ExceptionMessage;
 import com.pisces.web.config.WebMessage;
 
+@SuppressWarnings("unused")
 @Validated
 public abstract class EntityController<T extends EntityObject, S extends EntityService<T>> extends BaseController {
 	@Autowired
@@ -30,9 +31,8 @@ public abstract class EntityController<T extends EntityObject, S extends EntityS
 	
 	@GetMapping(value = "create")
 	@ExceptionMessage(clazz = WebMessage.class, name = "CREATE")
-	public ResponseData create() throws InstantiationException, IllegalAccessException {
-		throw new NotImplementedException();
-		//return succeed(this.service.create());
+	public ResponseData create() {
+		return succeed(this.service.create());
 	}
 	
 	@GetMapping("selectAll")
@@ -88,7 +88,7 @@ public abstract class EntityController<T extends EntityObject, S extends EntityS
 		return value > 0 ? succeed(id) : failed(id, WebMessage.NOT_EXISTED);
 	}
 	
-	@GetMapping(value = "properties")
+	/*@GetMapping(value = "properties")
 	@ExceptionMessage(clazz = WebMessage.class, name = "SELECT")
 	public ResponseData properties() {
 		return succeed(this.service.selectProperties(false));
@@ -98,5 +98,5 @@ public abstract class EntityController<T extends EntityObject, S extends EntityS
 	@ExceptionMessage(clazz = WebMessage.class, name = "SELECT")
 	public ResponseData propertiesForDisplay() {
 		return succeed(this.service.selectProperties(true));
-	}
+	}*/
 }

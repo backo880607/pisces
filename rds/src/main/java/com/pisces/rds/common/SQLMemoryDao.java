@@ -1,5 +1,6 @@
 package com.pisces.rds.common;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,14 +17,30 @@ import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.MemoryModifyDaoImpl;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.exception.ExistedException;
+import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.EntityUtils;
-import com.pisces.core.utils.IDGenerator;
 
 public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport implements BaseDao<T> {
 	private ThreadLocal<MemoryModifyDaoImpl<T>> impl = new ThreadLocal<>();
 	
 	@Autowired
 	private SQLDao<T> mapper;
+	
+	@SuppressWarnings("unchecked")
+	private Class<T> getEntityClass() {
+		return (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+	}
+	
+	private T create() {
+		T entity = null;
+		try {
+			entity = getEntityClass().newInstance();
+			entity.init();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new OperandException(e);
+		}
+		return entity;
+	}
 	
 	@Autowired
 	public void setSqlSessionTemplate(SqlSessionTemplate sqlSessionTemplate) {
@@ -70,11 +87,16 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 
 	@Override
 	public int insert(T record) {
-		if (record.getId() == null || record.getId() == 0) {
-			record.setId(IDGenerator.instance.getID());
+		if (!record.getInitialized()) {
+			T newRecord = create();
+			EntityUtils.copyIgnoreNull(record, newRecord);
+			record = newRecord;
 		}
-		impl.get().records.put(record.getId(), record);
-		record.setCreated(true);
+		if (impl.get().records.put(record.getId(), record) != null) {
+			record.setModified(true);
+		} else {
+			record.setCreated(true);
+		}
 		return 1;
 	}
 	
@@ -136,7 +158,7 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 			T record = entry.getValue();
 			if (record.getCreated()) {
 				creates.add(record);
-			} else if (record.isModified()) {
+			} else if (record.getModified()) {
 				modifies.add(record);
 			}
 		}

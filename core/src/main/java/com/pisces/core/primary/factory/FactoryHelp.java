@@ -88,7 +88,7 @@ class FactoryHelp {
 	
 	private static void initRelation(Class<? extends EntityObject> clazz) {
 		EntityFactory factory = FactoryManager.getFactory(clazz);
-		Field[] fields = clazz.getFields();
+		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			if (!Modifier.isStatic(field.getModifiers())) {
 				continue;

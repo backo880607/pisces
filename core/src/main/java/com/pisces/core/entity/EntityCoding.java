@@ -2,8 +2,9 @@ package com.pisces.core.entity;
 
 import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.enums.EntityStatus;
+import com.pisces.core.validator.InsertGroup;
 
-@PrimaryKey(fields={"code"})
+@PrimaryKey(fields={"code"}, groups = {InsertGroup.class})
 public class EntityCoding extends EntityObject {
 	private String code;
 	private String name;

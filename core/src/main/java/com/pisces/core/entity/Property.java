@@ -1,30 +1,42 @@
 package com.pisces.core.entity;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.enums.EditType;
 import com.pisces.core.enums.PropertyType;
 import com.pisces.core.relation.Sign;
+import com.pisces.core.validator.InsertGroup;
 
-public class Property extends EntityCoding {
+@PrimaryKey(fields={"belongName"}, groups = {InsertGroup.class})
+public class Property extends EntityCoding implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7594283934306849106L;
+	
 	private String belongName;	// 属性所属类
 	private PropertyType type;	// 属性类型
+	private String typeName;	// 属性类型名称，包含包路径
 	private EditType editType;	// 属性的编辑类型
-	private Boolean inherent;	// 是否是内部固有属性
+	private Boolean inherent = false;	// 是否是内部固有属性
 	private Boolean modifiable;	// 是否可以修改
 	private Boolean visiable;	// 由用户控制是否显示
 	private Boolean display;	// 是否能够在界面上显示
 	private Short preci;		// 对于double类型控制显示精度
 	private String tips;		// 属性的提示信息
 	private String expression;	// 属性取值表达式
-	private String displayName;	// 页面显示名称
 	private Boolean primaryKey;	// 是否为主键字段，自定义字段不能作为主键
 	
 	@JsonIgnore
 	@PropertyMeta(internal=true)
 	public transient Class<? extends EntityObject> belongClazz;
+	@JsonIgnore
+	@PropertyMeta(internal=true)
+	public transient Class<?> clazz;
 	@JsonIgnore
 	@PropertyMeta(internal=true)
 	public transient Sign sign;
@@ -41,14 +53,12 @@ public class Property extends EntityCoding {
 		belongName = "";
 		type = PropertyType.Integer;
 		editType = EditType.TEXT;
-		inherent = true;
 		modifiable = true;
 		visiable = true;
 		display = true;
 		preci = 7;
 		tips = "";
 		expression = "";
-		displayName = "";
 		primaryKey = false;
 	}
 	
@@ -68,6 +78,14 @@ public class Property extends EntityCoding {
 		this.type = type;
 	}
 	
+	public String getTypeName() {
+		return typeName;
+	}
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
+	}
+
 	public EditType getEditType() {
 		return editType;
 	}
@@ -130,14 +148,6 @@ public class Property extends EntityCoding {
 
 	public void setExpression(String expression) {
 		this.expression = expression;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
 	}
 
 	public Boolean getPrimaryKey() {

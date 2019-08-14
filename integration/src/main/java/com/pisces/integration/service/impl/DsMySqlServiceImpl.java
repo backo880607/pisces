@@ -19,7 +19,7 @@ class DsMySqlServiceImpl extends SqlDataSourceServiceImpl<DsMySql, DsMySqlDao> i
 	protected String getConnection(SqlDataSource dataSource) {
 		StringBuffer buffer = new StringBuffer("jdbc:mysql://");
 		buffer.append(dataSource.getIp()).append(":").append(dataSource.getPort()).append("/").append(dataSource.getDataBase());
-		buffer.append("?zeroDateTimeBehavior=convertToNull&characterEncoding=utf-8&amp;allowMultiQueries=true");
+		buffer.append("?zeroDateTimeBehavior=convertToNull&characterEncoding=").append(dataSource.getCharset()).append("&amp;allowMultiQueries=true");
 		return buffer.toString();
 	}
 

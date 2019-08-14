@@ -4,15 +4,18 @@ import java.util.Collection;
 
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.pisces.core.annotation.Relation;
 import com.pisces.core.entity.EntityCoding;
+import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
 import com.pisces.integration.enums.ImportType;
 
 @Table(name = "integration_scheme")
 public class Scheme extends EntityCoding {
+	@NotNull
 	private ImportType importType;
 	private String filter;
 	private String orderBy;
@@ -77,13 +80,21 @@ public class Scheme extends EntityCoding {
 	public final void setInName(String inName) {
 		this.inName = inName;
 	}
-	
-	public final SchemeGroup getSchemeGroup() {
+
+	public SchemeGroup getSchemeGroup() {
 		return getEntity(schemeGroup);
+	}
+	
+	public void setSchemeGroup(SchemeGroup schemeGroup) {
+		Ioc.set(this, Scheme.schemeGroup, schemeGroup);
 	}
 	
 	public final DataSource getDataSource() {
 		return getEntity(dataSource);
+	}
+	
+	public void setDataSource(DataSource dataSource) {
+		Ioc.set(this, Scheme.dataSource, dataSource);
 	}
 	
 	public final Collection<FieldInfo> getFields() {

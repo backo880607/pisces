@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.rpc")
 @LanguageAnnotation(message = RpcMessage.class, path = "rpc")
-public class RpcProperties implements BasicProperties {
+public class RpcProperties extends BasicProperties {
 
 }

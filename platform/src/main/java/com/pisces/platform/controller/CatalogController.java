@@ -25,7 +25,7 @@ public class CatalogController extends EntityController<Catalog, CatalogService>
 	
 	@GetMapping("/loadDefault")
 	public ResponseData loadDefault(String tableName) {
-		List<Property> properties = propertyService.getByClass(EntityUtils.getEntityClass(tableName));
+		List<Property> properties = propertyService.get(EntityUtils.getEntityClass(tableName));
 		String exp = "2+2.0";
 		IExpression expression = Primary.get().createExpression(exp);
 		if (expression != null)

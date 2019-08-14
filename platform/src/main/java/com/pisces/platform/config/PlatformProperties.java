@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.platform")
 @LanguageAnnotation(message = PlatformMessage.class, path = "platform")
-public class PlatformProperties implements BasicProperties {
+public class PlatformProperties extends BasicProperties {
 
 }

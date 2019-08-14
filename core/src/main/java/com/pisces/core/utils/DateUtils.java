@@ -1,5 +1,6 @@
 package com.pisces.core.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -7,13 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DateUtils {
-	public static final long MIN;
-	public static final long MAX = Long.MAX_VALUE;
+	public static final Date MIN;
+	public static final Date MAX = new Date(Long.MAX_VALUE);
 	public static final long PER_SECOND = 1000;
 	public static final long PER_MINUTE = 60000;
 	public static final long PER_HOUR = 3600000;
 	public static final long PER_DAY = 86400000;
-	public static final Date INVALID_DATE = new Date(0);
+	public static final Date INVALID = new Date(0);
+	public static final String SIMPLE_FROMAT = "yyyy-MM-dd HH:MM:SS";
 	private static long ZoneTime = 0;
 	
 	static {
@@ -21,7 +23,7 @@ public class DateUtils {
 		ZoneTime = cal.get(Calendar.ZONE_OFFSET);
 		cal.set(1970, 0, 1, 0, 0, 0);
 		cal.set(Calendar.MILLISECOND, 0);
-		MIN = cal.getTimeInMillis();
+		MIN = cal.getTime();
 	}
 	
 	private static ThreadLocal<Calendar> calendarLocal = new ThreadLocal<>();
@@ -36,7 +38,7 @@ public class DateUtils {
 	}
 	
 	private static ThreadLocal<Map<String, SimpleDateFormat>> formatLocal = new ThreadLocal<>();
-	private static SimpleDateFormat getSimpleDateFormat(String format) {
+	private static SimpleDateFormat GetSimpleDateFormat(String format) {
 		Map<String,SimpleDateFormat> formatMap = formatLocal.get();
 		if (formatMap == null) {
 			formatMap = new HashMap<>();
@@ -60,8 +62,31 @@ public class DateUtils {
 	 * @param format 日期格式(例："yyyy-MM-dd")
 	 * @return String
 	 */
-	public static String format(Date date, String format){
-		return getSimpleDateFormat(format).format(date);
+	public static String Format(Date date, String format) {
+		return GetSimpleDateFormat(format).format(date);
+	}
+	
+	public static String Format(Date date) {
+		return GetSimpleDateFormat(SIMPLE_FROMAT).format(date);
+	}
+	
+	/**
+	 * 使用format解析日期
+	 * @param value
+	 * @param format
+	 * @return
+	 * @throws ParseException
+	 */
+	public static Date Parse(String value, String format) throws ParseException {
+		return GetSimpleDateFormat(format).parse(value);
+	}
+	
+	public static Date Parse(String value) throws ParseException {
+		return GetSimpleDateFormat(SIMPLE_FROMAT).parse(value);
+	}
+	
+	public static Date Today() {
+		return null;
 	}
 	
 	/**
@@ -70,7 +95,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getDayOfWeek(Date date) {
+	public static int DayOfWeek(Date date) {
 		int week = getCalendar(date).get(Calendar.DAY_OF_WEEK);
 		switch (week) {
 		case 1:
@@ -103,7 +128,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getDayOfYear(Date date) {
+	public static int DayOfYear(Date date) {
 		return getCalendar(date).get(Calendar.DAY_OF_YEAR);
 	}
 	
@@ -112,7 +137,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getDayOfWeekInMonth(Date date) {
+	public static int DayOfWeekInMonth(Date date) {
 		return getCalendar(date).get(Calendar.DAY_OF_WEEK_IN_MONTH);
 	}
 	
@@ -121,7 +146,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getWeekOfMonth(Date date) {
+	public static int WeekOfMonth(Date date) {
 		return getCalendar(date).get(Calendar.WEEK_OF_MONTH);
 	}
 	
@@ -130,7 +155,7 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public static int getWeekOfYear(Date date) {
+	public static int WeekOfYear(Date date) {
 		return getCalendar(date).get(Calendar.WEEK_OF_YEAR);
 	}
 	
@@ -139,7 +164,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getAmPm(Date date) {
+	public static int AmPm(Date date) {
 		return getCalendar(date).get(Calendar.AM_PM);
 	}
 	
@@ -148,7 +173,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getHourOfDay(Date date) {
+	public static int HourOfDay(Date date) {
 		return getCalendar(date).get(Calendar.HOUR_OF_DAY);
 	}
 	
@@ -157,7 +182,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getYear(Date date) {
+	public static int Year(Date date) {
 		return getCalendar(date).get(Calendar.YEAR);
 	}
 	
@@ -166,7 +191,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getMonth(Date date) {
+	public static int Month(Date date) {
 		return getCalendar(date).get(Calendar.MONTH) + 1;
 	}
 	
@@ -175,7 +200,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getDay(Date date) {
+	public static int Day(Date date) {
 		return getCalendar(date).get(Calendar.DAY_OF_MONTH);
 	}
 	
@@ -184,7 +209,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getHour(Date date) {
+	public static int Hour(Date date) {
 		return getCalendar(date).get(Calendar.HOUR);
 	}
 	
@@ -193,7 +218,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getMinute(Date date) {
+	public static int Minute(Date date) {
 		return getCalendar(date).get(Calendar.MINUTE);
 	}
 	
@@ -202,7 +227,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int getSecond(Date date) {
+	public static int Second(Date date) {
 		return getCalendar(date).get(Calendar.SECOND);
 	}
 	
@@ -211,9 +236,9 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static Date getYearMonth(Date date) {
+	public static Date YearMonth(Date date) {
 		long result = ((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime;
-		return new Date(result - (getDay(date) - 1) * PER_DAY);
+		return new Date(result - (Day(date) - 1) * PER_DAY);
 	}
 	
 	/**
@@ -221,7 +246,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static Date getYearMonthDay(Date date) {
+	public static Date YearMonthDay(Date date) {
 		return new Date(((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime);
 	}
 	
@@ -230,7 +255,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static Date getHourMinuteSecond(Date date) {
+	public static Date HourMinuteSecond(Date date) {
 		long result = ((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime;
 		return new Date(date.getTime() - result - ZoneTime);
 	}
@@ -241,7 +266,7 @@ public class DateUtils {
 	 * @param value 加的值
 	 * @return Date
 	 */
-	public static Date addDay(Date date, int value) {
+	public static Date AddDay(Date date, int value) {
 		return new Date(date.getTime() + value * PER_DAY);
 	}
 	
@@ -251,7 +276,7 @@ public class DateUtils {
 	 * @param value 加的值
 	 * @return Date
 	 */
-	public static Date addHour(Date date, int value) {
+	public static Date AddHour(Date date, int value) {
 		return new Date(date.getTime() + value * PER_HOUR);
 	}
 	
@@ -261,7 +286,7 @@ public class DateUtils {
 	 * @param value 加的值
 	 * @return Date
 	 */
-	public static Date addMinute(Date date, int value) {
+	public static Date AddMinute(Date date, int value) {
 		return new Date(date.getTime() + value * PER_MINUTE);
 	}
 	
@@ -271,7 +296,7 @@ public class DateUtils {
 	 * @param value 加的值
 	 * @return Date
 	 */
-	public static Date addSeconds(Date date, int value) {
+	public static Date AddSeconds(Date date, int value) {
 		return new Date(date.getTime() + value * PER_SECOND);
 	}
 	
@@ -281,7 +306,7 @@ public class DateUtils {
 	 * @param value 减的值
 	 * @return Date
 	 */
-	public static Date subDay(Date date, int value) {
+	public static Date SubDay(Date date, int value) {
 		return new Date(date.getTime() - value * PER_DAY);
 	}
 	
@@ -291,7 +316,7 @@ public class DateUtils {
 	 * @param value 减的值
 	 * @return Date
 	 */
-	public static Date subHour(Date date,int value) {
+	public static Date SubHour(Date date,int value) {
 		return new Date(date.getTime() - value * PER_HOUR);
 	}
 	
@@ -301,7 +326,7 @@ public class DateUtils {
 	 * @param value 减的值
 	 * @return Date
 	 */
-	public static Date subMinute(Date date,int value) {
+	public static Date SubMinute(Date date,int value) {
 		return new Date(date.getTime() - value * PER_MINUTE);
 	}
 	
@@ -311,7 +336,7 @@ public class DateUtils {
 	 * @param value 减的值
 	 * @return Date
 	 */
-	public static Date subSecond(Date date,int value) {
+	public static Date SubSecond(Date date,int value) {
 		return new Date(date.getTime() - value * PER_SECOND);
 	}
 	
@@ -321,7 +346,7 @@ public class DateUtils {
 	 * @param date2
 	 * @return
 	 */
-	public static int differentDays(long before, long after) {
+	public static int DifferentDays(long before, long after) {
 		Calendar cal1 = Calendar.getInstance();
         cal1.setTimeInMillis(before);
         
@@ -353,7 +378,7 @@ public class DateUtils {
 	 * @param date2
 	 * @return
 	 */
-	public static int differentWeeks(long before, long after) {
+	public static int DifferentWeeks(long before, long after) {
 		Calendar cal1 = Calendar.getInstance();
         cal1.setTimeInMillis(before);
         
@@ -379,7 +404,7 @@ public class DateUtils {
 	 * @param date2
 	 * @return
 	 */
-	public static int differentMonths(long before, long after) {
+	public static int DifferentMonths(long before, long after) {
 		Calendar cal1 = Calendar.getInstance();
         cal1.setTimeInMillis(before);
         

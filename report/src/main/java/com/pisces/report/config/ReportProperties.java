@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.report")
 @LanguageAnnotation(message = ReportMessage.class, path = "report")
-public class ReportProperties implements BasicProperties {
+public class ReportProperties extends BasicProperties {
 
 }

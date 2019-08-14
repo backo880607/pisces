@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.user")
 @LanguageAnnotation(message = UserMessage.class, path = "user")
-public class UserProperties implements BasicProperties {
+public class UserProperties extends BasicProperties {
 
 }

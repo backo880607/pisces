@@ -12,17 +12,21 @@ class DsSQLServerServiceImpl extends SqlDataSourceServiceImpl<DsSqlServer, DsSQL
 
 	@Override
 	protected String getDriverName() {
-		return null;
+		return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 	}
 
 	@Override
 	protected String getConnection(SqlDataSource dataSource) {
-		return null;
+		StringBuffer buffer = new StringBuffer("jdbc:sqlserver://");
+		buffer.append(dataSource.getIp()).append(":").append(dataSource.getPort()).append(";DatabaseName=").append(dataSource.getDataBase());
+		return buffer.toString();
 	}
 
 	@Override
 	protected String existed(SqlDataSource dataSource, String tableName) {
-		return null;
+		StringBuffer buffer = new StringBuffer("SELECT COUNT(*) FROM sysobjects WHERE id= object_id('");
+		buffer.append(tableName).append("')");
+		return buffer.toString();
 	}
 
 }

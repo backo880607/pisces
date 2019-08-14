@@ -10,8 +10,10 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.Sign;
+import com.pisces.core.utils.IDGenerator;
 import com.pisces.core.utils.Primary;
 import com.pisces.core.utils.StringUtils;
+import com.pisces.rds.handler.UserFieldTypeHandler;
 
 public class EntityBeanWrapper extends BeanWrapper {
 	private Class<? extends EntityObject> entityClazz;
@@ -22,6 +24,10 @@ public class EntityBeanWrapper extends BeanWrapper {
 		super(metaObject, object);
 		this.entityClazz = (Class<? extends EntityObject>) object.getClass();
 		this.entity = (EntityObject) object;
+		if (this.entity.getId() == null || this.entity.getId() == 0) {
+			this.entity.setId(IDGenerator.instance.getID());
+		}
+		UserFieldTypeHandler.entityClazz.set(this.entityClazz);
 	}
 
 	@Override
@@ -50,7 +56,7 @@ public class EntityBeanWrapper extends BeanWrapper {
 			if (relaClazz == null) {
 				return;
 			}
-			RefBase ref = (RefBase)this.entity.getEntities(sign);
+			RefBase ref = this.entity.getRelations().get(sign);
 			ref.bindSign(sign);
 			for (String strId : ((String)value).split(",")) {
 				if (strId.isEmpty()) {

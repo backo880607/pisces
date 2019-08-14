@@ -12,8 +12,8 @@ public interface DataSourceService<T extends DataSource> extends EntityService<T
 	boolean validConnection(DataSource dataSource, String tableName) throws Exception;
 	boolean open(DataSource dataSource, String tableName) throws Exception;
 	void close();
-	boolean checkTableStructure(DataSource dataSource, String tableName, Collection<FieldInfo> fields) throws Exception;
 	boolean executeQuery(DataSource dataSource, String tableName, Collection<FieldInfo> fields) throws Exception;
+	Collection<FieldInfo> getFields() throws Exception;
 	
 	boolean step() throws Exception;
 	String getData(int index) throws Exception;

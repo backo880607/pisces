@@ -12,6 +12,7 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
+import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.core.utils.StringUtils;
 
@@ -19,7 +20,7 @@ public class PrimaryKeyValidator implements ConstraintValidator<PrimaryKey, Enti
 	
 	@Override
 	public boolean isValid(EntityObject value, ConstraintValidatorContext context) {
-		List<Property> properties = EntityUtils.getPrimaries(value.getClass());
+		List<Property> properties = AppUtils.getPropertyService().getPrimaries(value.getClass());
 		String key = StringUtils.join(properties, "\t", (Property property) -> {
 			return EntityUtils.getTextValue(value, property);
 		});

@@ -1,5 +1,7 @@
 package com.pisces.core.primary.factory;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,7 @@ public final class FactoryManager {
 		
 		try {
 			EntityUtils.checkProperty();
+			checkEntity();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -83,5 +86,27 @@ public final class FactoryManager {
 			throw new RegisteredException(name + " has not registered!");
 		}
 		return entityFactory;
+	}
+	
+	public static void checkEntity() throws Exception {
+		List<Class<? extends EntityObject>> clazzs = EntityUtils.getEntityClasses();
+		for (Class<? extends EntityObject> clazz : clazzs) {
+			if (clazz.getSimpleName().equals("Property") ||
+				clazz.getSimpleName().equals("EntityObject")) {
+				continue;
+			}
+			EntityObject entity = clazz.newInstance();
+			entity.init();
+			Field[] fields = clazz.getDeclaredFields();
+			for (Field field : fields) {
+				if (Modifier.isStatic(field.getModifiers())) {
+					continue;
+				}
+				field.setAccessible(true);
+				if (field.get(entity) == null) {
+					throw new NullPointerException(clazz.getName() + "`s field " + field.getName() + " has not default value.");
+				}
+			}
+		}
 	}
 }

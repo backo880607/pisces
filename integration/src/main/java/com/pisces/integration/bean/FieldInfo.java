@@ -4,6 +4,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
 import com.pisces.core.entity.EntityCoding;
+import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 
 @Table(name = "integration_field_info")
@@ -40,5 +41,9 @@ public class FieldInfo extends EntityCoding {
 	
 	public final Scheme getScheme() {
 		return getEntity(scheme);
+	}
+	
+	public void setScheme(Scheme scheme) {
+		Ioc.set(this, FieldInfo.scheme, scheme);
 	}
 }

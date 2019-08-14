@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -16,9 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pisces.core.dao.BaseDao;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.entity.Property;
+import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.AppUtils;
-import com.pisces.core.utils.EntityUtils;
 import com.pisces.core.utils.IExpression;
 import com.pisces.core.utils.PageParam;
 import com.pisces.core.utils.Primary;
@@ -54,9 +52,14 @@ protected Logger log = LoggerFactory.getLogger(this.getClass());
 	public void init() {}
 	
 	@Override
-	public T create() throws InstantiationException, IllegalAccessException {
-		T entity = getEntityClass().newInstance();
-		entity.init();
+	public T create() {
+		T entity = null;
+		try {
+			entity = getEntityClass().newInstance();
+			entity.init();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new OperandException(e);
+		}
 		return entity;
 	}
 
@@ -200,20 +203,5 @@ protected Logger log = LoggerFactory.getLogger(this.getClass());
 			}
 		});
 		return true;
-	}
-	
-	@Override
-	public List<Property> selectProperties(boolean onlyDisplay) {
-		List<Property> properties = EntityUtils.getProperties(getEntityClass());
-		if (onlyDisplay) {
-			Iterator<Property> iter = properties.iterator();
-			while (iter.hasNext()) {
-				Property property = iter.next();
-				if (!property.getDisplay() || !property.getVisiable()) {
-					iter.remove();
-				}
-			}
-		}
-		return properties;
 	}
 }

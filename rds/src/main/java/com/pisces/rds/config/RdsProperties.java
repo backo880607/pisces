@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.rds")
 @LanguageAnnotation(message = RdsMessage.class, path = "rds")
-public class RdsProperties implements BasicProperties {
+public class RdsProperties extends BasicProperties {
 
 }

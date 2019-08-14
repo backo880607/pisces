@@ -24,6 +24,7 @@ import com.pisces.core.primary.expression.value.ValueObject;
 import com.pisces.core.primary.expression.value.ValueText;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.RefList;
+import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 
 public class FieldCalculate implements Calculate {
@@ -184,7 +185,7 @@ public class FieldCalculate implements Calculate {
 						throw new ExpressionException("invalid object name : " + name);
 					}
 				} else {
-					Property path = EntityUtils.getProperty(propertyClazz, name);
+					Property path = AppUtils.getPropertyService().get(propertyClazz, name);
 					if (path == null) {
 						throw new ExpressionException(propertyClazz.getName() + " has not property name : " + name);
 					}
@@ -212,7 +213,7 @@ public class FieldCalculate implements Calculate {
 		
 		if (temp < index) {
 			String name = str.substring(temp, index);
-			this.property = EntityUtils.getProperty(propertyClazz, name);
+			this.property = AppUtils.getPropertyService().get(propertyClazz, name);
 			if (this.property == null) {
 				return -1;
 			}

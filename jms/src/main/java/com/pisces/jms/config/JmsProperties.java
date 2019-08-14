@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.jms")
 @LanguageAnnotation(message = JmsMessage.class, path = "jms")
-public class JmsProperties implements BasicProperties {
+public class JmsProperties extends BasicProperties {
 
 }

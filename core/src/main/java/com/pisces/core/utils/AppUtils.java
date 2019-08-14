@@ -8,7 +8,10 @@ import org.springframework.context.ApplicationContext;
 
 import com.pisces.core.Initializer;
 import com.pisces.core.dao.DaoManager;
+import com.pisces.core.entity.Property;
 import com.pisces.core.exception.ExistedException;
+import com.pisces.core.service.PropertyService;
+import com.pisces.core.service.ServiceManager;
 
 public class AppUtils {
 	private static ApplicationContext context;
@@ -17,6 +20,7 @@ public class AppUtils {
 	public static class UserData {
 		public String username = "";
 		public Map<Class<?>, Object> data = new ConcurrentHashMap<>();
+		public PropertyService propertyService;
 	}
 	private static Map<String, UserData> userDatas = new ConcurrentHashMap<>();
 	private static ThreadLocal<UserData> curUserData = new ThreadLocal<>();
@@ -105,5 +109,21 @@ public class AppUtils {
 		
 		curUserData.set(userData);
 		return DaoManager.switchUser(username);
+	}
+	
+	public static PropertyService getPropertyService() {
+		UserData userData = curUserData.get();
+		if (userData == null) {
+			throw new ExistedException("current thread not bind user data");
+		}
+		
+		if (userData.propertyService == null) {
+			synchronized (userData) {
+				if (userData.propertyService == null) {
+					userData.propertyService = (PropertyService)ServiceManager.getService(Property.class);
+				}
+			}
+		}
+		return userData.propertyService;
 	}
 }

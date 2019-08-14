@@ -29,6 +29,7 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.locale.ILanguageManager;
 import com.pisces.core.locale.LocaleManager;
+import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.core.validator.ErrorInfo;
 import com.pisces.web.annotation.ExceptionMessage;
@@ -52,6 +53,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler({Exception.class})
     public ResponseData jsonHandler(HttpServletRequest request, Exception ex) throws Exception {
+		ex.printStackTrace();
 		ResponseData r = new ResponseData();
 		Enum<?> message = WebMessage.UNKNOWN;
 		
@@ -106,7 +108,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			if (error instanceof FieldError) {
 				FieldError fieldError = (FieldError)error;
 				info.setField(fieldError.getField());
-				info.setValue(fieldError.getRejectedValue().toString());
+				if (fieldError.getRejectedValue() != null) {
+					info.setValue(fieldError.getRejectedValue().toString());
+				}
 			}
 			
 			Object source = getSource(error);
@@ -120,7 +124,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 					}
 					if (EntityObject.class.isAssignableFrom(impl.getRootBeanClass())) {
 						EntityObject entity = (EntityObject)rootValue;
-						List<Property> properties = EntityUtils.getPrimaries(entity.getClass());
+						List<Property> properties = AppUtils.getPropertyService().getPrimaries(entity.getClass());
 						for (Property property : properties) {
 							info.getEntity().put(property.getName(), EntityUtils.getTextValue(entity, property));
 						}

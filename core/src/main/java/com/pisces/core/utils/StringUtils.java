@@ -68,13 +68,13 @@ public class StringUtils {
 		return buf.toString();
 	}
 	
-	public static String trimLeft(String value, String target) {
-		int index = value.indexOf(target);
-		return index >= 0 ? value.substring(index) : value;
+	public static String getHead(String value, String sep) {
+		int index = value.indexOf(sep);
+		return index >= 0 ? value.substring(0, index) : "";
 	}
 	
-	public static String trimRight(String value, String target) {
-		int index = value.indexOf(target);
-		return index >= 0 ? value.substring(0, index) : value; 
+	public static String getTail(String value, String sep) {
+		int index = value.lastIndexOf(sep);
+		return index >= 0 ? value.substring(index) : "";
 	}
 }

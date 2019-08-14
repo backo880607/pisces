@@ -16,6 +16,7 @@ import org.apache.ibatis.type.JdbcType;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.rds.config.EntityWrapperFactory;
+import com.pisces.rds.config.MybatisEntityFactory;
 
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
@@ -44,6 +45,7 @@ public class SQLProvider extends BaseProvider {
 		if (notChecked) {
 			notChecked = false;
 			ms.getConfiguration().setObjectWrapperFactory(new EntityWrapperFactory());
+			ms.getConfiguration().setObjectFactory(new MybatisEntityFactory());
 			return;
 		}
 		Class<?> entityClazz = getEntityClass(ms);

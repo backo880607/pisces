@@ -11,17 +11,31 @@ import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.MemoryDaoImpl;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.exception.ExistedException;
+import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.EntityUtils;
-import com.pisces.core.utils.IDGenerator;
 
 public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 	private ThreadLocal<MemoryDaoImpl<T>> impl = new ThreadLocal<>();
 	
 	public MemoryDao() {
-		@SuppressWarnings("unchecked")
-		Class<T> clazz = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		EntityUtils.registerEntityClass(clazz);
+		EntityUtils.registerEntityClass(getEntityClass());
 		DaoManager.register(this);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Class<T> getEntityClass() {
+		return (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+	}
+	
+	private T create() {
+		T entity = null;
+		try {
+			entity = getEntityClass().newInstance();
+			entity.init();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new OperandException(e);
+		}
+		return entity;
 	}
 	
 	@Override
@@ -59,8 +73,10 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 
 	@Override
 	public int insert(T record) {
-		if (record.getId() == null || record.getId() == 0) {
-			record.setId(IDGenerator.instance.getID());
+		if (!record.getInitialized()) {
+			T newRecord = create();
+			EntityUtils.copyIgnoreNull(record, newRecord);
+			record = newRecord;
 		}
 		impl.get().records.put(record.getId(), record);
 		return 1;

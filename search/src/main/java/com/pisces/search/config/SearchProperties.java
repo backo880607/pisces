@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.search")
 @LanguageAnnotation(message = SearchMessage.class, path = "search")
-public class SearchProperties implements BasicProperties {
+public class SearchProperties extends BasicProperties {
 
 }

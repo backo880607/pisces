@@ -3,6 +3,7 @@ package com.pisces.core.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -12,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.naming.ConfigurationException;
 
 import org.springframework.util.StringUtils;
 
@@ -27,6 +26,7 @@ import com.pisces.core.converter.DateDurDeserializer;
 import com.pisces.core.converter.DateDurSerializer;
 import com.pisces.core.converter.DateJsonDeserializer;
 import com.pisces.core.converter.DateJsonSerializer;
+import com.pisces.core.converter.EntitySerializerModifier;
 import com.pisces.core.converter.NullValueSerializer;
 import com.pisces.core.converter.SignFieldHandler;
 import com.pisces.core.converter.SqlDateJsonDeserializer;
@@ -37,6 +37,10 @@ import com.pisces.core.entity.MultiEnum;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.EditType;
 import com.pisces.core.enums.PropertyType;
+import com.pisces.core.exception.ConfigurationException;
+import com.pisces.core.exception.DateDurException;
+import com.pisces.core.exception.OperandException;
+import com.pisces.core.exception.ParameterException;
 import com.pisces.core.exception.RegisteredException;
 import com.pisces.core.exception.RelationException;
 import com.pisces.core.relation.RelationKind;
@@ -119,44 +123,132 @@ public class EntityUtils {
 	
 	public static <T extends EntityObject> List<T> getInherit(Class<T> clazz, List<Long> ids) {
 		List<T> result = new ArrayList<>();
-		
+		for (Long id : ids) {
+			T entity = getInherit(clazz, id);
+			if (entity != null) {
+				result.add(entity);
+			}
+		}
 		return result;
 	}
 	
-	public static List<Property> getProperties() {
+	public static List<Property> getDefaultProperties() {
 		List<Property> result = new ArrayList<>();
-		for (Entry<Class<? extends EntityObject>, Map<String, Property>> entry : properties.entrySet()) {
-			for (Entry<String, Property> entryProperty : entry.getValue().entrySet()) {
-				result.add(entryProperty.getValue());
-			}
+		for (Class<? extends EntityObject> clazz : getEntityClasses()) {
+			getDefaultPropertiesImpl(result, clazz, clazz);
 		}
 		
 		return result;
 	}
 
-	public static List<Property> getProperties(Class<? extends EntityObject> clazz) {
+	public static List<Property> getDefaultProperties(Class<? extends EntityObject> clazz) {
 		List<Property> result = new LinkedList<>();
-		getPropertiesImpl(result, clazz);
+		getDefaultPropertiesImpl(result, clazz, clazz);
 		return result;
 	}
 	
-	private static void getPropertiesImpl(List<Property> result, Class<? extends EntityObject> clazz) {
+	private static void getDefaultPropertiesImpl(List<Property> result, Class<? extends EntityObject> clazz, Class<? extends EntityObject> belongClass) {
 		if (clazz == null) {
 			return;
 		}
 		
-		getPropertiesImpl(result, Primary.get().getSuperClass(clazz));
-		Map<String, Property> temp = properties.get(clazz);
-		if (temp == null) {
-			return;
+		getDefaultPropertiesImpl(result, Primary.get().getSuperClass(clazz), belongClass);
+		
+		Map<String, Property> codeMapProperties = new HashMap<String, Property>();
+		Field[] fields = clazz.getDeclaredFields();
+		for (Field field : fields) {
+			try {
+				Property property = createProperty(clazz, belongClass, field);
+				if (property != null) {
+					result.add(property);
+					codeMapProperties.put(property.getCode(), property);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
-		for (Entry<String, Property> entry : temp.entrySet()) {
-			result.add(entry.getValue());
+		PrimaryKey primaryKey = clazz.getAnnotation(PrimaryKey.class);
+		if (primaryKey != null) {
+			String[] primaryFields = primaryKey.fields();
+			for (String primaryField : primaryFields) {
+				Property property = codeMapProperties.get(primaryField);
+				if (property == null) {
+					throw new ConfigurationException(clazz.getName() + " config primary key has error field name: " + primaryField);
+				}
+				
+				property.setPrimaryKey(true);
+			}
 		}
+		
 	}
 	
-	public static Property getProperty(Class<? extends EntityObject> clazz, String name) {
+	private static Property createProperty(Class<? extends EntityObject> clazz, Class<? extends EntityObject> belongClass, Field field) throws Exception {
+		if (Modifier.isTransient(field.getModifiers())) {
+			return null;
+		}
+		PropertyMeta meta = field.getAnnotation(PropertyMeta.class);
+		if (meta != null && meta.internal()) {
+			return null;
+		}
+		if (Modifier.isStatic(field.getModifiers()) && field.getType() != Sign.class) {
+			return null;
+		}
+		Property property = new Property();
+		property.init();
+		property.setInherent(true);
+		property.setBelongName(belongClass.getSimpleName());
+		property.setCode(field.getName());
+		property.setName(property.getCode());
+		property.belongClazz = belongClass;
+		if (field.getType() == Sign.class) {
+			Sign sign = (Sign)field.get(null);
+			RelationKind kind = Primary.get().getRelationKind(clazz, sign);
+			if (kind == null) {
+				throw new RelationException(clazz.getName() + "`s field " + field.getName() + " not set relation annotation");
+			}
+			switch (kind) {
+			case Singleton:
+				property.setType(PropertyType.Object);
+				break;
+			default:
+				property.setType(PropertyType.List);
+				break;
+			}
+			property.sign = sign;
+			property.clazz = Primary.get().getRelationClass(clazz, sign);
+		} else {
+			property.clazz = field.getType();
+			property.setType(getPropertyType(field.getType()));
+		}
+		property.setTypeName(property.clazz.getName());
+		try {
+			property.getMethod = clazz.getMethod("get" + StringUtils.capitalize(property.getCode()));
+		} catch (Exception ex) {
+		}
+		try {
+			property.setMethod = clazz.getMethod("set" + StringUtils.capitalize(property.getCode()), property.clazz);
+		} catch (Exception ex) {
+		}
+		
+		if (meta != null) {
+			property.setEditType(meta.editType() != EditType.NONE ? meta.editType() : getDefaultEditType(property.getType()));
+			property.setModifiable(meta.modifiable());
+			property.setDisplay(meta.display());
+		} else {
+			property.setEditType(getDefaultEditType(property.getType()));
+		}
+		if (property.getMethod == null) {
+			throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not get method!");
+		}
+		if (property.setMethod == null && property.getType() != PropertyType.List) {
+			throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not set method!");
+		}
+		
+		return property;
+	}
+	
+	/*public static Property getProperty(Class<? extends EntityObject> clazz, String name) {
 		if (clazz == null) {
 			return null;
 		}
@@ -164,13 +256,13 @@ public class EntityUtils {
 		Map<String, Property> temp = properties.get(clazz);
 		Property result = temp != null ? temp.get(name) : null;
 		return result != null ? result : getProperty(Primary.get().getSuperClass(clazz), name);
-	}
+	}*/
 	
-	public static boolean hasProperty(Class<? extends EntityObject> clazz, String name) {
+	/*public static boolean hasProperty(Class<? extends EntityObject> clazz, String name) {
 		return getProperty(clazz, name) != null;
-	}
+	}*/
 	
-	public static List<Property> getPrimaries(Class<? extends EntityObject> clazz) {
+	/*public static List<Property> getPrimaries(Class<? extends EntityObject> clazz) {
 		List<Property> result = new LinkedList<>();
 		getPrimariesImpl(result, clazz);
 		if (result.isEmpty()) {
@@ -190,7 +282,7 @@ public class EntityUtils {
 			return;
 		}
 		result.addAll(temp);
-	}
+	}*/
 	
 	public static void checkProperty() throws Exception {
 		for (Entry<String, Class<? extends EntityObject>> entry : classes.entrySet()) {
@@ -208,7 +300,11 @@ public class EntityUtils {
 				if (meta != null && meta.internal()) {
 					continue;
 				}
+				if (Modifier.isStatic(field.getModifiers()) && field.getType() != Sign.class) {
+					continue;
+				}
 				Property property = new Property();
+				property.init();
 				property.setInherent(true);
 				property.setBelongName(clazz.getSimpleName());
 				property.setCode(field.getName());
@@ -229,15 +325,18 @@ public class EntityUtils {
 						break;
 					}
 					property.sign = sign;
+					property.clazz = Primary.get().getRelationClass(clazz, sign);
 				} else {
+					property.clazz = field.getType();
 					property.setType(getPropertyType(field.getType()));
 				}
+				property.setTypeName(property.clazz.getName());
 				try {
-					property.getMethod = clazz.getMethod("get" + StringUtils.capitalize(property.getName()));
+					property.getMethod = clazz.getMethod("get" + StringUtils.capitalize(property.getCode()));
 				} catch (Exception ex) {
 				}
 				try {
-					property.setMethod = clazz.getMethod("set" + StringUtils.capitalize(property.getName()), field.getType());
+					property.setMethod = clazz.getMethod("set" + StringUtils.capitalize(property.getCode()), property.clazz);
 				} catch (Exception ex) {
 				}
 				
@@ -248,10 +347,11 @@ public class EntityUtils {
 				} else {
 					property.setEditType(getDefaultEditType(property.getType()));
 				}
-				if (property.getMethod == null || property.setMethod == null) {
-					if (!Modifier.isStatic(field.getModifiers())) {
-						throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not get or set method!");
-					}
+				if (property.getMethod == null) {
+					throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not get method!");
+				}
+				if (property.setMethod == null && property.getType() != PropertyType.List) {
+					throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not set method!");
 				}
 				
 				temp.put(property.getCode(), property);
@@ -275,7 +375,7 @@ public class EntityUtils {
 	}
 	
 	public static PropertyType getPropertyType(Class<?> clazz) {
-		PropertyType type = PropertyType.UserDefined;
+		PropertyType type = PropertyType.None;
 		if (clazz == Boolean.class || clazz == boolean.class) {
 			type = PropertyType.Boolean;
 		} else if (clazz == Character.class || clazz == char.class) {
@@ -348,8 +448,6 @@ public class EntityUtils {
 		case Short:
 			clazz = Short.class;
 			break;
-		case UserDefined:
-			break;
 		case String:
 			clazz = String.class;
 			break;
@@ -398,8 +496,6 @@ public class EntityUtils {
 		case Short:
 			editType = EditType.TEXT;
 			break;
-		case UserDefined:
-			break;
 		case String:
 			editType = EditType.TEXT;
 			break;
@@ -418,9 +514,14 @@ public class EntityUtils {
 		Object value = null;
 		try {
 			if (property.getInherent()) {
-				value = property.getMethod.invoke(entity).toString();
+				value = property.getMethod.invoke(entity);
+			} else if (StringUtils.isEmpty(property.getExpression())) {
+				value = property.getMethod.invoke(entity, property.getCode());
 			} else {
-				value = property.getMethod.invoke(entity, property.getName());
+				IExpression expression = Primary.get().createExpression(property.getExpression());
+				if (expression != null) {
+					value = expression.getValue(entity);
+				}
 			}
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
@@ -436,33 +537,94 @@ public class EntityUtils {
 	}
 	
 	public static void setValue(EntityObject entity, Property property, Object value) {
-		if (property.setMethod == null) {
+		if (property.setMethod == null || value == null) {
 			return;
 		}
 		
 		try {
 			if (property.getInherent()) {
 				property.setMethod.invoke(entity, value);
-			} else {
-				property.setMethod.invoke(entity, property.getName(), value);
+			} else if (StringUtils.isEmpty(property.getExpression())) {
+				property.setMethod.invoke(entity, property.getCode(), value);
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void setTextValue(EntityObject entity, Property property, String str) {
+	public static Object convertTextValue(Property property, String str) {
 		Object value = null;
 		switch (property.getType()) {
+		case None:
+			throw new ParameterException(property.getBelongName() + "`s property " + property.getCode() + " type error");
 		case Boolean:
 			value = Boolean.valueOf(str);
 			break;
 		case Short:
 			value = Short.valueOf(str);
+			break;
+		case Integer:
+			value = Integer.valueOf(str);
+			break;
+		case Long:
+			value = Long.valueOf(str);
+			break;
+		case Double:
+			value = Double.valueOf(str);
+			break;
+		case Date:
+			if (str.isEmpty()) {
+				value = DateUtils.INVALID;
+			} else {
+				try {
+					value = DateUtils.Parse(str);
+				} catch (ParseException e) {
+					throw new ParameterException(e);
+				}
+			}
+			break;
+		case Duration: {
+			DateDur dur = new DateDur(str);
+			if (!dur.Valid() && !str.isEmpty()) {
+				throw new DateDurException("format error: " + str);
+			}
+			value = dur;
+		}
+			break;
+		case Enum: {
+			for (Object tso : property.clazz.getEnumConstants()) {
+				Enum<?> ts = (Enum<?>)tso;
+				if (ts.name().equalsIgnoreCase(str)) {
+					value = tso;
+					break;
+				}
+			}
+			if (value == null) {
+				throw new IllegalArgumentException("No enum constant " + property.clazz.getCanonicalName() + "." + str);
+			}
+		}
+			break;
+		case MultiEnum:
+			try {
+				MultiEnum<?> multiEnum = (MultiEnum<?>)property.clazz.newInstance();
+				multiEnum.parse(str);
+				value = multiEnum;
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new OperandException(e);
+			}
+			break;
+		case String:
+			value = str;
+			break;
 		default:
 			break;
 		}
-		setValue(entity, property, value);
+		
+		return value;
+	}
+	
+	public static void setTextValue(EntityObject entity, Property property, String str) {
+		setValue(entity, property, convertTextValue(property, str));
 	}
 	
 	/**
@@ -480,6 +642,7 @@ public class EntityUtils {
         module.addDeserializer(DateDur.class, new DateDurDeserializer());
         mapper.addHandler(new SignFieldHandler());
         mapper.getSerializerProvider().setNullValueSerializer(new NullValueSerializer());
+        mapper.setSerializerFactory(mapper.getSerializerFactory().withSerializerModifier(new EntitySerializerModifier()));
         mapper.registerModule(module);
         mapper.setDefaultSetterInfo(JsonSetter.Value.construct(Nulls.SKIP, Nulls.SKIP));
         return mapper;
@@ -490,7 +653,7 @@ public class EntityUtils {
 			return;
 		}
 		
-		List<Property> properties = getProperties(src.getClass());
+		List<Property> properties = AppUtils.getPropertyService().get(src.getClass());
 		for (Property property : properties) {
 			Object srcValue = getValue(src, property);
 			if (srcValue == null) {

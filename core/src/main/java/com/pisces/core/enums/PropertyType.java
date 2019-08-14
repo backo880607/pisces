@@ -1,6 +1,7 @@
 package com.pisces.core.enums;
 
 public enum PropertyType {
+	None,
 	Boolean,
 	Char,
 	Short,
@@ -13,6 +14,5 @@ public enum PropertyType {
 	MultiEnum,
 	String,
 	Object,
-	List,
-	UserDefined
+	List
 }

@@ -37,6 +37,7 @@ public class DateDur {
 	};
 	
 	public static final double PRECISION = 0.00001;
+	public static final DateDur INVALID = new DateDur("");
 	private String value;
 	private int time = 0;
 	private double rate = 0.0;

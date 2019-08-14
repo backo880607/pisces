@@ -8,9 +8,9 @@ public class DataSource extends EntityCoding {
 	@Override
 	public void init() {
 		super.init();
-		charset = "GBK";
+		charset = "utf-8";
 	}
-
+	
 	public final String getCharset() {
 		return charset;
 	}

@@ -9,6 +9,7 @@ import com.pisces.core.exception.ExistedException;
 import com.pisces.core.exception.NotImplementedException;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
+import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
@@ -35,10 +36,9 @@ public abstract class IOHelper {
 		}
 	}
 	
-	protected void checkPrimaryKey(Scheme scheme) {
+	protected void checkPrimaryKey(Scheme scheme, Collection<FieldInfo> fields) {
 		Class<? extends EntityObject> clazz = EntityUtils.getEntityClass(scheme.getInName());
-		Collection<FieldInfo> fields = scheme.getFields();
-		List<Property> properties = EntityUtils.getPrimaries(clazz);
+		List<Property> properties = AppUtils.getPropertyService().getPrimaries(clazz);
 		for (Property property : properties) {
 			boolean bFind = false;
 			for (FieldInfo field : fields) {
@@ -53,12 +53,11 @@ public abstract class IOHelper {
 		}
 	}
 	
-	protected void checkProperties(Scheme scheme) {
+	protected void checkProperties(Scheme scheme, Collection<FieldInfo> fields) {
 		Class<? extends EntityObject> clazz = EntityUtils.getEntityClass(scheme.getInName());
-		Collection<FieldInfo> fields = scheme.getFields();
 		for (FieldInfo field : fields) {
-			Property property = EntityUtils.getProperty(clazz, field.getName());
-			if (property != null) {
+			Property property = AppUtils.getPropertyService().get(clazz, field.getName());
+			if (property == null) {
 				throw new ExistedException("invalid field " + field.getExternName() + " in table " + scheme.getOutName());
 			}
 		}

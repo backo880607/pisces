@@ -13,6 +13,7 @@ import com.pisces.core.entity.MultiEnum;
 import com.pisces.core.relation.Sign;
 import com.pisces.rds.handler.MultiEnumTypeHandler;
 import com.pisces.rds.handler.SignTypeHandler;
+import com.pisces.rds.handler.UserFieldTypeHandler;
 
 import tk.mybatis.mapper.entity.Config;
 import tk.mybatis.mapper.entity.EntityColumn;
@@ -24,11 +25,15 @@ public class RelationEntityResolve extends DefaultEntityResolve {
 	@Override
 	public EntityTable resolveEntity(Class<?> entityClass, Config config) {
 		EntityTable table = super.resolveEntity(entityClass, config);
-		addRelationColumns(entityClass, table);
+		try {
+			addRelationColumns(entityClass, table);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return table;
 	}
 	
-	protected void addRelationColumns(Class<?> entityClazz, EntityTable table) {
+	protected void addRelationColumns(Class<?> entityClazz, EntityTable table) throws Exception {
 		Set<EntityColumn> columns = table.getEntityClassColumns();
 		Field[] fields = entityClazz.getFields();
 		for (Field field : fields) {
@@ -40,15 +45,11 @@ public class RelationEntityResolve extends DefaultEntityResolve {
 				column.setTypeHandler(SignTypeHandler.class);
 				column.setJdbcType(JdbcType.LONGVARCHAR);
 				EntityField entityField = new EntityField(null, null);
-				try {
-					modify(entityField, "name", field.getName());
-					modify(entityField, "field", field);
-					modify(entityField, "javaType", String.class);
-					modify(entityField, "setter", null);
-					modify(entityField, "getter", null);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				modify(entityField, "name", field.getName());
+				modify(entityField, "field", field);
+				modify(entityField, "javaType", String.class);
+				modify(entityField, "setter", null);
+				modify(entityField, "getter", null);
 				column.setEntityField(entityField);
 				columns.add(column);
 			}
@@ -68,21 +69,35 @@ public class RelationEntityResolve extends DefaultEntityResolve {
 						column.setJdbcType(JdbcType.INTEGER);
 						column.setTypeHandler(MultiEnumTypeHandler.class);
 						EntityField entityField = new EntityField(null, null);
-						try {
-							modify(entityField, "name", field.getName());
-							modify(entityField, "field", field);
-							modify(entityField, "javaType", field.getType());
-							modify(entityField, "setter", null);
-							modify(entityField, "getter", null);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						modify(entityField, "name", field.getName());
+						modify(entityField, "field", field);
+						modify(entityField, "javaType", field.getType());
+						modify(entityField, "setter", null);
+						modify(entityField, "getter", null);
 						column.setEntityField(entityField);
 						columns.add(column);
 					}
 				}
 			}
 			clazz = clazz.getSuperclass();
+		}
+		
+		if (clazz == EntityObject.class) {
+			Field field = clazz.getDeclaredField("userFields");
+			EntityColumn column = new EntityColumn(table);
+			column.setColumn(field.getName());
+			column.setProperty(field.getName());
+			column.setJavaType(field.getType());
+			column.setJdbcType(JdbcType.LONGVARCHAR);
+			column.setTypeHandler(UserFieldTypeHandler.class);
+			EntityField entityField = new EntityField(null, null);
+			modify(entityField, "name", field.getName());
+			modify(entityField, "field", field);
+			modify(entityField, "javaType", field.getType());
+			modify(entityField, "setter", null);
+			modify(entityField, "getter", null);
+			column.setEntityField(entityField);
+			columns.add(column);
 		}
 	}
 	

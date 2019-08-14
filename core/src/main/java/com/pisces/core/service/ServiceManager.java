@@ -17,7 +17,7 @@ public class ServiceManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T extends EntityObject> EntityService<T> getService(Class<? extends EntityObject> clazz) {
+	public static <T extends EntityObject> EntityService<T> getService(Class<T> clazz) {
 		return (EntityService<T>) services.get(clazz);
 	}
 	

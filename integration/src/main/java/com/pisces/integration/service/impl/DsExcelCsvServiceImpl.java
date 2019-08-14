@@ -1,16 +1,16 @@
 package com.pisces.integration.service.impl;
 
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.Collection;
 
 import org.springframework.stereotype.Service;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsExcelCsv;
 import com.pisces.integration.bean.FieldInfo;
@@ -22,11 +22,12 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 	
 	private CSVReader reader;
 	private String[] lineData;
+	private CSVWriter writer;
 	
 	private String getPath(DsExcelCsv excel, String tableName) {
 		String path = excel.getPath();
-		if (!path.endsWith("/")) {
-			path += "/";
+		if (!path.endsWith(File.separator)) {
+			path += File.separator;
 		}
 		return path + tableName + ".csv";
 	}
@@ -38,12 +39,9 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 		}
 		
 		DsExcelCsv excel = (DsExcelCsv)dataSource;
-		try (CSVReader temp = new CSVReader(new InputStreamReader(new FileInputStream(
-				getPath(excel, tableName)), excel.getCharset()))) {
-		} catch (Exception e) {
-			throw e;
-		}
-		return true;
+		reader = new CSVReader(new InputStreamReader(new FileInputStream(
+				getPath(excel, tableName)), excel.getCharset()));
+		return reader != null;
 	}
 
 	@Override
@@ -53,39 +51,33 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 		}
 		
 		DsExcelCsv excel = (DsExcelCsv)dataSource;
-		try {
-			this.reader = new CSVReader(new InputStreamReader(new FileInputStream(
+		this.reader = new CSVReader(new InputStreamReader(new FileInputStream(
 					getPath(excel, tableName)), excel.getCharset()));
-		} catch (UnsupportedEncodingException | FileNotFoundException e) {
-			close();
-			throw e;
-		}
-		return true;
+		return this.reader != null;
 	}
 
 	@Override
 	public void close() {
-		if (this.reader == null) {
-			return;
+		if (this.reader != null) {
+			try {
+				this.reader.close();
+				this.reader = null;
+			} catch (IOException e) {
+			}
 		}
-		
-		try {
-			this.reader.close();
-		} catch (IOException e) {
-		}
-		this.reader = null;
-	}
-	
-	@Override
-	public boolean checkTableStructure(DataSource dataSource, String tableName, Collection<FieldInfo> fields)
-			throws Exception {
-		return false;
 	}
 	
 	@Override
 	public boolean executeQuery(DataSource dataSource, String tableName, Collection<FieldInfo> fields)
 			throws Exception {
-		return false;
+		// skip the header
+		step();
+		return true;
+	}
+	
+	@Override
+	public Collection<FieldInfo> getFields() throws Exception {
+		return null;
 	}
 
 	@Override
@@ -106,6 +98,5 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 
 	@Override
 	public void write(Field field, String data) throws Exception {
-		
 	}
 }

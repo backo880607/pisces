@@ -110,7 +110,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funYear(Date date) {
-		return DateUtils.getYear(date);
+		return DateUtils.Year(date);
 	}
 	
 	/**
@@ -119,7 +119,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funMonth(Date date) {
-		return DateUtils.getMonth(date);
+		return DateUtils.Month(date);
 	}
 	
 	/**
@@ -128,7 +128,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funDay(Date date) {
-		return DateUtils.getDay(date);
+		return DateUtils.Day(date);
 	}
 	
 	/**
@@ -137,7 +137,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funHour(Date date) {
-		return DateUtils.getHour(date);
+		return DateUtils.Hour(date);
 	}
 	
 	/**
@@ -146,7 +146,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funMinute(Date date) {
-		return DateUtils.getMinute(date);
+		return DateUtils.Minute(date);
 	}
 	
 	/**
@@ -155,7 +155,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funSecond(Date date) {
-		return DateUtils.getSecond(date);
+		return DateUtils.Second(date);
 	}
 	
 	/**
@@ -173,7 +173,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funDayOfWeek(Date date) {
-		return DateUtils.getDayOfWeek(date);
+		return DateUtils.DayOfWeek(date);
 	}
 	
 	/**
@@ -182,7 +182,7 @@ class DateTimeFunction {
 	 * @return
 	 */
 	static long funWeekOfYear(Date date) {
-		return DateUtils.getWeekOfYear(date);
+		return DateUtils.WeekOfYear(date);
 	}
 	
 	/**

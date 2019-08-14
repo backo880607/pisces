@@ -7,7 +7,7 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.web")
 @LanguageAnnotation(message = WebMessage.class, path = "web")
-public class WebProperties implements BasicProperties {
+public class WebProperties extends BasicProperties {
 	private String clientId;
     private String base64Secret;
     private String name;

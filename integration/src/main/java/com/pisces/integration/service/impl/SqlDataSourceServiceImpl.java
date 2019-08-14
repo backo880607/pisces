@@ -4,8 +4,10 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import com.pisces.core.dao.BaseDao;
@@ -30,11 +32,10 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 		}
 		SqlDataSource ds = (SqlDataSource)dataSource;
 		Class.forName(getDriverName());
-		try (Connection tempConn = DriverManager.getConnection(getConnection(ds), ds.getUsername(), ds.getPassword());
-				Statement tempStmt = tempConn.createStatement(); 
-				ResultSet rs = tempStmt.executeQuery(existed(ds, tableName))) {
-			return rs.next();
-		}
+		conn = DriverManager.getConnection(getConnection(ds), ds.getUsername(), ds.getPassword());
+		stmt = conn.createStatement(); 
+		resultSet = stmt.executeQuery(existed(ds, tableName));
+		return resultSet.next();
 	}
 
 	@Override
@@ -51,16 +52,20 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 	@Override
 	public void close() {
 		try {
-			this.resultSet.close();
-			this.stmt.close();
-			this.conn.close();
+			if (this.resultSet != null) {
+				this.resultSet.close();
+				this.resultSet = null;
+			}
+			if (this.stmt != null) {
+				this.stmt.close();
+				this.stmt = null;
+			}
+			if (this.conn != null) {
+				this.conn.close();
+				this.conn = null;
+			}
 		} catch (SQLException e) {
 		}
-	}
-	
-	@Override
-	public boolean checkTableStructure(DataSource dataSource, String tableName, Collection<FieldInfo> fields) throws Exception {
-		return true;
 	}
 	
 	@Override
@@ -77,6 +82,18 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 		this.stmt = this.conn.createStatement();
 		this.resultSet = this.stmt.executeQuery(builder.toString());
 		return !this.resultSet.isClosed();
+	}
+	
+	@Override
+	public Collection<FieldInfo> getFields() throws Exception {
+		Collection<FieldInfo> result = new ArrayList<FieldInfo>();
+		ResultSetMetaData metaData = resultSet.getMetaData();
+		for (int i = 1; i <= metaData.getColumnCount(); ++i) {
+			FieldInfo field = new FieldInfo();
+			field.setName(metaData.getColumnName(i));
+			field.setExternName(field.getName());
+		}
+		return result;
 	}
 
 	@Override

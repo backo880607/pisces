@@ -18,7 +18,7 @@ class DsOracleServiceImpl extends SqlDataSourceServiceImpl<DsOracle, DsOracleDao
 	@Override
 	protected String getConnection(SqlDataSource dataSource) {
 		StringBuffer buffer = new StringBuffer("jdbc:oracle:thin:@");
-		buffer.append(dataSource.getIp()).append(":").append(dataSource.getIp());
+		buffer.append(dataSource.getIp()).append(":").append(dataSource.getPort());
 		buffer.append(":").append(dataSource.getDataBase());
 		return buffer.toString();
 	}

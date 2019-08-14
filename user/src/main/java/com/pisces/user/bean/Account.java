@@ -143,6 +143,10 @@ public class Account extends EntityObject {
 	public Collection<Tenant> getTenants() {
 		return getEntities(tenants);
 	}
+	
+	public Collection<Role> getRoles() {
+		return getEntities(roles);
+	}
 
 	public EffectTaskType getType() {
 		return type;

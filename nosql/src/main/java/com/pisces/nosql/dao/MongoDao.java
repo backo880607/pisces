@@ -67,7 +67,7 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	public int update(T record) {
 		Query query = new Query(Criteria.where("id").is(record.getId()));
         Update update= new Update();
-        List<Property> properties = EntityUtils.getProperties(this.clazz);
+        List<Property> properties = AppUtils.getPropertyService().get(this.clazz);
         for (Property property : properties) {
         	update.set(property.getName(), EntityUtils.getValue(record, property));
         }

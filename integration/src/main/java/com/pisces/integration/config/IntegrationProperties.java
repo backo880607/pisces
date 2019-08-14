@@ -7,6 +7,6 @@ import com.pisces.core.annotation.LanguageAnnotation;
 
 @ConfigurationProperties(prefix = "pisces.integration")
 @LanguageAnnotation(message = IntegrationMessage.class, path = "integration")
-public class IntegrationProperties implements BasicProperties {
+public class IntegrationProperties extends BasicProperties {
 
 }

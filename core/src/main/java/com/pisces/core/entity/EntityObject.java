@@ -9,7 +9,6 @@ import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pisces.core.enums.CreateUpdateType;
-import com.pisces.core.exception.ExistedException;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.utils.DateUtils;
@@ -28,6 +27,8 @@ public class EntityObject implements Comparable<EntityObject> {
 	private transient boolean created = false;
 	@JsonIgnore
 	private transient boolean modified = false;
+	@JsonIgnore
+	private transient boolean initialized = false;
 	
 	@JsonIgnore
 	private transient Map<Sign, RefBase> relations;
@@ -61,10 +62,11 @@ public class EntityObject implements Comparable<EntityObject> {
 		id = IDGenerator.instance.getID();
 		createBy = "";
 		updateBy = "";
-		createDate = DateUtils.INVALID_DATE;
-		updateDate = DateUtils.INVALID_DATE;
+		createDate = DateUtils.INVALID;
+		updateDate = DateUtils.INVALID;
 		createType = CreateUpdateType.SYSTEM;
 		updateType = CreateUpdateType.SYSTEM;
+		initialized = true;
 	}
 	
 	public Long getId() {
@@ -83,12 +85,20 @@ public class EntityObject implements Comparable<EntityObject> {
 		this.created = created;
 	}
 
-	public boolean isModified() {
+	public boolean getModified() {
 		return modified;
 	}
 
 	public void setModified(boolean modified) {
 		this.modified = modified;
+	}
+	
+	public boolean getInitialized() {
+		return initialized;
+	}
+	
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
 	}
 	
 	public Map<Sign, RefBase> getRelations() {
@@ -110,16 +120,10 @@ public class EntityObject implements Comparable<EntityObject> {
 	}
 	
 	public Object getUserFields(String name) {
-		if (!this.userFields.containsKey(name)) {
-			throw new ExistedException("user field`s name: " + name + " is not existed");
-		}
 		return this.userFields.get(name);
 	}
 	
 	public void setUserFields(String name, Object value) {
-		if (!this.userFields.containsKey(name)) {
-			throw new ExistedException("user field`s name: " + name + " is not existed");
-		}
 		this.userFields.put(name, value);
 	}
 	

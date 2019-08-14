@@ -14,6 +14,7 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.PropertyType;
 import com.pisces.core.relation.Ioc;
+import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 
 public class SignFieldHandler extends DeserializationProblemHandler {
@@ -25,7 +26,7 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 		if (EntityObject.class.isAssignableFrom(deserializer.handledType())) {
 			Class<? extends EntityObject> clazz = (Class<? extends EntityObject>) deserializer.handledType();
 			EntityObject entity = (EntityObject) beanOrClass;
-			Property property = EntityUtils.getProperty(clazz, propertyName);
+			Property property = AppUtils.getPropertyService().get(clazz, propertyName);
 			if (property != null) {
 				if (property.sign != null) {
 					return handleRelationProperty(entity, property, p);
@@ -85,8 +86,10 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 	}
 	
 	private boolean handleUserProperty(EntityObject entity, Property property, JsonParser p) throws IOException {
-		JsonNode node = p.getCodec().readTree(p);
-		EntityUtils.setTextValue(entity, property, node.textValue());
+		if (property.getModifiable()) {
+			JsonNode node = p.getCodec().readTree(p);
+			EntityUtils.setTextValue(entity, property, node.textValue());
+		}
 		return true;
 	}
 }

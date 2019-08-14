@@ -3,6 +3,7 @@ package com.pisces.integration.bean;
 import java.util.Collection;
 
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import com.pisces.core.annotation.Relation;
 import com.pisces.core.entity.EntityCoding;
@@ -12,6 +13,7 @@ import com.pisces.integration.enums.SchemeType;
 
 @Table(name = "integration_scheme_group")
 public class SchemeGroup extends EntityCoding {
+	@NotNull
 	private SchemeType type;
 	
 	@Relation(clazz="Scheme", sign="schemeGroup", type=Type.OneToMulti, owner=true)

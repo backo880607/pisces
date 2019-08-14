@@ -13,6 +13,7 @@ public class DataSet extends EntityCoding {
 	@Override
 	public void init() {
 		super.init();
+		type = new EffectTaskType(EffectTaskType.Impl.Manuf);
 	}
 
 	public EffectTaskType getType() {
