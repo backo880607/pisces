@@ -14,10 +14,10 @@ import com.pisces.core.utils.EntityUtils;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
-import com.pisces.integration.service.DataSourceService;
+import com.pisces.integration.service.DataSourceAdapter;
 
 public abstract class IOHelper {
-	protected DataSourceService<? extends DataSource> dataSourceService;
+	protected DataSourceAdapter adapter;
 	private DataConfig config;
 	
 	public DataConfig getConfig() {
@@ -26,11 +26,10 @@ public abstract class IOHelper {
 	
 	public abstract void execute(Collection<Scheme> schemes);
 	
-	@SuppressWarnings("unchecked")
 	protected void switchDataSourceService(DataSource dataSource) {
 		EntityService<? extends EntityObject> service = ServiceManager.getService(dataSource.getClass());
 		if (service != null) {
-			this.dataSourceService = (DataSourceService<? extends DataSource>) service;
+			this.adapter = (DataSourceAdapter) service;
 		} else {
 			throw new NotImplementedException("datasource " + dataSource.getName() + " not implement service class!");
 		}

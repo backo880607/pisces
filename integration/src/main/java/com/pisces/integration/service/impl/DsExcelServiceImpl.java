@@ -15,6 +15,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import com.pisces.core.entity.EntityObject;
+import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.core.utils.StringUtils;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsExcel;
@@ -23,7 +25,7 @@ import com.pisces.integration.dao.DsExcelDao;
 import com.pisces.integration.service.DsExcelService;
 
 @Service
-public class DsExcelServiceImpl extends DataSourceServiceImpl<DsExcel, DsExcelDao> implements DsExcelService {
+public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> implements DsExcelService {
 	private Workbook book;
 	private Sheet sheet;
 	private Row row;
@@ -126,9 +128,23 @@ public class DsExcelServiceImpl extends DataSourceServiceImpl<DsExcel, DsExcelDa
 	public String getData(Field field) throws Exception {
 		return null;
 	}
+	
+	@Override
+	public void writeHeader(Collection<FieldInfo> fields) {
+	}
+	
+	@Override
+	public void beforeWriteEntity(EntityObject entity) {
+		
+	}
 
 	@Override
-	public void write(Field field, String data) throws Exception {
+	public void write(int index, String data) throws Exception {
+		
+	}
+
+	@Override
+	public void afterWriteEntity(EntityObject entity) {
 		
 	}
 

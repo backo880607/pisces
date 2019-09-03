@@ -70,6 +70,7 @@ public abstract class SQLProvider {
 	}
 
 	public abstract String existedTable(String tableName);
+	public abstract boolean existedTable(ResultSet resultSet) throws SQLException;
 	public abstract String createTable(String tableName, Class<?> entityClass) throws SQLException;
 	public abstract String addColumns(String tableName, List<EntityColumn> columns) throws SQLException;
 	public abstract String changeColumns(String tableName, List<EntityColumn> columns) throws SQLException;

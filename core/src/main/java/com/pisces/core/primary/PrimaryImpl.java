@@ -34,6 +34,21 @@ public class PrimaryImpl implements Primary {
 	}
 	
 	@Override
+	public void registerEntityClass(Class<? extends EntityObject> clazz) {
+		FactoryManager.registerEntityClass(clazz);;
+	}
+
+	@Override
+	public List<Class<? extends EntityObject>> getEntityClasses() {
+		return FactoryManager.getEntityClasses();
+	}
+
+	@Override
+	public Class<? extends EntityObject> getEntityClass(String name) {
+		return FactoryManager.getEntityClass(name);
+	}
+	
+	@Override
 	public Class<? extends EntityObject> getSuperClass(Class<? extends EntityObject> clazz) {
 		EntityFactory superFactory = FactoryManager.getFactory(clazz).getSuperFactory();
 		return superFactory != null ? superFactory.getEntityClass() : null;

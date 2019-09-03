@@ -1,5 +1,6 @@
 package com.pisces.rds.provider.base;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +97,11 @@ public class MySQLProvider extends SQLProvider {
 	}
 	
 	@Override
+	public boolean existedTable(ResultSet resultSet) throws SQLException {
+		return resultSet.getInt(1) > 0;
+	}
+	
+	@Override
 	public String createTable(String tableName, Class<?> entityClass) throws SQLException {
 		StringBuilder sql = new StringBuilder();
 		sql.append("CREATE TABLE ").append(tableName).append(" (");
@@ -122,9 +128,7 @@ public class MySQLProvider extends SQLProvider {
 	public String addColumns(String tableName, List<EntityColumn> columns) throws SQLException {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE ").append(tableName).append(" ADD ");
-		if (columns.size() > 1) {
-			sql.append("(");
-		}
+		sql.append("(");
 		boolean bFind = false;
 		for (EntityColumn column : columns) {
 			if (bFind) {
@@ -133,9 +137,7 @@ public class MySQLProvider extends SQLProvider {
 			sql.append(column.getColumn()).append(" ").append(getSQLType(column));
 			bFind = true;
 		}
-		if (columns.size() > 1) {
-			sql.append(")");
-		}
+		sql.append(")");
 		return sql.toString();
 	}
 

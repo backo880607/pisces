@@ -26,8 +26,6 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	@SuppressWarnings("unchecked")
 	public MongoDao() {
 		this.clazz = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		EntityUtils.registerEntityClass(clazz);
-		
 	}
 
 	@Override
@@ -112,11 +110,6 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	@Override
 	public List<T> selectMap(Collection<Long> ids) {
 		return null;
-	}
-
-	@Override
-	public void afterLoadData() {
-		
 	}
 
 }

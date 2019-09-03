@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.pisces.core.locale.LocaleManager;
 import com.pisces.core.primary.expression.EnumHelper;
-import com.pisces.core.utils.Primary;
+import com.pisces.core.utils.EntityUtils;
 
 public class Initializer {
 	private final static String dllCore = "core";
@@ -75,7 +75,7 @@ public class Initializer {
 	public static void execute() {
 		try {
 			EnumHelper.init();
-			Primary.get().init();
+			EntityUtils.init();
 			LocaleManager.init();
 			//load(EntityUtil.getEntityClasses());
 		} catch (Exception e) {

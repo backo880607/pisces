@@ -111,7 +111,7 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
 	}
 
 	@Override
-	public final void loadData() {
+	public void loadData() {
 		List<T> objects = mapper.selectAll();
 		if (objects.isEmpty()) {
 			try {
@@ -129,11 +129,6 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
 		}
 		
 		this.impl.get().modified = false;
-		afterLoadData();
-	}
-	
-	@Override
-	public void afterLoadData() {
 	}
 
 	@Override

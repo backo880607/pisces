@@ -1,5 +1,6 @@
 package com.pisces.rds.provider.base;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,15 @@ public class SQLiteProvider extends SQLProvider {
 
 	@Override
 	public String existedTable(String tableName) {
-		return null;
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * FROM sqlite_master WHERE type='table' AND name='");
+		sql.append(tableName).append("'");
+		return sql.toString();
+	}
+	
+	@Override
+	public boolean existedTable(ResultSet resultSet) throws SQLException {
+		return resultSet.getInt(1) > 0;
 	}
 
 	@Override

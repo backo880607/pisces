@@ -80,11 +80,7 @@ public class GlobalDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public final void loadData() {
-	}
-	
-	@Override
-	public final void afterLoadData() {
+	public void loadData() {
 	}
 	
 	@Override

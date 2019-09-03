@@ -14,7 +14,8 @@ public class LanguageDao extends SQLSingletonDao<Language> {
 	private LanguageService languageService;
 	
 	@Override
-	public void afterLoadData() {
+	public void loadData() {
+		super.loadData();
 		languageService.switchLocale(select().getLocale());
 	}
 }

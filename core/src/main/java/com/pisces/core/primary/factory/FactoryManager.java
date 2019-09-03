@@ -1,7 +1,5 @@
 package com.pisces.core.primary.factory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,22 +7,20 @@ import java.util.Map;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.exception.RegisteredException;
-import com.pisces.core.utils.EntityUtils;
 
 public final class FactoryManager {
+	private static List<Class<? extends EntityObject>> classes = new ArrayList<Class<? extends EntityObject>>();
 	private static Map<Class<? extends EntityObject>, EntityFactory> factories = new HashMap<>();
 	private static Map<String, EntityFactory> factoryNames = new HashMap<>();
 	
 	public static void init() {
-		EntityUtils.init();
-		List<Class<? extends EntityObject>> clazzs = EntityUtils.getEntityClasses();
-		for (Class<? extends EntityObject> clazz : clazzs) {
+		for (Class<? extends EntityObject> clazz : classes) {
 			EntityFactory factory = new EntityFactory(clazz);
 			FactoryManager.factories.put(clazz, factory);
 			FactoryManager.factoryNames.put(clazz.getSimpleName(), factory);
 		}
 		
-		for (Class<? extends EntityObject> clazz : clazzs) {
+		for (Class<? extends EntityObject> clazz : classes) {
 			@SuppressWarnings("unchecked")
 			Class<? extends EntityObject> superClazz = (Class<? extends EntityObject>) clazz.getSuperclass();
 			EntityFactory factory = FactoryManager.factories.get(clazz);
@@ -36,13 +32,18 @@ public final class FactoryManager {
 		}
 		
 		FactoryHelp.initRelation();
-		
-		try {
-			EntityUtils.checkProperty();
-			checkEntity();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	}
+	
+	public static void registerEntityClass(Class<? extends EntityObject> clazz) {
+		classes.add(clazz);
+	}
+	
+	public static List<Class<? extends EntityObject>> getEntityClasses() {
+		return classes;
+	}
+	
+	public static Class<? extends EntityObject> getEntityClass(String name) {
+		return getFactory(name).getEntityClass();
 	}
 	
 	/**
@@ -88,25 +89,5 @@ public final class FactoryManager {
 		return entityFactory;
 	}
 	
-	public static void checkEntity() throws Exception {
-		List<Class<? extends EntityObject>> clazzs = EntityUtils.getEntityClasses();
-		for (Class<? extends EntityObject> clazz : clazzs) {
-			if (clazz.getSimpleName().equals("Property") ||
-				clazz.getSimpleName().equals("EntityObject")) {
-				continue;
-			}
-			EntityObject entity = clazz.newInstance();
-			entity.init();
-			Field[] fields = clazz.getDeclaredFields();
-			for (Field field : fields) {
-				if (Modifier.isStatic(field.getModifiers())) {
-					continue;
-				}
-				field.setAccessible(true);
-				if (field.get(entity) == null) {
-					throw new NullPointerException(clazz.getName() + "`s field " + field.getName() + " has not default value.");
-				}
-			}
-		}
-	}
+	
 }

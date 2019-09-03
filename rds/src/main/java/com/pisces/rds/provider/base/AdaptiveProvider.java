@@ -1,5 +1,6 @@
 package com.pisces.rds.provider.base;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,11 @@ public class AdaptiveProvider extends SQLProvider {
 	@Override
 	public String existedTable(String tableName) {
 		return null;
+	}
+	
+	@Override
+	public boolean existedTable(ResultSet resultSet) throws SQLException {
+		return resultSet.getInt(1) > 0;
 	}
 
 	@Override

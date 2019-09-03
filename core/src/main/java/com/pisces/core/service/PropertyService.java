@@ -10,4 +10,5 @@ public interface PropertyService extends EntityService<Property> {
 	public List<Property> get(Class<? extends EntityObject> clazz);
 	public Property get(Class<? extends EntityObject> clazz, String code);
 	public List<Property> getPrimaries(Class<? extends EntityObject> clazz);
+	public List<Property> getVisiables(Class<? extends EntityObject> clazz);
 }

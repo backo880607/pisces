@@ -22,6 +22,5 @@ public interface BaseDao<T extends EntityObject> {
 	void switchDaoImpl(DaoImpl impl);
 	
 	void loadData();
-	void afterLoadData();
 	void sync();
 }

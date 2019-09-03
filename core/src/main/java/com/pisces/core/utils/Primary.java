@@ -28,6 +28,10 @@ public interface Primary {
 	void createRelation(EntityObject entity);
 	IExpression createExpression(String str);
 	
+	void registerEntityClass(Class<? extends EntityObject> clazz);
+	List<Class<? extends EntityObject>> getEntityClasses();
+	Class<? extends EntityObject> getEntityClass(String name);
+	
 	Class<? extends EntityObject> getSuperClass(Class<? extends EntityObject> clazz);
 	Class<? extends EntityObject> getSuperClass(String name);
 	List<Class<? extends EntityObject>> getChildClasses(Class<? extends EntityObject> clazz);

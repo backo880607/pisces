@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import com.pisces.core.entity.EntityObject;
+import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsExcelCsv;
 import com.pisces.integration.bean.FieldInfo;
@@ -18,7 +20,7 @@ import com.pisces.integration.dao.DsExcelCsvDao;
 import com.pisces.integration.service.DsExcelCsvService;
 
 @Service
-class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsvDao> implements DsExcelCsvService {
+class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao> implements DsExcelCsvService {
 	
 	private CSVReader reader;
 	private String[] lineData;
@@ -70,7 +72,6 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 	@Override
 	public boolean executeQuery(DataSource dataSource, String tableName, Collection<FieldInfo> fields)
 			throws Exception {
-		// skip the header
 		step();
 		return true;
 	}
@@ -97,6 +98,21 @@ class DsExcelCsvServiceImpl extends DataSourceServiceImpl<DsExcelCsv, DsExcelCsv
 	}
 
 	@Override
-	public void write(Field field, String data) throws Exception {
+	public void writeHeader(Collection<FieldInfo> fields) {
+		
+	}
+	
+	@Override
+	public void beforeWriteEntity(EntityObject entity) {
+		
+	}
+	
+	@Override
+	public void write(int index, String data) throws Exception {
+	}
+
+	@Override
+	public void afterWriteEntity(EntityObject entity) {
+		
 	}
 }

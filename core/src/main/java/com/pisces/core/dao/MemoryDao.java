@@ -18,7 +18,6 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 	private ThreadLocal<MemoryDaoImpl<T>> impl = new ThreadLocal<>();
 	
 	public MemoryDao() {
-		EntityUtils.registerEntityClass(getEntityClass());
 		DaoManager.register(this);
 	}
 	
@@ -115,12 +114,7 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 	}
 	
 	@Override
-	public final void loadData() {
-		afterLoadData();
-	}
-	
-	@Override
-	public void afterLoadData() {
+	public void loadData() {
 	}
 	
 	@Override

@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.pisces.core.dao.BaseDao;
+import com.pisces.core.entity.EntityObject;
+import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.SqlDataSource;
 import com.pisces.integration.service.SqlDataSourceService;
 
-abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseDao<T>> extends DataSourceServiceImpl<T, D> implements SqlDataSourceService<T> {
+abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseDao<T>> extends EntityServiceImpl<T, D> implements SqlDataSourceService<T> {
 	private Connection conn;
 	private Statement stmt;
 	private ResultSet resultSet;
@@ -110,8 +112,22 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 	public String getData(Field field) throws Exception {
 		return this.resultSet.getString(field.getName());
 	}
+	
+	@Override
+	public void writeHeader(Collection<FieldInfo> fields) {
+	}
 
 	@Override
-	public void write(Field field, String data) throws Exception {		
+	public void beforeWriteEntity(EntityObject entity) {
+		
+	}
+	
+	@Override
+	public void write(int index, String data) throws Exception {
+	}
+	
+	@Override
+	public void afterWriteEntity(EntityObject entity) {
+		
 	}
 }

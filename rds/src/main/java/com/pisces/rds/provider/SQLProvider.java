@@ -13,8 +13,6 @@ import java.util.Set;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.type.JdbcType;
 
-import com.pisces.core.entity.EntityObject;
-import com.pisces.core.utils.EntityUtils;
 import com.pisces.rds.config.EntityWrapperFactory;
 import com.pisces.rds.config.MybatisEntityFactory;
 
@@ -40,7 +38,6 @@ public class SQLProvider extends BaseProvider {
 	}
 	
 	private static boolean notChecked = true;
-	@SuppressWarnings("unchecked")
 	public void checkTable(MappedStatement ms) throws SQLException {
 		if (notChecked) {
 			notChecked = false;
@@ -49,7 +46,6 @@ public class SQLProvider extends BaseProvider {
 			return;
 		}
 		Class<?> entityClazz = getEntityClass(ms);
-		EntityUtils.registerEntityClass((Class<? extends EntityObject>)entityClazz);
 		try (Connection conn = ms.getConfiguration().getEnvironment().getDataSource().getConnection()) {
 			if (!doExistedTable(conn, ms)) {
 				doCreateTable(conn, ms);
@@ -94,7 +90,7 @@ public class SQLProvider extends BaseProvider {
 		try (PreparedStatement stmt = conn.prepareStatement(existedTable(ms)); 
 				ResultSet resultSet = stmt.executeQuery()) {
 			if (resultSet.next()) {
-				bOK = resultSet.getInt(1) > 0;
+				bOK = getProvider(ms).existedTable(resultSet);
 			}
 		}
 		return bOK;

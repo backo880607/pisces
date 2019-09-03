@@ -17,7 +17,6 @@ import com.pisces.core.dao.BaseDao;
 import com.pisces.core.dao.DaoManager;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.utils.EntityUtils;
 import com.pisces.nosql.utils.RedisUtils;
 
 public class RedisDao<T extends EntityObject> implements BaseDao<T> {
@@ -31,7 +30,6 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 	@SuppressWarnings("unchecked")
 	public RedisDao() {
 		this.clazz = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		EntityUtils.registerEntityClass(this.clazz);
 		DaoManager.register(this);
 	}
 	
@@ -127,10 +125,6 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 	@Override
 	public List<T> selectMap(Collection<Long> ids) {
 		return null;
-	}
-
-	@Override
-	public void afterLoadData() {
 	}
 
 }

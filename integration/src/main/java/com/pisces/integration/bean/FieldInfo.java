@@ -3,12 +3,12 @@ package com.pisces.integration.bean;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
-import com.pisces.core.entity.EntityCoding;
+import com.pisces.core.entity.EntityObject;
 import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 
 @Table(name = "integration_field_info")
-public class FieldInfo extends EntityCoding {
+public class FieldInfo extends EntityObject {
 	@NotBlank
 	private String name;
 	@NotBlank

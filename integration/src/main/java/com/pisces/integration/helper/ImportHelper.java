@@ -41,24 +41,24 @@ public class ImportHelper extends IOHelper {
 			}
 			try {
 				switchDataSourceService(scheme.getDataSource());
-				if (!dataSourceService.validConnection(scheme.getDataSource(), scheme.getOutName())) {
+				if (!adapter.validConnection(scheme.getDataSource(), scheme.getOutName())) {
 					throw new DataSourceException("datasource " + scheme.getDataSource().getName() + " connection failed!");
 				}
 				
 				Collection<FieldInfo> fields = scheme.getFields();
 				if (fields.isEmpty()) {
-					fields = dataSourceService.getFields();
+					fields = adapter.getFields();
 				}
 				checkPrimaryKey(scheme, fields);
 				checkProperties(scheme, fields);
 			} catch (Exception ex) {
-				if (dataSourceService != null) {
-					dataSourceService.close();
+				if (adapter != null) {
+					adapter.close();
 				}
 				throw new OperandException(ex);
 			} finally {
-				if (dataSourceService != null) {
-					dataSourceService.close();
+				if (adapter != null) {
+					adapter.close();
 				}
 			}
 		}
@@ -66,14 +66,14 @@ public class ImportHelper extends IOHelper {
 		for (Scheme scheme : schemes) {
 			try {
 				switchDataSourceService(scheme.getDataSource());
-				dataSourceService.open(scheme.getDataSource(), scheme.getOutName());
+				adapter.open(scheme.getDataSource(), scheme.getOutName());
 				Collection<FieldInfo> fields = scheme.getFields();
 				if (fields.isEmpty()) {
-					fields = dataSourceService.getFields();
+					fields = adapter.getFields();
 				}
-				if (dataSourceService.executeQuery(scheme.getDataSource(), scheme.getOutName(), fields)) {
+				if (adapter.executeQuery(scheme.getDataSource(), scheme.getOutName(), fields)) {
 					Class<? extends EntityObject> clazz = EntityUtils.getEntityClass(scheme.getInName());
-					while (dataSourceService.step()) {
+					while (adapter.step()) {
 						EntityObject entity = createEntity(clazz);
 						if (entity == null) {
 							continue;
@@ -95,19 +95,19 @@ public class ImportHelper extends IOHelper {
 					}
 				}
 			} catch (Exception e) {
-				if (dataSourceService != null) {
-					dataSourceService.close();
+				if (adapter != null) {
+					adapter.close();
 				}
 			} finally {
-				if (dataSourceService != null) {
-					dataSourceService.close();
+				if (adapter != null) {
+					adapter.close();
 				}
 			}
 		}
 	}
 	
 	private String obtainValue(int index) throws Exception {
-		String value = dataSourceService.getData(index);
+		String value = adapter.getData(index);
 		value.replace(getConfig().getReplaceField(), getConfig().getSepField());
 		value.replace(getConfig().getReplaceEntity(), getConfig().getSepEntity());
 		return value;

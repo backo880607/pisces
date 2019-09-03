@@ -2,6 +2,7 @@ package com.pisces.core.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -11,8 +12,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.util.StringUtils;
 
@@ -41,7 +40,6 @@ import com.pisces.core.exception.ConfigurationException;
 import com.pisces.core.exception.DateDurException;
 import com.pisces.core.exception.OperandException;
 import com.pisces.core.exception.ParameterException;
-import com.pisces.core.exception.RegisteredException;
 import com.pisces.core.exception.RelationException;
 import com.pisces.core.relation.RelationKind;
 import com.pisces.core.relation.Sign;
@@ -49,51 +47,23 @@ import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
 
 public class EntityUtils {
-	private static final Map<String, Class<? extends EntityObject>> classes = new HashMap<>();
-	private static final Map<Class<? extends EntityObject>, Map<String, Property>> properties = new HashMap<>();
-	private static final Map<Class<? extends EntityObject>, List<Property>> primaries = new HashMap<>();
-	
-	public static void registerEntityClass(Class<? extends EntityObject> clazz) {
-		if (classes.containsKey(clazz.getSimpleName())) {
-			throw new RegisteredException(clazz.getName() + " has registered!");
-		}
-		classes.put(clazz.getSimpleName(), clazz);
-		properties.put(clazz, new HashMap<>());
-		primaries.put(clazz, new LinkedList<>());
-	}
 	
 	public static void init() {
-		for (Class<? extends EntityObject> clazz : getEntityClasses()) {
-			initImpl(clazz);
-		}
-	}
-	@SuppressWarnings("unchecked")
-	private static void initImpl(Class<? extends EntityObject> clazz) {
-		if (!classes.containsKey(clazz.getSimpleName())) {
-			classes.put(clazz.getSimpleName(), clazz);
-			properties.put(clazz, new ConcurrentHashMap<>());
-			primaries.put(clazz, new LinkedList<>());
-		}
-		Class<?> superClass = clazz.getSuperclass();
-		if (superClass != Object.class) {
-			initImpl((Class<? extends EntityObject>)superClass);
+		Primary.get().init();
+		try {
+			checkProperty();
+			checkEntity();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
 	public static List<Class<? extends EntityObject>> getEntityClasses() {
-		List<Class<? extends EntityObject>> result = new ArrayList<>();
-		for (Entry<String, Class<? extends EntityObject>> entry : classes.entrySet()) {
-			result.add(entry.getValue());
-		}
-		return result;
+		return Primary.get().getEntityClasses();
 	}
 	
 	public static Class<? extends EntityObject> getEntityClass(String name) {
-		Class<? extends EntityObject> clazz = classes.get(name);
-		if (clazz == null) {
-			throw new RegisteredException("enitty class name:" + name + " has not registered!");
-		}
-		return clazz;
+		return Primary.get().getEntityClass(name);
 	}
 	
 	public static Class<? extends EntityObject> getSuperClass(Class<? extends EntityObject> clazz) {
@@ -248,50 +218,10 @@ public class EntityUtils {
 		return property;
 	}
 	
-	/*public static Property getProperty(Class<? extends EntityObject> clazz, String name) {
-		if (clazz == null) {
-			return null;
-		}
-		
-		Map<String, Property> temp = properties.get(clazz);
-		Property result = temp != null ? temp.get(name) : null;
-		return result != null ? result : getProperty(Primary.get().getSuperClass(clazz), name);
-	}*/
-	
-	/*public static boolean hasProperty(Class<? extends EntityObject> clazz, String name) {
-		return getProperty(clazz, name) != null;
-	}*/
-	
-	/*public static List<Property> getPrimaries(Class<? extends EntityObject> clazz) {
-		List<Property> result = new LinkedList<>();
-		getPrimariesImpl(result, clazz);
-		if (result.isEmpty()) {
-			result.add(getProperty(EntityObject.class, "id"));
-		}
-		return result;
-	}
-	
-	private static void getPrimariesImpl(List<Property> result, Class<? extends EntityObject> clazz) {
-		if (clazz == null) {
-			return;
-		}
-		
-		getPrimariesImpl(result, Primary.get().getSuperClass(clazz));
-		List<Property> temp = primaries.get(clazz);
-		if (temp == null) {
-			return;
-		}
-		result.addAll(temp);
-	}*/
-	
 	public static void checkProperty() throws Exception {
-		for (Entry<String, Class<? extends EntityObject>> entry : classes.entrySet()) {
-			Class<? extends EntityObject> clazz = entry.getValue();
-			Map<String, Property> temp = properties.get(clazz);
-			if (temp == null) {
-				throw new RegisteredException(clazz.getName() + " has not registered!");
-			}
+		for (Class<? extends EntityObject> clazz : getEntityClasses()) {
 			Field[] fields = clazz.getDeclaredFields();
+			Map<String, Field> fieldCache = new HashMap<String, Field>();
 			for (Field field : fields) {
 				if (Modifier.isTransient(field.getModifiers())) {
 					continue;
@@ -303,13 +233,9 @@ public class EntityUtils {
 				if (Modifier.isStatic(field.getModifiers()) && field.getType() != Sign.class) {
 					continue;
 				}
-				Property property = new Property();
-				property.init();
-				property.setInherent(true);
-				property.setBelongName(clazz.getSimpleName());
-				property.setCode(field.getName());
-				property.setName(property.getCode());
-				property.belongClazz = clazz;
+				
+				PropertyType type = PropertyType.None;
+				Class<?> fieldClass = null;
 				if (field.getType() == Sign.class) {
 					Sign sign = (Sign)field.get(null);
 					RelationKind kind = Primary.get().getRelationKind(clazz, sign);
@@ -318,57 +244,68 @@ public class EntityUtils {
 					}
 					switch (kind) {
 					case Singleton:
-						property.setType(PropertyType.Object);
+						type = PropertyType.Object;
 						break;
 					default:
-						property.setType(PropertyType.List);
+						type = PropertyType.List;
 						break;
 					}
-					property.sign = sign;
-					property.clazz = Primary.get().getRelationClass(clazz, sign);
+					fieldClass = Primary.get().getRelationClass(clazz, sign);
 				} else {
-					property.clazz = field.getType();
-					property.setType(getPropertyType(field.getType()));
+					type = getPropertyType(field.getType());
+					fieldClass = field.getType();
 				}
-				property.setTypeName(property.clazz.getName());
+				Method getMethod = null;
+				Method setMethod = null;
 				try {
-					property.getMethod = clazz.getMethod("get" + StringUtils.capitalize(property.getCode()));
+					getMethod = clazz.getMethod("get" + StringUtils.capitalize(field.getName()));
 				} catch (Exception ex) {
 				}
 				try {
-					property.setMethod = clazz.getMethod("set" + StringUtils.capitalize(property.getCode()), property.clazz);
+					setMethod = clazz.getMethod("set" + StringUtils.capitalize(field.getName()), fieldClass);
 				} catch (Exception ex) {
 				}
 				
-				if (meta != null) {
-					property.setEditType(meta.editType() != EditType.NONE ? meta.editType() : getDefaultEditType(property.getType()));
-					property.setModifiable(meta.modifiable());
-					property.setDisplay(meta.display());
-				} else {
-					property.setEditType(getDefaultEditType(property.getType()));
+				if (getMethod == null) {
+					throw new NoSuchMethodException(clazz.getName() + "`s Field " + field.getName() + " has not get method!");
 				}
-				if (property.getMethod == null) {
-					throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not get method!");
-				}
-				if (property.setMethod == null && property.getType() != PropertyType.List) {
-					throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not set method!");
+				if (setMethod == null && type != PropertyType.List) {
+					throw new NoSuchMethodException(clazz.getName() + "`s Field " + field.getName() + " has not set method!");
 				}
 				
-				temp.put(property.getCode(), property);
+				fieldCache.put(field.getName(), field);
 			}
 			
-			List<Property> primaryProperties = primaries.get(clazz);
 			PrimaryKey primaryKey = clazz.getAnnotation(PrimaryKey.class);
 			if (primaryKey != null) {
 				String[] primaryFields = primaryKey.fields();
 				for (String primaryField : primaryFields) {
-					Property property = temp.get(primaryField);
-					if (property == null) {
+					Field field = fieldCache.get(primaryField);
+					if (field == null) {
 						throw new ConfigurationException(clazz.getName() + " config primary key has error field name: " + primaryField);
 					}
-					
-					property.setPrimaryKey(true);
-					primaryProperties.add(property);
+				}
+			}
+		}
+	}
+	
+	public static void checkEntity() throws Exception {
+		List<Class<? extends EntityObject>> clazzs = getEntityClasses();
+		for (Class<? extends EntityObject> clazz : clazzs) {
+			if (clazz.getSimpleName().equals("Property") ||
+				clazz.getSimpleName().equals("EntityObject")) {
+				continue;
+			}
+			EntityObject entity = clazz.newInstance();
+			entity.init();
+			Field[] fields = clazz.getDeclaredFields();
+			for (Field field : fields) {
+				if (Modifier.isStatic(field.getModifiers())) {
+					continue;
+				}
+				field.setAccessible(true);
+				if (field.get(entity) == null) {
+					throw new NullPointerException(clazz.getName() + "`s field " + field.getName() + " has not default value.");
 				}
 			}
 		}
@@ -533,11 +470,31 @@ public class EntityUtils {
 	
 	public static String getTextValue(EntityObject entity, Property property) {
 		Object value = getValue(entity, property);
-		return value != null ? value.toString() : "";
+		if (value == null) {
+			return "";
+		}
+		
+		String result = "";
+		switch (property.getType()) {
+		case None:
+			throw new ParameterException(property.getBelongName() + "`s property " + property.getCode() + " type error");
+		case Date:
+			if (!value.equals(DateUtils.INVALID)) {
+				result = DateUtils.Format((Date)value);
+			}
+			break;
+		case Duration:
+			result = ((DateDur)value).getString();
+			break;
+		default:
+			result = value.toString();
+			break;
+		}
+		return result;
 	}
 	
 	public static void setValue(EntityObject entity, Property property, Object value) {
-		if (property.setMethod == null || value == null) {
+		if (property.setMethod == null || value == null || !property.getModifiable()) {
 			return;
 		}
 		

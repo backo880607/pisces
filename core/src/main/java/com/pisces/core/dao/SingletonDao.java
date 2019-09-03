@@ -18,7 +18,6 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 	@SuppressWarnings("unchecked")
 	public SingletonDao() {
 		this.entityClass = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		EntityUtils.registerEntityClass(this.entityClass);
 		DaoManager.register(this);
 	}
 	
@@ -79,17 +78,12 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public final void loadData() {
+	public void loadData() {
 		try {
 			this.impl.get().record = entityClass.newInstance();
-			afterLoadData();
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	@Override
-	public void afterLoadData() {
 	}
 	
 	@Override

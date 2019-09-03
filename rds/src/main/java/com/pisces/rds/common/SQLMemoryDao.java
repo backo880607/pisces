@@ -138,16 +138,11 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 	}
 	
 	@Override
-	public final void loadData() {
+	public void loadData() {
 		List<T> objects = mapper.selectAll();
 		for (T object : objects) {
 			impl.get().records.put(object.getId(), object);
 		}
-		afterLoadData();
-	}
-	
-	@Override
-	public void afterLoadData() {
 	}
 
 	@Override

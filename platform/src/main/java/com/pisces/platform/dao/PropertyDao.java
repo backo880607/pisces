@@ -27,7 +27,7 @@ import com.pisces.rds.common.SQLDao;
 @Component
 public class PropertyDao implements BaseDao<Property> {
 	class PropertyDaoImpl implements DaoImpl {
-		public Map<Class<? extends EntityObject>, Map<String, Property>> entities = new HashMap<>();
+		public Map<Class<? extends EntityObject>, Map<String, Property>> properties = new HashMap<>();
 		public void insert(Property property) {
 			if (!property.getInitialized()) {
 				Property newRecord = new Property();
@@ -74,7 +74,7 @@ public class PropertyDao implements BaseDao<Property> {
 			if (!StringUtils.isEmpty(property.getExpression())) {
 				property.setModifiable(false);
 			}
-			entities.get(property.belongClazz).put(property.getCode(), property);
+			properties.get(property.belongClazz).put(property.getCode(), property);
 		}
 	}
 	private ThreadLocal<PropertyDaoImpl> impl = new ThreadLocal<>();
@@ -94,7 +94,7 @@ public class PropertyDao implements BaseDao<Property> {
 	@Override
 	public List<Property> selectAll() {
 		List<Property> properties = new ArrayList<Property>();
-		for (Entry<Class<? extends EntityObject>, Map<String, Property>> entry : impl.get().entities.entrySet()) {
+		for (Entry<Class<? extends EntityObject>, Map<String, Property>> entry : impl.get().properties.entrySet()) {
 			for (Entry<String, Property> iter : entry.getValue().entrySet()) {
 				properties.add(iter.getValue());
 			}
@@ -152,7 +152,7 @@ public class PropertyDao implements BaseDao<Property> {
 
 	@Override
 	public int delete(Property record) {
-		Map<String, Property> properties = impl.get().entities.get(EntityUtils.getEntityClass(record.getBelongName()));
+		Map<String, Property> properties = impl.get().properties.get(EntityUtils.getEntityClass(record.getBelongName()));
 		if (properties == null) {
 			return 0;
 		}
@@ -172,7 +172,7 @@ public class PropertyDao implements BaseDao<Property> {
 	@Override
 	public int deleteByPrimaryKey(Object key) {
 		boolean bFind = false;
-		for (Entry<Class<? extends EntityObject>, Map<String, Property>> entry : impl.get().entities.entrySet()) {
+		for (Entry<Class<? extends EntityObject>, Map<String, Property>> entry : impl.get().properties.entrySet()) {
 			for (Entry<String, Property> iter : entry.getValue().entrySet()) {
 				if (iter.getValue().getId().equals(key)) {
 					if (iter.getValue().getInherent()) {
@@ -203,7 +203,7 @@ public class PropertyDao implements BaseDao<Property> {
 	@Override
 	public void loadData() {
 		for (Class<? extends EntityObject> clazz : EntityUtils.getEntityClasses()) {
-			impl.get().entities.put(clazz, new HashMap<String, Property>());
+			impl.get().properties.put(clazz, new HashMap<String, Property>());
 		}
 		List<Property> properties = mapper.selectAll();
 		if (properties.isEmpty()) {
@@ -213,12 +213,6 @@ public class PropertyDao implements BaseDao<Property> {
 		for (Property property : properties) {
 			impl.get().insert(property);
 		}
-		afterLoadData();
-	}
-
-	@Override
-	public void afterLoadData() {
-		
 	}
 
 	@Override
@@ -228,7 +222,7 @@ public class PropertyDao implements BaseDao<Property> {
 	
 	public List<Property> get(Class<? extends EntityObject> clazz) {
 		List<Property> result = new ArrayList<Property>();
-		Map<String, Property> properties = impl.get().entities.get(clazz);
+		Map<String, Property> properties = impl.get().properties.get(clazz);
 		if (properties != null) {
 			for (Entry<String, Property> entry : properties.entrySet()) {
 				result.add(entry.getValue());
@@ -239,13 +233,13 @@ public class PropertyDao implements BaseDao<Property> {
 	}
 	
 	public Property get(Class<? extends EntityObject> clazz, String code) {
-		Map<String, Property> properties = impl.get().entities.get(clazz);
+		Map<String, Property> properties = impl.get().properties.get(clazz);
 		return properties != null ? properties.get(code) : null;
 	}
 	
 	public List<Property> getPrimaries(Class<? extends EntityObject> clazz) {
 		List<Property> result = new ArrayList<Property>();
-		Map<String, Property> properties = impl.get().entities.get(clazz);
+		Map<String, Property> properties = impl.get().properties.get(clazz);
 		if (properties != null) {
 			for (Entry<String, Property> entry : properties.entrySet()) {
 				if (entry.getValue().getPrimaryKey()) {
