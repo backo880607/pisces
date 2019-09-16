@@ -14,6 +14,18 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class FileUtils {
+	
+	public static void deleteFile(String path) {
+		File file = new File(path);
+		if (!file.isDirectory()) {
+			file.delete();
+		} else {
+            for (String subPath : file.list()) {
+            	deleteFile(path + File.separator + subPath);
+            }
+            file.delete();
+		}
+	}
 
     public static String findJarPath() {
         String filePath = FileUtils.class.getProtectionDomain()

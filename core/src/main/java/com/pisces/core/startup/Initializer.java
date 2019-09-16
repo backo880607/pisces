@@ -1,4 +1,4 @@
-package com.pisces.core;
+package com.pisces.core.startup;
 
 //import java.io.File;
 //import java.io.FileOutputStream;

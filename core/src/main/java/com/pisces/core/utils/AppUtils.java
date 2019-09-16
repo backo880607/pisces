@@ -6,12 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
-import com.pisces.core.Initializer;
 import com.pisces.core.dao.DaoManager;
 import com.pisces.core.entity.Property;
 import com.pisces.core.exception.ExistedException;
 import com.pisces.core.service.PropertyService;
 import com.pisces.core.service.ServiceManager;
+import com.pisces.core.startup.Initializer;
 
 public class AppUtils {
 	private static ApplicationContext context;
