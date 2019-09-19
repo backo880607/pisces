@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class ParameterException extends ExpressionException {
+public class ParameterException extends BaseException {
 
 	/**
 	 * 

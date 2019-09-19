@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.pisces.core.entity.DateDur;
 
-public class DateDurSerializer extends JsonSerializer<DateDur> {
+public class DurationSerializer extends JsonSerializer<DateDur> {
 
 	@Override
 	public void serialize(DateDur value, JsonGenerator gen, SerializerProvider serializers) throws IOException {

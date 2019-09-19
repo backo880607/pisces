@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class LicenseException extends RuntimeException {
+public class LicenseException extends BaseException {
 
 	/**
 	 * 

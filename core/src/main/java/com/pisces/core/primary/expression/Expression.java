@@ -12,10 +12,10 @@ import com.pisces.core.primary.expression.calculate.Calculate;
 import com.pisces.core.primary.expression.calculate.DateTimeCalculate;
 import com.pisces.core.primary.expression.calculate.DoubleCalculate;
 import com.pisces.core.primary.expression.calculate.EnumClaculate;
-import com.pisces.core.primary.expression.calculate.FieldCalculate;
+import com.pisces.core.primary.expression.calculate.PropertyCalculate;
 import com.pisces.core.primary.expression.calculate.FunctionCalculate;
 import com.pisces.core.primary.expression.calculate.LongCalculate;
-import com.pisces.core.primary.expression.calculate.MeCalculate;
+import com.pisces.core.primary.expression.calculate.EntityCalculate;
 import com.pisces.core.primary.expression.calculate.OperTypeCalculate;
 import com.pisces.core.primary.expression.calculate.ReverseCalculate;
 import com.pisces.core.primary.expression.calculate.TextCalculate;
@@ -23,7 +23,9 @@ import com.pisces.core.primary.expression.exception.FunctionException;
 import com.pisces.core.primary.expression.value.Type;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueBoolean;
+import com.pisces.core.primary.expression.value.ValueDouble;
 import com.pisces.core.primary.expression.value.ValueHelp;
+import com.pisces.core.primary.expression.value.ValueInt;
 import com.pisces.core.primary.expression.value.ValueText;
 import com.pisces.core.utils.IExpression;
 
@@ -365,12 +367,12 @@ public class Expression implements IExpression {
 				++index;
 			} while (index < str.length() && Character.isDigit(str.charAt(index)));
 			DoubleCalculate calculate = new DoubleCalculate();
-			calculate.value = Double.valueOf(str.substring(temp, index));
+			calculate.value = new ValueDouble(Double.valueOf(str.substring(temp, index)));
 			return new AbstractMap.SimpleEntry<Integer, Calculate>(index, calculate);
 		}
 		
 		LongCalculate calculate = new LongCalculate();
-		calculate.value = Long.valueOf(str.substring(temp, index));
+		calculate.value = new ValueInt(Long.valueOf(str.substring(temp, index)));
 		return new AbstractMap.SimpleEntry<Integer, Calculate>(index, calculate);
 	}
 	
@@ -382,7 +384,7 @@ public class Expression implements IExpression {
 				Calculate calculate = new EnumClaculate();
 				index = calculate.Parse(str, index);
 				if (index == -1) {	// 非枚举类型
-					calculate = new FieldCalculate();
+					calculate = new PropertyCalculate();
 					index = calculate.Parse(str, startIndex);
 					if (index == -1) {
 						break;
@@ -411,7 +413,7 @@ public class Expression implements IExpression {
 			}
 			
 			if (!Character.isAlphabetic(str.charAt(temp)) && !Character.isDigit(str.charAt(temp)) && str.charAt(temp) != '_') {
-				Calculate calculate = new MeCalculate();
+				Calculate calculate = new EntityCalculate();
 				index = calculate.Parse(str, index);
 				if (index == -1) {
 					break;

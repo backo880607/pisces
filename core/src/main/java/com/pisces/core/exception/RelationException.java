@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class RelationException extends RuntimeException {
+public class RelationException extends BaseException {
 
 	/**
 	 * 

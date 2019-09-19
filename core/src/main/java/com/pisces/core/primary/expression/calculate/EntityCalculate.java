@@ -5,7 +5,7 @@ import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueObject;
 import com.pisces.core.utils.EntityUtils;
 
-public class MeCalculate implements Calculate {
+public class EntityCalculate implements Calculate {
 	private Class<?> clazz;
 	
 	@Override

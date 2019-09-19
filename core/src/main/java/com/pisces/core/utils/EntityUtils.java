@@ -1,10 +1,10 @@
 package com.pisces.core.utils;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -17,14 +17,15 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
-import com.pisces.core.converter.DateDurDeserializer;
-import com.pisces.core.converter.DateDurSerializer;
-import com.pisces.core.converter.DateJsonDeserializer;
-import com.pisces.core.converter.DateJsonSerializer;
+import com.pisces.core.converter.DurationDeserializer;
+import com.pisces.core.converter.DurationSerializer;
+import com.pisces.core.converter.DateTimeDeserializer;
+import com.pisces.core.converter.DateTimeSerializer;
 import com.pisces.core.converter.EntitySerializerModifier;
 import com.pisces.core.converter.NullValueSerializer;
 import com.pisces.core.converter.SignFieldHandler;
@@ -34,13 +35,11 @@ import com.pisces.core.entity.DateDur;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.MultiEnum;
 import com.pisces.core.entity.Property;
-import com.pisces.core.enums.EditType;
-import com.pisces.core.enums.PropertyType;
+import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ConfigurationException;
-import com.pisces.core.exception.DateDurException;
 import com.pisces.core.exception.OperandException;
-import com.pisces.core.exception.ParameterException;
 import com.pisces.core.exception.RelationException;
+import com.pisces.core.exception.UpdateException;
 import com.pisces.core.relation.RelationKind;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.service.EntityService;
@@ -179,10 +178,10 @@ public class EntityUtils {
 			}
 			switch (kind) {
 			case Singleton:
-				property.setType(PropertyType.Object);
+				property.setType(PROPERTY_TYPE.ENTITY);
 				break;
 			default:
-				property.setType(PropertyType.List);
+				property.setType(PROPERTY_TYPE.LIST);
 				break;
 			}
 			property.sign = sign;
@@ -202,16 +201,16 @@ public class EntityUtils {
 		}
 		
 		if (meta != null) {
-			property.setEditType(meta.editType() != EditType.NONE ? meta.editType() : getDefaultEditType(property.getType()));
 			property.setModifiable(meta.modifiable());
 			property.setDisplay(meta.display());
-		} else {
-			property.setEditType(getDefaultEditType(property.getType()));
+			if (meta.type() != PROPERTY_TYPE.NONE) {
+				property.setType(meta.type());
+			}
 		}
 		if (property.getMethod == null) {
 			throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not get method!");
 		}
-		if (property.setMethod == null && property.getType() != PropertyType.List) {
+		if (property.setMethod == null && property.getType() != PROPERTY_TYPE.LIST) {
 			throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not set method!");
 		}
 		
@@ -234,7 +233,7 @@ public class EntityUtils {
 					continue;
 				}
 				
-				PropertyType type = PropertyType.None;
+				PROPERTY_TYPE type = PROPERTY_TYPE.NONE;
 				Class<?> fieldClass = null;
 				if (field.getType() == Sign.class) {
 					Sign sign = (Sign)field.get(null);
@@ -244,10 +243,10 @@ public class EntityUtils {
 					}
 					switch (kind) {
 					case Singleton:
-						type = PropertyType.Object;
+						type = PROPERTY_TYPE.ENTITY;
 						break;
 					default:
-						type = PropertyType.List;
+						type = PROPERTY_TYPE.LIST;
 						break;
 					}
 					fieldClass = Primary.get().getRelationClass(clazz, sign);
@@ -269,7 +268,7 @@ public class EntityUtils {
 				if (getMethod == null) {
 					throw new NoSuchMethodException(clazz.getName() + "`s Field " + field.getName() + " has not get method!");
 				}
-				if (setMethod == null && type != PropertyType.List) {
+				if (setMethod == null && type != PROPERTY_TYPE.LIST) {
 					throw new NoSuchMethodException(clazz.getName() + "`s Field " + field.getName() + " has not set method!");
 				}
 				
@@ -311,136 +310,38 @@ public class EntityUtils {
 		}
 	}
 	
-	public static PropertyType getPropertyType(Class<?> clazz) {
-		PropertyType type = PropertyType.None;
+	public static PROPERTY_TYPE getPropertyType(Class<?> clazz) {
+		PROPERTY_TYPE type = PROPERTY_TYPE.NONE;
 		if (clazz == Boolean.class || clazz == boolean.class) {
-			type = PropertyType.Boolean;
+			type = PROPERTY_TYPE.BOOLEAN;
 		} else if (clazz == Character.class || clazz == char.class) {
-			type = PropertyType.Char;
+			type = PROPERTY_TYPE.CHAR;
 		} else if (clazz == Short.class || clazz == short.class) {
-			type = PropertyType.Short;
+			type = PROPERTY_TYPE.LONG;
 		} else if (clazz == Integer.class || clazz == int.class) {
-			type = PropertyType.Integer;
+			type = PROPERTY_TYPE.LONG;
 		} else if (clazz == Long.class || clazz == long.class) {
-			type = PropertyType.Long;
+			type = PROPERTY_TYPE.LONG;
 		} else if (clazz == Float.class || clazz == float.class) {
-			type = PropertyType.Double;
+			type = PROPERTY_TYPE.DOUBLE;
 		} else if (clazz == Double.class || clazz == double.class) {
-			type = PropertyType.Double;
+			type = PROPERTY_TYPE.DOUBLE;
 		} else if (clazz == String.class) {
-			type = PropertyType.String;
+			type = PROPERTY_TYPE.STRING;
 		} else if (clazz == Date.class) {
-			type = PropertyType.Date;
+			type = PROPERTY_TYPE.DATE;
 		} else if (Enum.class.isAssignableFrom(clazz)) {
-			type = PropertyType.Enum;
+			type = PROPERTY_TYPE.ENUM;
 		} else if (MultiEnum.class.isAssignableFrom(clazz)) {
-			type = PropertyType.MultiEnum;
+			type = PROPERTY_TYPE.MULTI_ENUM;
 		} else if (EntityObject.class.isAssignableFrom(clazz)) {
-			type = PropertyType.Object;
+			type = PROPERTY_TYPE.ENTITY;
 		} else if (Collection.class.isAssignableFrom(clazz)) {
-			type = PropertyType.List;
+			type = PROPERTY_TYPE.LIST;
+		} else {
+			throw new OperandException("not support type: " + clazz.getName());
 		}
 		return type;
-	}
-	
-	public static Class<?> getPropertyClass(Property property) {
-		if (property.sign != null) {
-			return property.sign.getEntityClass();
-		}
-		Class<?> clazz = null;
-		switch (property.getType()) {
-		case Boolean:
-			clazz = Boolean.class;
-			break;
-		case Char:
-			clazz = Character.class;
-			break;
-		case Date:
-			clazz = Date.class;
-			break;
-		case Double:
-			clazz = Double.class;
-			break;
-		case Duration:
-			clazz = DateDur.class;
-			break;
-		case Enum:
-			clazz = Enum.class;
-			break;
-		case Integer:
-			clazz = Integer.class;
-			break;
-		case List:
-			clazz = Collection.class;
-			break;
-		case Long:
-			clazz = Long.class;
-			break;
-		case MultiEnum:
-			clazz = MultiEnum.class;
-			break;
-		case Object:
-			clazz = EntityObject.class;
-			break;
-		case Short:
-			clazz = Short.class;
-			break;
-		case String:
-			clazz = String.class;
-			break;
-		default:
-			break;
-		}
-		return clazz;
-	}
-	
-	public static EditType getDefaultEditType(PropertyType type) {
-		EditType editType = EditType.TEXT;
-		switch (type) {
-		case Boolean:
-			editType = EditType.CHECKBOX;
-			break;
-		case Char:
-			editType = EditType.TEXT;
-			break;
-		case Date:
-			editType = EditType.DATE;
-			break;
-		case Double:
-			editType = EditType.TEXT;
-			break;
-		case Duration:
-			editType = EditType.DURATION;
-			break;
-		case Enum:
-			editType = EditType.RADIO;
-			break;
-		case Integer:
-			editType = EditType.TEXT;
-			break;
-		case List:
-			editType = EditType.MULTISELECT;
-			break;
-		case Long:
-			editType = EditType.TEXT;
-			break;
-		case MultiEnum:
-			editType = EditType.MULTISELECT;
-			break;
-		case Object:
-			editType = EditType.SELECT;
-			break;
-		case Short:
-			editType = EditType.TEXT;
-			break;
-		case String:
-			editType = EditType.TEXT;
-			break;
-		default:
-			break;
-		}
-		
-		return editType;
 	}
 	
 	public static Object getValue(EntityObject entity, Property property) {
@@ -474,23 +375,11 @@ public class EntityUtils {
 			return "";
 		}
 		
-		String result = "";
-		switch (property.getType()) {
-		case None:
-			throw new ParameterException(property.getBelongName() + "`s property " + property.getCode() + " type error");
-		case Date:
-			if (!value.equals(DateUtils.INVALID)) {
-				result = DateUtils.Format((Date)value);
-			}
-			break;
-		case Duration:
-			result = ((DateDur)value).getString();
-			break;
-		default:
-			result = value.toString();
-			break;
+		try {
+			return defaultObjectMapper().writeValueAsString(value);
+		} catch (JsonProcessingException e) {
+			throw new OperandException();
 		}
-		return result;
 	}
 	
 	public static void setValue(EntityObject entity, Property property, Object value) {
@@ -503,6 +392,12 @@ public class EntityUtils {
 				property.setMethod.invoke(entity, value);
 			} else if (StringUtils.isEmpty(property.getExpression())) {
 				property.setMethod.invoke(entity, property.getCode(), value);
+			} else {
+				UpdateException exception = new UpdateException("cannot update");
+				exception.setEntity(entity);
+				exception.setProperty(property);
+				exception.setValue(value);
+				throw exception;
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
@@ -510,74 +405,11 @@ public class EntityUtils {
 	}
 	
 	public static Object convertTextValue(Property property, String str) {
-		Object value = null;
-		switch (property.getType()) {
-		case None:
-			throw new ParameterException(property.getBelongName() + "`s property " + property.getCode() + " type error");
-		case Boolean:
-			value = Boolean.valueOf(str);
-			break;
-		case Short:
-			value = Short.valueOf(str);
-			break;
-		case Integer:
-			value = Integer.valueOf(str);
-			break;
-		case Long:
-			value = Long.valueOf(str);
-			break;
-		case Double:
-			value = Double.valueOf(str);
-			break;
-		case Date:
-			if (str.isEmpty()) {
-				value = DateUtils.INVALID;
-			} else {
-				try {
-					value = DateUtils.Parse(str);
-				} catch (ParseException e) {
-					throw new ParameterException(e);
-				}
-			}
-			break;
-		case Duration: {
-			DateDur dur = new DateDur(str);
-			if (!dur.Valid() && !str.isEmpty()) {
-				throw new DateDurException("format error: " + str);
-			}
-			value = dur;
+		try {
+			return defaultObjectMapper().readValue(str, property.clazz);
+		} catch (IOException e) {
+			throw new OperandException();
 		}
-			break;
-		case Enum: {
-			for (Object tso : property.clazz.getEnumConstants()) {
-				Enum<?> ts = (Enum<?>)tso;
-				if (ts.name().equalsIgnoreCase(str)) {
-					value = tso;
-					break;
-				}
-			}
-			if (value == null) {
-				throw new IllegalArgumentException("No enum constant " + property.clazz.getCanonicalName() + "." + str);
-			}
-		}
-			break;
-		case MultiEnum:
-			try {
-				MultiEnum<?> multiEnum = (MultiEnum<?>)property.clazz.newInstance();
-				multiEnum.parse(str);
-				value = multiEnum;
-			} catch (InstantiationException | IllegalAccessException e) {
-				throw new OperandException(e);
-			}
-			break;
-		case String:
-			value = str;
-			break;
-		default:
-			break;
-		}
-		
-		return value;
 	}
 	
 	public static void setTextValue(EntityObject entity, Property property, String str) {
@@ -588,21 +420,33 @@ public class EntityUtils {
 	 * 获取默认的Jackson序列化Mapper
 	 * @return
 	 */
-	public static ObjectMapper defaultObjectMapper() {
+	public static ObjectMapper createObjectMapper() {
 		ObjectMapper mapper = new ObjectMapper();
 		SimpleModule module = new SimpleModule();
-        module.addSerializer(Date.class, new DateJsonSerializer());
-        module.addDeserializer(Date.class, new DateJsonDeserializer());
+        module.addSerializer(Date.class, new DateTimeSerializer());
+        module.addDeserializer(Date.class, new DateTimeDeserializer());
         module.addSerializer(java.sql.Date.class, new SqlDateJsonSerializer());
         module.addDeserializer(java.sql.Date.class, new SqlDateJsonDeserializer());
-        module.addSerializer(DateDur.class, new DateDurSerializer());
-        module.addDeserializer(DateDur.class, new DateDurDeserializer());
+        module.addSerializer(DateDur.class, new DurationSerializer());
+        module.addDeserializer(DateDur.class, new DurationDeserializer());
         mapper.addHandler(new SignFieldHandler());
         mapper.getSerializerProvider().setNullValueSerializer(new NullValueSerializer());
         mapper.setSerializerFactory(mapper.getSerializerFactory().withSerializerModifier(new EntitySerializerModifier()));
         mapper.registerModule(module);
         mapper.setDefaultSetterInfo(JsonSetter.Value.construct(Nulls.SKIP, Nulls.SKIP));
         return mapper;
+	}
+	
+	private static ObjectMapper defaultMapper;
+	public static ObjectMapper defaultObjectMapper() {
+		if (defaultMapper == null) {
+			synchronized (EntityUtils.class) {
+				if (defaultMapper == null) {
+					defaultMapper = createObjectMapper();
+				}
+			}
+		}
+		return defaultMapper;
 	}
 	
 	public static <T extends EntityObject> void copyIgnoreNull(T src, T target) {

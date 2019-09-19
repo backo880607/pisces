@@ -15,7 +15,9 @@ public class DateUtils {
 	public static final long PER_HOUR = 3600000;
 	public static final long PER_DAY = 86400000;
 	public static final Date INVALID = new Date(0);
-	public static final String SIMPLE_FROMAT = "yyyy-MM-dd HH:MM:SS";
+	public static final String SIMPLE_FROMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
+	public static final String TIME_FORMAT = "HH:mm:ss";
 	private static long ZoneTime = 0;
 	
 	static {
@@ -62,12 +64,15 @@ public class DateUtils {
 	 * @param format 日期格式(例："yyyy-MM-dd")
 	 * @return String
 	 */
-	public static String Format(Date date, String format) {
+	public static String format(Date date, String format) {
+		if (date == null || date.getTime() == 0 || date == DateUtils.INVALID) {
+			return "";
+		}
 		return GetSimpleDateFormat(format).format(date);
 	}
 	
-	public static String Format(Date date) {
-		return GetSimpleDateFormat(SIMPLE_FROMAT).format(date);
+	public static String format(Date date) {
+		return format(date, SIMPLE_FROMAT);
 	}
 	
 	/**
@@ -77,15 +82,18 @@ public class DateUtils {
 	 * @return
 	 * @throws ParseException
 	 */
-	public static Date Parse(String value, String format) throws ParseException {
+	public static Date parse(String value, String format) throws ParseException {
+		if (value == null || value.isEmpty()) {
+			return DateUtils.INVALID;
+		}
 		return GetSimpleDateFormat(format).parse(value);
 	}
 	
-	public static Date Parse(String value) throws ParseException {
-		return GetSimpleDateFormat(SIMPLE_FROMAT).parse(value);
+	public static Date parse(String value) throws ParseException {
+		return parse(value, SIMPLE_FROMAT);
 	}
 	
-	public static Date Today() {
+	public static Date today() {
 		return null;
 	}
 	
@@ -95,7 +103,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int DayOfWeek(Date date) {
+	public static int dayOfWeek(Date date) {
 		int week = getCalendar(date).get(Calendar.DAY_OF_WEEK);
 		switch (week) {
 		case 1:
@@ -128,7 +136,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int DayOfYear(Date date) {
+	public static int dayOfYear(Date date) {
 		return getCalendar(date).get(Calendar.DAY_OF_YEAR);
 	}
 	
@@ -137,7 +145,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int DayOfWeekInMonth(Date date) {
+	public static int dayOfWeekInMonth(Date date) {
 		return getCalendar(date).get(Calendar.DAY_OF_WEEK_IN_MONTH);
 	}
 	
@@ -146,7 +154,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int WeekOfMonth(Date date) {
+	public static int weekOfMonth(Date date) {
 		return getCalendar(date).get(Calendar.WEEK_OF_MONTH);
 	}
 	
@@ -155,7 +163,7 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public static int WeekOfYear(Date date) {
+	public static int weekOfYear(Date date) {
 		return getCalendar(date).get(Calendar.WEEK_OF_YEAR);
 	}
 	
@@ -164,7 +172,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int AmPm(Date date) {
+	public static int amPm(Date date) {
 		return getCalendar(date).get(Calendar.AM_PM);
 	}
 	
@@ -173,7 +181,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int HourOfDay(Date date) {
+	public static int hourOfDay(Date date) {
 		return getCalendar(date).get(Calendar.HOUR_OF_DAY);
 	}
 	
@@ -182,7 +190,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int Year(Date date) {
+	public static int year(Date date) {
 		return getCalendar(date).get(Calendar.YEAR);
 	}
 	
@@ -191,7 +199,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int Month(Date date) {
+	public static int month(Date date) {
 		return getCalendar(date).get(Calendar.MONTH) + 1;
 	}
 	
@@ -200,7 +208,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int Day(Date date) {
+	public static int day(Date date) {
 		return getCalendar(date).get(Calendar.DAY_OF_MONTH);
 	}
 	
@@ -209,7 +217,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int Hour(Date date) {
+	public static int hour(Date date) {
 		return getCalendar(date).get(Calendar.HOUR);
 	}
 	
@@ -218,7 +226,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int Minute(Date date) {
+	public static int minute(Date date) {
 		return getCalendar(date).get(Calendar.MINUTE);
 	}
 	
@@ -227,7 +235,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static int Second(Date date) {
+	public static int second(Date date) {
 		return getCalendar(date).get(Calendar.SECOND);
 	}
 	
@@ -236,9 +244,9 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static Date YearMonth(Date date) {
+	public static Date yearMonth(Date date) {
 		long result = ((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime;
-		return new Date(result - (Day(date) - 1) * PER_DAY);
+		return new Date(result - (day(date) - 1) * PER_DAY);
 	}
 	
 	/**
@@ -246,7 +254,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static Date YearMonthDay(Date date) {
+	public static Date yearMonthDay(Date date) {
 		return new Date(((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime);
 	}
 	
@@ -255,7 +263,7 @@ public class DateUtils {
 	 * @param date 日期
 	 * @return int
 	 */
-	public static Date HourMinuteSecond(Date date) {
+	public static Date hourMinuteSecond(Date date) {
 		long result = ((date.getTime() + ZoneTime) / PER_DAY) * PER_DAY - ZoneTime;
 		return new Date(date.getTime() - result - ZoneTime);
 	}
@@ -263,90 +271,50 @@ public class DateUtils {
 	/**
 	 * 增加天数
 	 * @param date 日期
-	 * @param value 加的值
+	 * @param value 正数增加，负数减少
 	 * @return Date
 	 */
-	public static Date AddDay(Date date, int value) {
+	public static Date addDay(Date date, int value) {
 		return new Date(date.getTime() + value * PER_DAY);
 	}
 	
 	/**
 	 * 增加小时
 	 * @param date 日期
-	 * @param value 加的值
+	 * @param value 正数增加，负数减少
 	 * @return Date
 	 */
-	public static Date AddHour(Date date, int value) {
+	public static Date addHour(Date date, int value) {
 		return new Date(date.getTime() + value * PER_HOUR);
 	}
 	
 	/**
 	 * 增加分钟
 	 * @param date 日期
-	 * @param value 加的值
+	 * @param value 正数增加，负数减少
 	 * @return Date
 	 */
-	public static Date AddMinute(Date date, int value) {
+	public static Date addMinute(Date date, int value) {
 		return new Date(date.getTime() + value * PER_MINUTE);
 	}
 	
 	/**
 	 * 增加秒数
 	 * @param date 日期
-	 * @param value 加的值
+	 * @param value 正数增加，负数减少
 	 * @return Date
 	 */
-	public static Date AddSeconds(Date date, int value) {
+	public static Date addSeconds(Date date, int value) {
 		return new Date(date.getTime() + value * PER_SECOND);
 	}
 	
 	/**
-	 * 减少天数
-	 * @param date 日期
-	 * @param value 减的值
-	 * @return Date
-	 */
-	public static Date SubDay(Date date, int value) {
-		return new Date(date.getTime() - value * PER_DAY);
-	}
-	
-	/**
-	 * 减少小时
-	 * @param date 日期
-	 * @param value 减的值
-	 * @return Date
-	 */
-	public static Date SubHour(Date date,int value) {
-		return new Date(date.getTime() - value * PER_HOUR);
-	}
-	
-	/**
-	 * 减少分钟
-	 * @param date 日期
-	 * @param value 减的值
-	 * @return Date
-	 */
-	public static Date SubMinute(Date date,int value) {
-		return new Date(date.getTime() - value * PER_MINUTE);
-	}
-	
-	/**
-	 * 减少秒数
-	 * @param date 日期
-	 * @param value 减的值
-	 * @return Date
-	 */
-	public static Date SubSecond(Date date,int value) {
-		return new Date(date.getTime() - value * PER_SECOND);
-	}
-	
-	/**
 	 * 判断after相差before多少天
-	 * @param date1
-	 * @param date2
+	 * @param before
+	 * @param after
 	 * @return
 	 */
-	public static int DifferentDays(long before, long after) {
+	public static int differentDays(long before, long after) {
 		Calendar cal1 = Calendar.getInstance();
         cal1.setTimeInMillis(before);
         
@@ -374,11 +342,11 @@ public class DateUtils {
 	
 	/**
 	 * 判断after相差before多少周
-	 * @param date1
-	 * @param date2
+	 * @param before
+	 * @param after
 	 * @return
 	 */
-	public static int DifferentWeeks(long before, long after) {
+	public static int differentWeeks(long before, long after) {
 		Calendar cal1 = Calendar.getInstance();
         cal1.setTimeInMillis(before);
         
@@ -400,11 +368,11 @@ public class DateUtils {
 	
 	/**
 	 * 判断after相差before多少月
-	 * @param date1
-	 * @param date2
+	 * @param before
+	 * @param after
 	 * @return
 	 */
-	public static int DifferentMonths(long before, long after) {
+	public static int differentMonths(long before, long after) {
 		Calendar cal1 = Calendar.getInstance();
         cal1.setTimeInMillis(before);
         

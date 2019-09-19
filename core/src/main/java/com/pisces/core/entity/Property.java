@@ -6,8 +6,7 @@ import java.lang.reflect.Method;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
-import com.pisces.core.enums.EditType;
-import com.pisces.core.enums.PropertyType;
+import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.validator.InsertGroup;
 
@@ -19,9 +18,8 @@ public class Property extends EntityCoding implements Serializable {
 	private static final long serialVersionUID = -7594283934306849106L;
 	
 	private String belongName;	// 属性所属类
-	private PropertyType type;	// 属性类型
+	private PROPERTY_TYPE type;	// 属性类型
 	private String typeName;	// 属性类型名称，包含包路径
-	private EditType editType;	// 属性的编辑类型
 	private Boolean inherent = false;	// 是否是内部固有属性
 	private Boolean modifiable;	// 是否可以修改
 	private Boolean visiable;	// 由用户控制是否显示
@@ -51,8 +49,7 @@ public class Property extends EntityCoding implements Serializable {
 	public void init() {
 		super.init();
 		belongName = "";
-		type = PropertyType.Integer;
-		editType = EditType.TEXT;
+		type = PROPERTY_TYPE.LONG;
 		modifiable = true;
 		visiable = true;
 		display = true;
@@ -70,11 +67,11 @@ public class Property extends EntityCoding implements Serializable {
 		this.belongName = belongName;
 	}
 	
-	public PropertyType getType() {
+	public PROPERTY_TYPE getType() {
 		return type;
 	}
 	
-	public void setType(PropertyType type) {
+	public void setType(PROPERTY_TYPE type) {
 		this.type = type;
 	}
 	
@@ -84,14 +81,6 @@ public class Property extends EntityCoding implements Serializable {
 
 	public void setTypeName(String typeName) {
 		this.typeName = typeName;
-	}
-
-	public EditType getEditType() {
-		return editType;
-	}
-	
-	public void setEditType(EditType editType) {
-		this.editType = editType;
 	}
 	
 	public Boolean getInherent() {

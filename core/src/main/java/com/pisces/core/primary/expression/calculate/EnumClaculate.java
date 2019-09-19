@@ -6,11 +6,11 @@ import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueEnum;
 
 public class EnumClaculate implements Calculate {
-	private Enum<?> value;
+	private ValueEnum value;
 	
 	@Override
 	public ValueAbstract GetValue(EntityObject entity) {
-		return new ValueEnum(value);
+		return value;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class EnumClaculate implements Calculate {
 			for (Object tso : enumCls.getEnumConstants()) {
 				Enum<?> ts = (Enum<?>)tso;
 				if (ts.name().equalsIgnoreCase(name)) {
-					this.value = ts;
+					this.value = new ValueEnum(ts);
 					return index;
 				}
 			}

@@ -16,7 +16,7 @@ import com.pisces.core.dao.DaoManager;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.enums.PropertyType;
+import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ExistedException;
 import com.pisces.core.exception.NotImplementedException;
 import com.pisces.core.exception.OperandException;
@@ -60,7 +60,7 @@ public class PropertyDao implements BaseDao<Property> {
 				
 				if (property.setMethod == null) {
 					if (property.getInherent()) {
-						if (property.getType() != PropertyType.List) {
+						if (property.getType() != PROPERTY_TYPE.LIST) {
 							property.setMethod = property.belongClazz.getMethod("set" + StringUtils.capitalize(property.getCode()), property.clazz);
 						}
 					} else {

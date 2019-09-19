@@ -9,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pisces.core.dao.BaseDao;
@@ -22,8 +20,6 @@ import com.pisces.core.utils.PageParam;
 import com.pisces.core.utils.Primary;
 
 public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDao<T>> extends BaseServiceImpl implements EntityService<T> {
-protected Logger log = LoggerFactory.getLogger(this.getClass());
-	
 	private Class<T> entityClass;
 
 	@Autowired

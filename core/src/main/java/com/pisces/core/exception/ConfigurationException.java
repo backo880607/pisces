@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class ConfigurationException extends RuntimeException {
+public class ConfigurationException extends BaseException {
 
 	/**
 	 * 

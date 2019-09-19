@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.enums.PropertyType;
+import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ExpressionException;
 import com.pisces.core.primary.expression.exception.EntityAccessException;
 import com.pisces.core.primary.expression.exception.ValueException;
@@ -20,76 +20,60 @@ import com.pisces.core.primary.expression.value.ValueDuration;
 import com.pisces.core.primary.expression.value.ValueEnum;
 import com.pisces.core.primary.expression.value.ValueInt;
 import com.pisces.core.primary.expression.value.ValueList;
-import com.pisces.core.primary.expression.value.ValueObject;
 import com.pisces.core.primary.expression.value.ValueText;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.RefList;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 
-public class FieldCalculate implements Calculate {
+public class PropertyCalculate implements Calculate {
 	private Property property = null;
 	private List<Property> paths = new ArrayList<>();
 	private boolean isList = false;
 	
-	private Object getValueImpl(EntityObject entity) {
-		Object value = null;
-		try {
-			value = this.property.getInherent() ? this.property.getMethod.invoke(entity) :
-				this.property.getMethod.invoke(entity, this.property.getCode());
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new EntityAccessException(e.getMessage());
-		}
-		
-		return value;
-	}
-	
 	private ValueAbstract convertValue(Object value) {
 		if (value == null) {
 			switch (property.getType()) {
-			case Boolean:
+			case BOOLEAN:
 				return new ValueBoolean(false);
-			case Short:
-			case Integer:
-			case Long:
+			case LONG:
 				return new ValueInt(0);
-			case Double:
+			case DOUBLE:
 				return new ValueDouble(0.0);
-			case Date:
-				return new ValueDateTime(new Date(0));
-			case Duration:
+			case DATE:
+				return new ValueDateTime(new Date(0), property.getType());
+			case DURATION:
 				return new ValueDuration("");
-			case Enum:
+			case ENUM:
 				return new ValueEnum(InvalidEnum.NONE);
-			case String:
+			case STRING:
 				return new ValueText("");
-			case Object:
-			case List:
-				throw new ValueException("property type must not be object type: " + property.getType());
+			case ENTITY:
+			case LIST:
 			default:
 				break;
 			}
 		} else {
 			switch (property.getType()) {
-			case Boolean:
+			case BOOLEAN:
 				return new ValueBoolean((boolean)value);
-			case Short:
-			case Integer:
-			case Long:
+			case LONG:
 				return new ValueInt((long)value);
-			case Double:
+			case DOUBLE:
 				return new ValueDouble((double)value);
-			case Date:
-				return new ValueDateTime((Date)value);
-			case Duration:
+			case DATE:
+			case TIME:
+			case DATE_TIME:
+				return new ValueDateTime((Date)value, property.getType());
+			case DURATION:
 				return new ValueDuration((String)value);
-			case Enum:
+			case ENUM:
 				return new ValueEnum((Enum<?>)value);
-			case String:
+			case STRING:
 				return new ValueText((String)value);
-			case Object:
-				return new ValueObject((EntityObject)value);
-			case List:
+			case ENTITY:
+				break;
+			case LIST:
 				return new ValueList((RefBase)value);
 			default:
 				break;
@@ -112,14 +96,13 @@ public class FieldCalculate implements Calculate {
 			result.add(entity);
 		} else {
 			try {
-				Property path = paths.get(index);
-				Object nextObj = path.getMethod.invoke(entity);
-				if (nextObj != null) {
-					if (EntityObject.class.isAssignableFrom(nextObj.getClass())) {
-						getListImpl(result, (EntityObject)nextObj, paths, index + 1);
-					} else if (RefBase.class.isAssignableFrom(nextObj.getClass())) {
-						for (EntityObject nextEntity : (RefBase)nextObj) {
-							getListImpl(result, nextEntity, paths, index + 1);
+				Object relaEntity = paths.get(index).getMethod.invoke(entity);
+				if (relaEntity != null) {
+					if (paths.get(index).getType() == PROPERTY_TYPE.ENTITY) {
+						getListImpl(result, (EntityObject)relaEntity, paths, index + 1);
+					} else if (paths.get(index).getType() == PROPERTY_TYPE.LIST) {
+						for (EntityObject rela : (RefBase)relaEntity) {
+							getListImpl(result, rela, paths, index + 1);
 						}
 					}
 				}
@@ -131,16 +114,16 @@ public class FieldCalculate implements Calculate {
 	
 	private RefBase GetListValue(EntityObject entity) {
 		List<EntityObject> entities = new ArrayList<>();
-		getListImpl(entities, entity, paths, 0);
+		getListImpl(entities, entity, this.paths, 0);
 		RefBase result = new RefList();
 		for (EntityObject curEntity : entities) {
-			Object val = getValueImpl(curEntity);
+			Object val = EntityUtils.getValue(curEntity, this.property);
 			if (val == null) {
 				continue;
 			}
-			if (this.property.getType() == PropertyType.Object) {
+			if (this.property.getType() == PROPERTY_TYPE.ENTITY) {
 				result.add((EntityObject)val);
-			} else if (this.property.getType() == PropertyType.List) {
+			} else if (this.property.getType() == PROPERTY_TYPE.LIST) {
 				result.addAll(((RefBase)val).collection());
 			}
 		}
@@ -151,17 +134,14 @@ public class FieldCalculate implements Calculate {
 		if (this.isList) {
 			return new ValueList(GetListValue(entity));
 		}
-		EntityObject nextEntity = entity;
-		try {
-			for (Property path : this.paths) {
-				nextEntity = (EntityObject)path.getMethod.invoke(nextEntity);
-				if (nextEntity == null) {
-					throw new NullPointerException();
-				}
+		EntityObject relaEntity = entity;
+		for (Property path : this.paths) {
+			relaEntity = (EntityObject)EntityUtils.getValue(relaEntity, path);
+			if (relaEntity == null) {
+				throw new NullPointerException();
 			}
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 		}
-		return convertValue(getValueImpl(nextEntity));
+		return convertValue(EntityUtils.getValue(relaEntity, this.property));
 	}
 	
 	@Override
@@ -175,6 +155,7 @@ public class FieldCalculate implements Calculate {
 		
 		this.property = null;
 		this.paths.clear();
+		this.isList = false;
 		while (index < str.length()) {
 			char curChar = str.charAt(index);
 			if (curChar == '.') {
@@ -182,25 +163,21 @@ public class FieldCalculate implements Calculate {
 				if (propertyClazz == null) {
 					propertyClazz = EntityUtils.getEntityClass(name);
 					if (propertyClazz == null) {
-						throw new ExpressionException("invalid object name : " + name);
+						throw new ExpressionException("invalid object name: " + name);
 					}
 				} else {
 					Property path = AppUtils.getPropertyService().get(propertyClazz, name);
 					if (path == null) {
-						throw new ExpressionException(propertyClazz.getName() + " has not property name : " + name);
+						throw new ExpressionException(propertyClazz.getName() + " has not property name: " + name);
+					}
+					if (path.getType() != PROPERTY_TYPE.ENTITY && path.getType() != PROPERTY_TYPE.LIST) {
+						throw new ExpressionException(propertyClazz.getName() + "`s property : " + name + " is not obejct or object collection");
 					}
 					this.paths.add(path);
-					propertyClazz = (Class<? extends EntityObject>)EntityUtils.getPropertyClass(path);
-				}
-				
-				if (propertyClazz == null) {
-					return -1;
-				}
-				
-				if (RefBase.class.isAssignableFrom(propertyClazz)) {
-					this.isList = true;
-				} else if (!EntityObject.class.isAssignableFrom(propertyClazz)) {
-					return -1;
+					propertyClazz = (Class<? extends EntityObject>)path.clazz;
+					if (path.getType() == PROPERTY_TYPE.LIST) {
+						this.isList = true;
+					}
 				}
 				
 				temp = index + 1;
@@ -215,24 +192,23 @@ public class FieldCalculate implements Calculate {
 			String name = str.substring(temp, index);
 			this.property = AppUtils.getPropertyService().get(propertyClazz, name);
 			if (this.property == null) {
-				return -1;
+				throw new ExpressionException(propertyClazz.getName() + " has not property name : " + name);
 			}
-			propertyClazz = (Class<? extends EntityObject>) EntityUtils.getPropertyClass(this.property);
-			if (propertyClazz == null) {
-				return -1;
+			if (this.property.getType() == PROPERTY_TYPE.ENTITY) {
+				throw new ExpressionException("last property: " + name + " cannot be object");
 			}
-			if (!this.isList) {
-				this.isList = RefBase.class.isAssignableFrom(propertyClazz);
+			if (this.property.getType() == PROPERTY_TYPE.LIST) {
+				this.isList = true;
 			}
 			
 			return index;
 		}
 		
-		return -1;
+		throw new ExpressionException("property expression is not correct ");
 	}
 
 	@Override
 	public Class<?> getReturnClass() {
-		return EntityUtils.getPropertyClass(this.property);
+		return this.property.getType() != PROPERTY_TYPE.LIST ? this.property.clazz : RefBase.class;
 	}
 }

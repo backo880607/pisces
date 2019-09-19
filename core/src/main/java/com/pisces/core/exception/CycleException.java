@@ -2,7 +2,7 @@ package com.pisces.core.exception;
 
 import com.pisces.core.entity.EntityObject;
 
-public class CycleException extends RuntimeException {
+public class CycleException extends BaseException {
 
 	/**
 	 * 

@@ -79,8 +79,8 @@ public class SQLProvider extends BaseProvider {
 				autoChangeColumns(conn, ms, changeColumns);
 			}
 			
-			if (!existedColumns.isEmpty()) {
-				autoDropColumns(conn, ms, existedColumns);
+			if (!existedColumns.isEmpty()) { 
+				autoDropColumns(conn, ms, existedColumns); 
 			}
 		}
 	}

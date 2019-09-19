@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class DateDurException extends RuntimeException {
+public class DateDurException extends BaseException {
 
 	/**
 	 * 

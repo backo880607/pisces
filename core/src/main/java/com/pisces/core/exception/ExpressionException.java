@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class ExpressionException extends RuntimeException {
+public class ExpressionException extends BaseException {
 
 	/**
 	 * 

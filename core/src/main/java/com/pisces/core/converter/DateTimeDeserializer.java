@@ -11,15 +11,12 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pisces.core.utils.DateUtils;
 
-public class DateJsonDeserializer extends JsonDeserializer<Date> {
+public class DateTimeDeserializer extends JsonDeserializer<Date> {
 
 	@Override
 	public Date deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		if (p.getText().isEmpty()) {
-			return DateUtils.INVALID;
-		}
 		try {
-			return DateUtils.Parse(p.getText());
+			return DateUtils.parse(p.getText());
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
 		}

@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class NotImplementedException extends RuntimeException {
+public class NotImplementedException extends BaseException {
 
 	/**
 	 * 

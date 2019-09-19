@@ -17,7 +17,7 @@ public class ReverseCalculate implements Calculate {
 
 	@Override
 	public int Parse(String str, int index) {
-		FieldCalculate fieldCalculate = new FieldCalculate();
+		PropertyCalculate fieldCalculate = new PropertyCalculate();
 		index = fieldCalculate.Parse(str, index);
 		if (index < 0) {
 			return index;

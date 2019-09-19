@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.pisces.core.converter.DateDurDeserializer;
-import com.pisces.core.converter.DateDurSerializer;
+import com.pisces.core.converter.DurationDeserializer;
+import com.pisces.core.converter.DurationSerializer;
 import com.pisces.core.utils.DateUtils;
 
-@JsonSerialize(using = DateDurSerializer.class)
-@JsonDeserialize(using = DateDurDeserializer.class)
+@JsonSerialize(using = DurationSerializer.class)
+@JsonDeserialize(using = DurationDeserializer.class)
 public class DateDur {
 	private static Logger log = LoggerFactory.getLogger(DateDur.class);
 	enum  EV_STRING_TYPE {

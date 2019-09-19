@@ -40,7 +40,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 		final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setObjectMapper(EntityUtils.defaultObjectMapper());
+		converter.setObjectMapper(EntityUtils.createObjectMapper());
         converter.setPrettyPrint(false);
         List<MediaType> mediaTypes = new ArrayList<>();
         mediaTypes.add(MediaType.APPLICATION_JSON_UTF8);

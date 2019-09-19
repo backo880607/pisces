@@ -1,14 +1,14 @@
 package com.pisces.core.entity;
 
 import com.pisces.core.annotation.PrimaryKey;
-import com.pisces.core.enums.EntityStatus;
+import com.pisces.core.enums.ENTITY_STATUS;
 import com.pisces.core.validator.InsertGroup;
 
 @PrimaryKey(fields={"code"}, groups = {InsertGroup.class})
 public class EntityCoding extends EntityObject {
 	private String code;
 	private String name;
-	private EntityStatus status;
+	private ENTITY_STATUS status;
 	private String remarks;
 	
 	@Override
@@ -16,7 +16,7 @@ public class EntityCoding extends EntityObject {
 		super.init();
 		code = "";
 		name = "";
-		status = EntityStatus.ENABLE;
+		status = ENTITY_STATUS.ENABLE;
 		remarks = "";
 	}
 	
@@ -36,11 +36,11 @@ public class EntityCoding extends EntityObject {
 		this.name = name;
 	}
 	
-	public EntityStatus getStatus() {
+	public ENTITY_STATUS getStatus() {
 		return status;
 	}
 	
-	public void setStatus(EntityStatus status) {
+	public void setStatus(ENTITY_STATUS status) {
 		this.status = status;
 	}
 	

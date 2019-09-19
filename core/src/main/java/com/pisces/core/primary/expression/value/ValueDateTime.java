@@ -1,24 +1,49 @@
 package com.pisces.core.primary.expression.value;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.pisces.core.enums.PROPERTY_TYPE;
+import com.pisces.core.exception.ExpressionException;
 import com.pisces.core.utils.DateUtils;
 
 public class ValueDateTime extends ValueAbstract {
+	private String format;
 	public Date value;
-	public static SimpleDateFormat DATETIME_FORMATOR = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public ValueDateTime(Date time) {
+	public ValueDateTime(Date time, PROPERTY_TYPE type) {
 		this.value = time;
+		switch (type) {
+		case DATE:
+			format = DateUtils.DATE_FORMAT;
+			break;
+		case TIME:
+			format = DateUtils.TIME_FORMAT;
+			break;
+		case DATE_TIME:
+			format = DateUtils.SIMPLE_FROMAT;
+			break;
+		default:
+			throw new ExpressionException("not support time type: " + type);
+		}
 	}
 	
 	public ValueDateTime(String str) {
 		try {
-			this.value = DATETIME_FORMATOR.parse(str);
+			this.value = DateUtils.parse(str);
+			this.format = DateUtils.SIMPLE_FROMAT;
 		} catch (ParseException e) {
-			this.value = new Date(0);
+			try {
+				this.value = DateUtils.parse(str, DateUtils.DATE_FORMAT);
+				this.format = DateUtils.DATE_FORMAT;
+			} catch (ParseException e2) {
+				try {
+					this.value = DateUtils.parse(str, DateUtils.TIME_FORMAT);
+					this.format = DateUtils.TIME_FORMAT;
+				} catch (ParseException e3) {
+					throw new ExpressionException("invalid date format: " + str);
+				}
+			}
 		}
 	}
 	
@@ -42,8 +67,6 @@ public class ValueDateTime extends ValueAbstract {
 		switch (rhs.getType()) {
 		case LONG:
 			return this.addImpl((ValueInt)rhs);
-		case DATETIME:
-			return this.addImpl((ValueDateTime)rhs);
 		case DURATION:
 			return this.addImpl((ValueDuration)rhs);
 		default:
@@ -53,16 +76,19 @@ public class ValueDateTime extends ValueAbstract {
 	}
 	
 	private ValueAbstract addImpl(ValueInt rhs) {
-		long value = this.value.getTime() + rhs.value * DateUtils.PER_DAY;
-		return new ValueDateTime(new Date(value));
-	}
-	private ValueAbstract addImpl(ValueDateTime rhs) {
-		long value = rhs.value == null ? 0 : this.value.getTime() + rhs.value.getTime();
-		return new ValueDateTime(new Date(value));
+		if (format == DateUtils.TIME_FORMAT) {
+			throw new ExpressionException("not support by time format");
+		}
+		if (this.value != DateUtils.INVALID) {
+			this.value.setTime(this.value.getTime() + rhs.value * DateUtils.PER_DAY);
+		}
+		return this;
 	}
 	private ValueAbstract addImpl(ValueDuration rhs) {
-		long value = this.value.getTime() + rhs.value;
-		return new ValueDateTime(new Date(value));
+		if (this.value != DateUtils.INVALID) {
+			this.value.setTime(this.value.getTime() + rhs.value);
+		}
+		return this;
 	}
 
 	@Override
@@ -70,8 +96,6 @@ public class ValueDateTime extends ValueAbstract {
 		switch (rhs.getType()) {
 		case LONG:
 			return this.subImpl((ValueInt)rhs);
-		case DATETIME:
-			return this.subImpl((ValueDateTime)rhs);
 		case DURATION:
 			return this.subImpl((ValueDuration)rhs);
 		default:
@@ -81,16 +105,19 @@ public class ValueDateTime extends ValueAbstract {
 	}
 	
 	private ValueAbstract subImpl(ValueInt rhs) {
-		long value = this.value.getTime() - rhs.value * DateUtils.PER_DAY;
-		return new ValueDateTime(new Date(value));
-	}
-	private ValueAbstract subImpl(ValueDateTime rhs) {
-		long value = rhs.value == null ? 0 : this.value.getTime() - rhs.value.getTime();
-		return new ValueInt(value / DateUtils.PER_SECOND);
+		if (format == DateUtils.TIME_FORMAT) {
+			throw new ExpressionException("not support by time format");
+		}
+		if (this.value != DateUtils.INVALID) {
+			this.value.setTime(this.value.getTime() - rhs.value * DateUtils.PER_DAY);
+		}
+		return this;
 	}
 	private ValueAbstract subImpl(ValueDuration rhs) {
-		long value = this.value.getTime() - rhs.value;
-		return new ValueDateTime(new Date(value));
+		if (this.value != DateUtils.INVALID) {
+			this.value.setTime(this.value.getTime() - rhs.value);
+		}
+		return this;
 	}
 
 	@Override
@@ -110,12 +137,8 @@ public class ValueDateTime extends ValueAbstract {
 		return new ValueBoolean(this.value.getTime() > rhs.value.getTime());
 	}
 	private ValueBoolean greaterImpl(ValueText rhs) {
-		try {
-			Date temp = DATETIME_FORMATOR.parse(rhs.value);
-			return new ValueBoolean(this.value.getTime() > temp.getTime());
-		} catch (ParseException e) {
-		}
-		return new ValueBoolean(true);
+		ValueDateTime temp = new ValueDateTime(rhs.value);
+		return new ValueBoolean(this.value.getTime() > temp.value.getTime());
 	}
 
 	@Override
@@ -135,12 +158,8 @@ public class ValueDateTime extends ValueAbstract {
 		return new ValueBoolean(this.value.getTime() >= rhs.value.getTime());
 	}
 	private ValueBoolean greaterEqualImpl(ValueText rhs) {
-		try {
-			Date temp = DATETIME_FORMATOR.parse(rhs.value);
-			return new ValueBoolean(this.value.getTime() >= temp.getTime());
-		} catch (ParseException e) {
-		}
-		return new ValueBoolean(true);
+		ValueDateTime temp = new ValueDateTime(rhs.value);
+		return new ValueBoolean(this.value.getTime() >= temp.value.getTime());
 	}
 
 	@Override
@@ -160,12 +179,8 @@ public class ValueDateTime extends ValueAbstract {
 		return new ValueBoolean(this.value.getTime() < rhs.value.getTime());
 	}
 	private ValueBoolean lessImpl(ValueText rhs) {
-		try {
-			Date temp = DATETIME_FORMATOR.parse(rhs.value);
-			return new ValueBoolean(this.value.getTime() < temp.getTime());
-		} catch (ParseException e) {
-		}
-		return new ValueBoolean(false);
+		ValueDateTime temp = new ValueDateTime(rhs.value);
+		return new ValueBoolean(this.value.getTime() < temp.value.getTime());
 	}
 
 	@Override
@@ -185,12 +200,8 @@ public class ValueDateTime extends ValueAbstract {
 		return new ValueBoolean(this.value.getTime() <= rhs.value.getTime());
 	}
 	private ValueBoolean lessEqualImpl(ValueText rhs) {
-		try {
-			Date temp = DATETIME_FORMATOR.parse(rhs.value);
-			return new ValueBoolean(this.value.getTime() <= temp.getTime());
-		} catch (ParseException e) {
-		}
-		return new ValueBoolean(false);
+		ValueDateTime temp = new ValueDateTime(rhs.value);
+		return new ValueBoolean(this.value.getTime() <= temp.value.getTime());
 	}
 
 	@Override
@@ -210,12 +221,8 @@ public class ValueDateTime extends ValueAbstract {
 		return new ValueBoolean(this.value.getTime() == rhs.value.getTime());
 	}
 	private ValueBoolean equalImpl(ValueText rhs) {
-		try {
-			Date temp = DATETIME_FORMATOR.parse(rhs.value);
-			return new ValueBoolean(this.value.getTime() == temp.getTime());
-		} catch (ParseException e) {
-		}
-		return new ValueBoolean(false);
+		ValueDateTime temp = new ValueDateTime(rhs.value);
+		return new ValueBoolean(this.value.getTime() == temp.value.getTime());
 	}
 
 	@Override
@@ -235,25 +242,17 @@ public class ValueDateTime extends ValueAbstract {
 		return new ValueBoolean(this.value.getTime() != rhs.value.getTime());
 	}
 	private ValueBoolean notEqualImpl(ValueText rhs) {
-		try {
-			Date temp = DATETIME_FORMATOR.parse(rhs.value);
-			return new ValueBoolean(this.value.getTime() != temp.getTime());
-		} catch (ParseException e) {
-		}
-		return new ValueBoolean(true);
+		ValueDateTime temp = new ValueDateTime(rhs.value);
+		return new ValueBoolean(this.value.getTime() != temp.value.getTime());
 	}
 
 	@Override
 	public ValueText toText() {
-		if (this.value == null || this.value.getTime() == 0) {
-			return new ValueText("");
-		}
-		return new ValueText(ValueDateTime.DATETIME_FORMATOR.format(this.value));
+		return new ValueText(DateUtils.format(this.value, this.format));
 	}
 	
 	public ValueAbstract toText(String format) {
-		SimpleDateFormat formater = new SimpleDateFormat(format);
-		return new ValueText(formater.format(this.value));
+		return new ValueText(DateUtils.format(this.value, format));
 	}
 
 	@Override

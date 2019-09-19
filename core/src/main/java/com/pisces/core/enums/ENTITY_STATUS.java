@@ -1,6 +1,6 @@
 package com.pisces.core.enums;
 
-public enum EntityStatus {
+public enum ENTITY_STATUS {
 	ENABLE,
 	DISABLE;
 }

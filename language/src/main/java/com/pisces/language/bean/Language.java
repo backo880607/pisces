@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 
 import org.apache.ibatis.type.JdbcType;
 
+import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.rds.handler.LocaleHandler;
 
@@ -16,6 +17,7 @@ import tk.mybatis.mapper.annotation.ColumnType;
 public class Language extends EntityObject {
 	public static final String ERROR = "#error#";
 	@ColumnType(jdbcType = JdbcType.VARCHAR, typeHandler = LocaleHandler.class)
+	@PropertyMeta(internal = true)
 	private Locale locale = Locale.getDefault();
 	private transient List<ResourceBundle> bundles = new ArrayList<>();
 	

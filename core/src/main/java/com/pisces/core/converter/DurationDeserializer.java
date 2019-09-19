@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.pisces.core.entity.DateDur;
 
-public class DateDurDeserializer extends JsonDeserializer<DateDur> {
+public class DurationDeserializer extends JsonDeserializer<DateDur> {
 
 	@Override
 	public DateDur deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {

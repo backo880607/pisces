@@ -5,11 +5,11 @@ import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueDouble;
 
 public class DoubleCalculate implements Calculate {
-	public double value;
+	public ValueDouble value;
 	
 	@Override
 	public ValueAbstract GetValue(EntityObject entity) {
-		return new ValueDouble(value);
+		return value;
 	}
 	
 	@Override

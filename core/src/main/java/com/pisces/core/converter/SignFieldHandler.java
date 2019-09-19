@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.enums.PropertyType;
+import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.relation.Ioc;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
@@ -65,8 +65,8 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 	private boolean handleRelationProperty(EntityObject entity, Property property, JsonParser p) throws IOException {
 		Class<? extends EntityObject> propertyClazz = property.sign.getEntityClass();
 		try {
-			if (property.getType() == PropertyType.Object) {
-				EntityObject relaEntity = EntityUtils.defaultObjectMapper().readValue(p, propertyClazz);
+			if (property.getType() == PROPERTY_TYPE.ENTITY) {
+				EntityObject relaEntity = EntityUtils.createObjectMapper().readValue(p, propertyClazz);
 				Ioc.set(entity, property.sign, relaEntity);
 				return true;
 			}

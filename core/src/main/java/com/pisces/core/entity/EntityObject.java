@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pisces.core.enums.CreateUpdateType;
+import com.pisces.core.enums.CREATE_UPDATE_TYPE;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.utils.DateUtils;
@@ -38,8 +38,8 @@ public class EntityObject implements Comparable<EntityObject> {
 	private String updateBy;
 	private Date createDate;
 	private Date updateDate;
-	private CreateUpdateType createType;
-	private CreateUpdateType updateType;
+	private CREATE_UPDATE_TYPE createType;
+	private CREATE_UPDATE_TYPE updateType;
 	
 	public EntityObject() {
 		Primary.get().createRelation(this);
@@ -64,8 +64,8 @@ public class EntityObject implements Comparable<EntityObject> {
 		updateBy = "";
 		createDate = DateUtils.INVALID;
 		updateDate = DateUtils.INVALID;
-		createType = CreateUpdateType.SYSTEM;
-		updateType = CreateUpdateType.SYSTEM;
+		createType = CREATE_UPDATE_TYPE.SYSTEM;
+		updateType = CREATE_UPDATE_TYPE.SYSTEM;
 		initialized = true;
 	}
 	
@@ -159,19 +159,19 @@ public class EntityObject implements Comparable<EntityObject> {
 		this.updateDate = updateDate;
 	}
 	
-	public CreateUpdateType getCreateType() {
+	public CREATE_UPDATE_TYPE getCreateType() {
 		return createType;
 	}
 	
-	public void setCreateType(CreateUpdateType createType) {
+	public void setCreateType(CREATE_UPDATE_TYPE createType) {
 		this.createType = createType;
 	}
 	
-	public CreateUpdateType getUpdateType() {
+	public CREATE_UPDATE_TYPE getUpdateType() {
 		return updateType;
 	}
 	
-	public void setUpdateType(CreateUpdateType updateType) {
+	public void setUpdateType(CREATE_UPDATE_TYPE updateType) {
 		this.updateType = updateType;
 	}
 

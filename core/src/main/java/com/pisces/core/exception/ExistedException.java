@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class ExistedException extends RuntimeException {
+public class ExistedException extends BaseException {
 
 	/**
 	 * 

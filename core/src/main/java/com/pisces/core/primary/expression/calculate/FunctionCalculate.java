@@ -21,7 +21,7 @@ import com.pisces.core.relation.RefList;
 public class FunctionCalculate implements Calculate {
 	FunctionManager.Data data;
 	List<Expression> paramExps = new ArrayList<Expression>();
-	FieldCalculate fieldCalc;
+	PropertyCalculate fieldCalc;
 	boolean isLastChain;
 	boolean isIF;
 	
@@ -50,13 +50,7 @@ public class FunctionCalculate implements Calculate {
 		}
 		
 		params.add(paramValue);
-		if (EntityObject.class.isAssignableFrom(paramValue.getClass())) {
-			while (iter.hasNext()) {
-				//++index;
-				exp = iter.next();
-				params.add(exp.getValueAbstract(entity));
-			}
-		} else if (RefBase.class.isAssignableFrom(paramValue.getClass())) {
+		if (RefBase.class.isAssignableFrom(paramValue.getClass())) {
 			@SuppressWarnings("unchecked")
 			Collection<EntityObject> objects = (Collection<EntityObject>)paramValue;
 			while (iter.hasNext()) {
@@ -125,7 +119,7 @@ public class FunctionCalculate implements Calculate {
 			temp = index;
 			while (temp < str.length()) {
 				if (str.charAt(temp) == '.') {
-					fieldCalc = new FieldCalculate();
+					fieldCalc = new PropertyCalculate();
 					@SuppressWarnings("unchecked")
 					Class<? extends EntityObject> clazz = (Class<? extends EntityObject>)getReturnClass();
 					index = fieldCalc.Parse(str, index, clazz);

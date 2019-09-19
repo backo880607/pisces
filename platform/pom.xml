@@ -50,13 +50,13 @@
 	</dependency>
   </dependencies>
   
-  <build>
+  <!-- <build>
 	<plugins>
 	 <plugin>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-maven-plugin</artifactId>
 		<configuration>
-		  <mainClass>${start-class}</mainClass>
+		  <mainClass>com.pisces.core.startup.Application</mainClass>
 		  <layout>JAR</layout>
 		</configuration>
 		<executions>
@@ -70,5 +70,5 @@
 		</executions>
 	  </plugin>
 	</plugins>
-  </build>
+  </build> -->
 </project>

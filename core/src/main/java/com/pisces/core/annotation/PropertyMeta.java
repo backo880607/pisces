@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.pisces.core.enums.EditType;
+import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.relation.RelationKind;
 
 @Target(ElementType.FIELD)
@@ -17,6 +17,6 @@ public @interface PropertyMeta {
 	boolean unique() default false;
 	boolean modifiable() default true;
 	boolean display() default true;
-	EditType editType() default EditType.NONE;
+	PROPERTY_TYPE type() default PROPERTY_TYPE.NONE;
 	RelationKind kind() default RelationKind.None;
 }

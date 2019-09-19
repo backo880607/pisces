@@ -44,8 +44,7 @@ public class ValueDuration extends ValueAbstract {
 		return super.add(rhs);
 	}
 	private ValueAbstract addImpl(ValueDateTime rhs) {
-		long value = this.value + rhs.value.getTime();
-		return new ValueDateTime(new Date(value));
+		return rhs.add(this);
 	}
 	private ValueAbstract addImpl(ValueDuration rhs) {
 		long value = this.value + rhs.value;

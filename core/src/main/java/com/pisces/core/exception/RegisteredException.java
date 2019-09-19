@@ -1,6 +1,6 @@
 package com.pisces.core.exception;
 
-public class RegisteredException extends RuntimeException {
+public class RegisteredException extends BaseException {
 
 	/**
 	 * 

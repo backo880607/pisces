@@ -5,11 +5,11 @@ import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueInt;
 
 public class LongCalculate implements Calculate {
-	public long value;
+	public ValueInt value;
 	
 	@Override
 	public ValueAbstract GetValue(EntityObject entity) {
-		return new ValueInt(value);
+		return value;
 	}
 	
 	@Override
