@@ -8,7 +8,6 @@ import java.util.List;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.SingletonDaoImpl;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.NotImplementedException;
 import com.pisces.core.utils.EntityUtils;
 
 public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
@@ -39,23 +38,23 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 	}
 	
 	@Override
-	public List<T> selectMap(Collection<Long> ids) {
+	public List<T> selectByIds(Collection<Long> ids) {
 		return selectAll();
 	}
 
 	@Override
 	public boolean existsWithPrimaryKey(Object key) {
-		return key.equals(impl.get().record.getId());
+		return true;
 	}
 
 	@Override
 	public int insert(T record) {
-		throw new NotImplementedException("insert Singleton entity is not allowed");
+		throw new UnsupportedOperationException("insert Singleton entity is not allowed");
 	}
 
 	@Override
 	public int insertList(Collection<T> recordList) {
-		throw new NotImplementedException("insert Singleton entity is not allowed");
+		throw new UnsupportedOperationException("insert Singleton entity is not allowed");
 	}
 
 	@Override
@@ -66,15 +65,33 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 		}
 		return 1;
 	}
+	
+	@Override
+	public int updateList(Collection<T> recordList) {
+		if (recordList.isEmpty()) {
+			return 0;
+		}
+		return update(recordList.iterator().next());
+	}
 
 	@Override
 	public int delete(T record) {
-		throw new NotImplementedException("delete Singleton entity is not allowed");
+		throw new UnsupportedOperationException("delete Singleton entity is not allowed");
+	}
+	
+	@Override
+	public int deleteList(Collection<T> recordList) {
+		throw new UnsupportedOperationException("delete Singleton entity is not allowed");
 	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
-		throw new NotImplementedException("delete Singleton entity is not allowed");
+		throw new UnsupportedOperationException("delete Singleton entity is not allowed");
+	}
+	
+	@Override
+	public int deleteByPrimaryKeys(Collection<Long> keyList) {
+		throw new UnsupportedOperationException("delete Singleton entity is not allowed");
 	}
 
 	@Override
@@ -87,7 +104,7 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 	}
 	
 	@Override
-	public void sync() {		
+	public void sync() {
 	}
 
 	@Override
@@ -100,5 +117,11 @@ public class SingletonDao<T extends EntityObject> implements BaseDao<T> {
 	public void switchDaoImpl(DaoImpl impl) {
 		this.impl.set((SingletonDaoImpl<T>)impl);
 	}
+
+	
+
+	
+
+	
 
 }

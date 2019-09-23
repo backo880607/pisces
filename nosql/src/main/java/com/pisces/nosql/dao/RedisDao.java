@@ -94,15 +94,30 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 		obtain().put(record.getId(), record);
 		return 1;
 	}
+	
+	@Override
+	public int updateList(Collection<T> recordList) {
+		return 0;
+	}
 
 	@Override
 	public int delete(T record) {
 		return obtain().delete(record.getId()) != null ? 1 : 0;
 	}
+	
+	@Override
+	public int deleteList(Collection<T> recordList) {
+		return 0;
+	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
 		return obtain().delete(key) != null ? 1 : 0;
+	}
+	
+	@Override
+	public int deleteByPrimaryKeys(Collection<Long> keyList) {
+		return 0;
 	}
 
 	@Override
@@ -123,8 +138,7 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public List<T> selectMap(Collection<Long> ids) {
+	public List<T> selectByIds(Collection<Long> ids) {
 		return null;
 	}
-
 }

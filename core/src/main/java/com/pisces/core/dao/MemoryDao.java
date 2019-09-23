@@ -10,8 +10,6 @@ import java.util.Map.Entry;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.MemoryDaoImpl;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.ExistedException;
-import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.EntityUtils;
 
 public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
@@ -32,7 +30,7 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 			entity = getEntityClass().newInstance();
 			entity.init();
 		} catch (InstantiationException | IllegalAccessException e) {
-			throw new OperandException(e);
+			throw new UnsupportedOperationException(e);
 		}
 		return entity;
 	}
@@ -54,7 +52,7 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 	}
 	
 	@Override
-	public List<T> selectMap(Collection<Long> ids) {
+	public List<T> selectByIds(Collection<Long> ids) {
 		List<T> result = new ArrayList<>();
 		for (Long id : ids) {
 			T record = this.selectByPrimaryKey(id);
@@ -93,7 +91,7 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 	public int update(T record) {
 		T oldRecord = selectByPrimaryKey(record.getId());
 		if (oldRecord == null) {
-			throw new ExistedException("update a not existed entity");
+			throw new IllegalArgumentException("invalid entity id: " + record.getId());
 		}
 		
 		if (oldRecord != record) {
@@ -101,16 +99,41 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
 		}
 		return 1;
 	}
+	
+	@Override
+	public int updateList(Collection<T> recordList) {
+		for (T record : recordList) {
+			update(record);
+		}
+		return recordList.size();
+	}
 
 	@Override
 	public int delete(T record) {
 		return deleteByPrimaryKey(record.getId());
 	}
+	
+	@Override
+	public int deleteList(Collection<T> recordList) {
+		int count = 0;
+		for (T record : recordList) {
+			count += delete(record);
+		}
+		return count;
+	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
-		impl.get().records.remove(key);
-		return 1;
+		return impl.get().records.remove(key) != null ? 1 : 0;
+	}
+	
+	@Override
+	public int deleteByPrimaryKeys(Collection<Long> keyList) {
+		int count = 0;
+		for (Long key : keyList) {
+			count += deleteByPrimaryKey(key);
+		}
+		return count;
 	}
 	
 	@Override

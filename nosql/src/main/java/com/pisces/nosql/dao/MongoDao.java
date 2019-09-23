@@ -81,6 +81,11 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 		 */
         return 0;
 	}
+	
+	@Override
+	public int updateList(Collection<T> recordList) {
+		return 0;
+	}
 
 	@Override
 	public int delete(T record) {
@@ -90,6 +95,11 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 		 */
 		return 0;
 	}
+	
+	@Override
+	public int deleteList(Collection<T> recordList) {
+		return 0;
+	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
@@ -97,6 +107,11 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 		 * Query query = new Query(Criteria.where("id").is(key)); return
 		 * mongoTemplate.remove(query, this.clazz) != null ? 1 : 0;
 		 */
+		return 0;
+	}
+	
+	@Override
+	public int deleteByPrimaryKeys(Collection<Long> keyList) {
 		return 0;
 	}
 
@@ -118,8 +133,7 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public List<T> selectMap(Collection<Long> ids) {
+	public List<T> selectByIds(Collection<Long> ids) {
 		return null;
 	}
-
 }

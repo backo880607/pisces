@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.NotImplementedException;
 import com.pisces.core.utils.EntityUtils;
 
 public class GlobalDao<T extends EntityObject> implements BaseDao<T> {
@@ -41,7 +40,7 @@ public class GlobalDao<T extends EntityObject> implements BaseDao<T> {
 	}
 	
 	@Override
-	public List<T> selectMap(Collection<Long> ids) {
+	public List<T> selectByIds(Collection<Long> ids) {
 		return selectAll();
 	}
 
@@ -52,12 +51,12 @@ public class GlobalDao<T extends EntityObject> implements BaseDao<T> {
 
 	@Override
 	public int insert(T record) {
-		throw new NotImplementedException("insert global entity is not allowed");
+		throw new UnsupportedOperationException("insert global entity is not allowed");
 	}
 
 	@Override
 	public int insertList(Collection<T> recordList) {
-		throw new NotImplementedException("insert global entity is not allowed");
+		throw new UnsupportedOperationException("insert global entity is not allowed");
 	}
 
 	@Override
@@ -68,31 +67,53 @@ public class GlobalDao<T extends EntityObject> implements BaseDao<T> {
 		}
 		return 1;
 	}
+	
+	@Override
+	public int updateList(Collection<T> recordList) {
+		if (recordList.isEmpty()) {
+			return 0;
+		}
+		
+		return update(recordList.iterator().next());
+	}
 
 	@Override
 	public int delete(T record) {
-		throw new NotImplementedException("delete global entity is not allowed");
+		throw new UnsupportedOperationException("delete global entity is not allowed");
+	}
+	
+	@Override
+	public int deleteList(Collection<T> recordList) {
+		throw new UnsupportedOperationException("delete global entity is not allowed");
 	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
-		throw new NotImplementedException("delete global entity is not allowed");
+		throw new UnsupportedOperationException("delete global entity is not allowed");
+	}
+	
+	@Override
+	public int deleteByPrimaryKeys(Collection<Long> keyList) {
+		throw new UnsupportedOperationException("delete global entity is not allowed");
 	}
 
 	@Override
 	public void loadData() {
+		throw new UnsupportedOperationException("global dao is not allowed");
 	}
 	
 	@Override
-	public void sync() {		
+	public void sync() {
+		throw new UnsupportedOperationException("global dao is not allowed");
 	}
 
 	@Override
 	public DaoImpl createDaoImpl() {
-		return null;
+		throw new UnsupportedOperationException("global dao is not allowed");
 	}
 
 	@Override
 	public void switchDaoImpl(DaoImpl impl) {
+		throw new UnsupportedOperationException("global dao is not allowed");
 	}
 }

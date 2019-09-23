@@ -191,6 +191,7 @@ public class EntityUtils {
 			property.setType(getPropertyType(field.getType()));
 		}
 		property.setTypeName(property.clazz.getName());
+		
 		try {
 			property.getMethod = clazz.getMethod("get" + StringUtils.capitalize(property.getCode()));
 		} catch (Exception ex) {
@@ -330,6 +331,8 @@ public class EntityUtils {
 			type = PROPERTY_TYPE.STRING;
 		} else if (clazz == Date.class) {
 			type = PROPERTY_TYPE.DATE;
+		} else if (clazz == DateDur.class) {
+			type = PROPERTY_TYPE.DURATION;
 		} else if (Enum.class.isAssignableFrom(clazz)) {
 			type = PROPERTY_TYPE.ENUM;
 		} else if (MultiEnum.class.isAssignableFrom(clazz)) {

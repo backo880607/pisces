@@ -19,14 +19,20 @@ public interface SQLMapper<T> {
 	void checkTable();
 	
 	@SelectProvider(type = SQLProvider.class, method = "dynamicSQL")
-	List<T> selectMap(Collection<Long> ids);
+	List<T> selectByIds(Collection<Long> idList);
 	
 	@InsertProvider(type = SQLProvider.class, method = "dynamicSQL")
 	int insertList(Collection<T> recordList);
 	
-	@DeleteProvider(type = SQLProvider.class, method = "dynamicSQL")
-	int deleteList(Collection<Long> recordList);
-	
 	@UpdateProvider(type = SQLProvider.class, method = "dynamicSQL")
     int update(T record);
+	
+	@UpdateProvider(type = SQLProvider.class, method = "dynamicSQL")
+	int updateList(Collection<T> recordList);
+	
+	@DeleteProvider(type = SQLProvider.class, method = "dynamicSQL")
+	int deleteList(Collection<T> recordList);
+	
+	@DeleteProvider(type = SQLProvider.class, method = "dynamicSQL")
+	int deleteByPrimaryKeys(Collection<Long> keyList);
 }

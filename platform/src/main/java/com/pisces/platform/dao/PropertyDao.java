@@ -18,7 +18,6 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ExistedException;
-import com.pisces.core.exception.NotImplementedException;
 import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.core.utils.Primary;
@@ -88,7 +87,7 @@ public class PropertyDao implements BaseDao<Property> {
 
 	@Override
 	public Property select() {
-		throw new NotImplementedException("select one property is not allowed");
+		throw new UnsupportedOperationException("select one property is not allowed");
 	}
 
 	@Override
@@ -108,8 +107,8 @@ public class PropertyDao implements BaseDao<Property> {
 	}
 
 	@Override
-	public List<Property> selectMap(Collection<Long> ids) {
-		return mapper.selectMap(ids);
+	public List<Property> selectByIds(Collection<Long> ids) {
+		return mapper.selectByIds(ids);
 	}
 
 	@Override
@@ -149,6 +148,11 @@ public class PropertyDao implements BaseDao<Property> {
 		}
 		return 1;
 	}
+	
+	@Override
+	public int updateList(Collection<Property> recordList) {
+		return 0;
+	}
 
 	@Override
 	public int delete(Property record) {
@@ -166,6 +170,11 @@ public class PropertyDao implements BaseDao<Property> {
 			properties.remove(record.getCode());
 			return 1; 
 		}
+		return 0;
+	}
+	
+	@Override
+	public int deleteList(Collection<Property> recordList) {
 		return 0;
 	}
 
@@ -188,6 +197,11 @@ public class PropertyDao implements BaseDao<Property> {
 			}
 		}
 		return bFind ? mapper.deleteByPrimaryKey(key) : 0;
+	}
+	
+	@Override
+	public int deleteByPrimaryKeys(Collection<Long> keyList) {
+		return 0;
 	}
 
 	@Override

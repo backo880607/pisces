@@ -58,10 +58,25 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 		}
 		return entity;
 	}
+	
+	@Override
+	public T select() {
+		return this.dao.select();
+	}
 
 	@Override
 	public List<T> selectAll() {
 		return this.dao.selectAll();
+	}
+	
+	@Override
+	public T selectById(long id) {
+		return this.dao.selectByPrimaryKey(id);
+	}
+	
+	@Override
+	public List<T> selectByIds(List<Long> ids) {
+		return this.dao.selectByIds(ids);
 	}
 	
 	@Override
@@ -84,16 +99,8 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 		final int end = Math.min(begin + param.getPageSize(), result.size());
 		return result.subList(begin, end);
 	}
-
+	
 	@Override
-	public T selectById(long id) {
-		return this.dao.selectByPrimaryKey(id);
-	}
-	
-	public T select() {
-		return this.dao.select();
-	}
-	
 	public T select(Predicate<T> filter) {
 		T result = null;
 		final List<T> records = this.selectAll();
@@ -107,6 +114,7 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 		return result;
 	}
 	
+	@Override
 	public List<T> selectList(Predicate<T> filter) {
 		List<T> result = new ArrayList<>();
 		final List<T> records = this.selectAll();
@@ -117,6 +125,11 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public boolean exist(long id) {
+		return this.dao.existsWithPrimaryKey(id);
 	}
 
 	@Override
@@ -132,6 +145,22 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 		entity.setUpdateDate(new Date());
 		return this.dao.insert(entity);
 	}
+	
+	@Override
+	public int insertList(List<T> entities) {
+		for (T entity : entities) {
+			if (entity.getCreateBy() == null) {
+				entity.setCreateBy(AppUtils.getUsername());
+			}
+			entity.setUpdateBy(AppUtils.getUsername());
+			
+			if (entity.getCreateDate() == null) {
+				entity.setCreateDate(new Date());
+			}
+			entity.setUpdateDate(new Date());
+		}
+		return this.dao.insertList(entities);
+	}
 
 	@Override
 	public int update(T entity) {
@@ -139,15 +168,35 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 		entity.setUpdateDate(new Date());
 		return this.dao.update(entity);
 	}
+	
+	@Override
+	public int updateList(List<T> entities) {
+		for (T entity : entities) {
+			entity.setUpdateBy(AppUtils.getUsername());
+			entity.setUpdateDate(new Date());
+		}
+		
+		return this.dao.updateList(entities);
+	}
 
 	@Override
 	public int delete(T entity) {
 		return this.dao.delete(entity);
 	}
+	
+	@Override
+	public int deleteList(List<T> entities) {
+		return this.dao.deleteList(entities);
+	}
 
 	@Override
 	public int deleteById(long id) {
 		return this.dao.deleteByPrimaryKey(id);
+	}
+	
+	@Override
+	public int deleteByIds(List<Long> ids) {
+		return this.dao.deleteByPrimaryKeys(ids);
 	}
 	
 	public static <T extends EntityObject> boolean sort(List<T> entities, String str) {

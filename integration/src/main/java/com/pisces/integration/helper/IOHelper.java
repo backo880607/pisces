@@ -6,7 +6,6 @@ import java.util.List;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.exception.ExistedException;
-import com.pisces.core.exception.NotImplementedException;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.AppUtils;
@@ -31,7 +30,7 @@ public abstract class IOHelper {
 		if (service != null) {
 			this.adapter = (DataSourceAdapter) service;
 		} else {
-			throw new NotImplementedException("datasource " + dataSource.getName() + " not implement service class!");
+			throw new UnsupportedOperationException("datasource " + dataSource.getName() + " not implement service class!");
 		}
 	}
 	

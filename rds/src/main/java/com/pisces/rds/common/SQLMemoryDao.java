@@ -16,8 +16,6 @@ import com.pisces.core.dao.DaoManager;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.MemoryModifyDaoImpl;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.ExistedException;
-import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.EntityUtils;
 
 public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport implements BaseDao<T> {
@@ -37,7 +35,7 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 			entity = getEntityClass().newInstance();
 			entity.init();
 		} catch (InstantiationException | IllegalAccessException e) {
-			throw new OperandException(e);
+			throw new UnsupportedOperationException(e);
 		}
 		return entity;
 	}
@@ -64,7 +62,7 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 	}
 	
 	@Override
-	public List<T> selectMap(Collection<Long> ids) {
+	public List<T> selectByIds(Collection<Long> ids) {
 		List<T> records = new ArrayList<>();
 		for (Long id : ids) {
 			T record = selectByPrimaryKey(id);
@@ -112,7 +110,7 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 	public int update(T record) {
 		T oldRecord = selectByPrimaryKey(record.getId());
 		if (oldRecord == null) {
-			throw new ExistedException("update a not existed entity");
+			throw new IllegalArgumentException("invalid entity id: " + record.getId());
 		}
 		
 		if (oldRecord != record) {
@@ -124,17 +122,45 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 		}
 		return 1;
 	}
+	
+	@Override
+	public int updateList(Collection<T> recordList) {
+		for (T record : recordList) {
+			update(record);
+		}
+		return recordList.size();
+	}
 
 	@Override
 	public int delete(T record) {
 		return deleteByPrimaryKey(record.getId());
 	}
+	
+	@Override
+	public int deleteList(Collection<T> recordList) {
+		int count = 0;
+		for (T record : recordList) {
+			count += delete(record);
+		}
+		return count;
+	}
 
 	@Override
 	public int deleteByPrimaryKey(Object key) {
-		impl.get().records.remove(key);
-		impl.get().deleteds.add((Long)key);
-		return 1;
+		if (impl.get().records.remove(key) != null) {
+			impl.get().deleteds.add((Long)key);
+			return 1;
+		}
+		return 0;
+	}
+	
+	@Override
+	public int deleteByPrimaryKeys(Collection<Long> keyList) {
+		int count = 0;
+		for (Long key : keyList) {
+			count += deleteByPrimaryKey(key);
+		}
+		return count;
 	}
 	
 	@Override
@@ -159,7 +185,7 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 		}
 		
 		if (!impl.get().deleteds.isEmpty()) {
-			this.mapper.deleteList(impl.get().deleteds);
+			this.mapper.deleteByPrimaryKeys(impl.get().deleteds);
 		}
 		
 		if (!creates.isEmpty()) {

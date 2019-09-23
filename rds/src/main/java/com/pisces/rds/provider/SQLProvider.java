@@ -144,7 +144,7 @@ public class SQLProvider extends BaseProvider {
      *
      * @param ms
      */
-    public String selectMap(MappedStatement ms) {
+    public String selectByIds(MappedStatement ms) {
         final Class<?> entityClass = getEntityClass(ms);
         setResultType(ms, entityClass);
         StringBuilder sql = new StringBuilder();
@@ -184,6 +184,34 @@ public class SQLProvider extends BaseProvider {
         sql.append("</foreach>");
         return sql.toString();
     }
+    
+    /**
+     * 更新单个对象
+     * @param ms
+     * @return
+     */
+    public String update(MappedStatement ms) {
+        Class<?> entityClass = getEntityClass(ms);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.updateSetColumns(entityClass, null, true, isNotEmpty()));
+        sql.append(SqlHelper.wherePKColumns(entityClass, true));
+        return sql.toString();
+    }
+    
+    /**
+     * 批量更新对象
+     * @param ms
+     * @return
+     */
+    public String updateList(MappedStatement ms) {
+        Class<?> entityClass = getEntityClass(ms);
+        StringBuilder sql = new StringBuilder();
+        sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.updateSetColumns(entityClass, null, true, isNotEmpty()));
+        sql.append(SqlHelper.wherePKColumns(entityClass, true));
+        return sql.toString();
+    }
 
     /**
      * 批量删除
@@ -212,12 +240,30 @@ public class SQLProvider extends BaseProvider {
         return sql.toString();
     }
     
-    public String update(MappedStatement ms) {
-        Class<?> entityClass = getEntityClass(ms);
+    /**
+     * 批量删除
+     *
+     * @param ms
+     */
+    public String deleteByPrimaryKeys(MappedStatement ms) {
+        final Class<?> entityClazz = getEntityClass(ms);
+        //开始拼sql
         StringBuilder sql = new StringBuilder();
-        sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
-        sql.append(SqlHelper.updateSetColumns(entityClass, null, true, isNotEmpty()));
-        sql.append(SqlHelper.wherePKColumns(entityClass, true));
+        sql.append(SqlHelper.insertIntoTable(entityClazz, tableName(entityClazz)));
+        sql.append(SqlHelper.insertColumns(entityClazz, false, false, false));
+        sql.append(" VALUES ");
+        sql.append("<foreach collection=\"list\" item=\"record\" separator=\",\" >");
+        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
+        //获取全部列
+        Set<EntityColumn> columnList = EntityHelper.getColumns(entityClazz);
+        //当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
+        for (EntityColumn column : columnList) {
+            if (column.isInsertable()) {
+                sql.append(column.getColumnHolder("record") + ",");
+            }
+        }
+        sql.append("</trim>");
+        sql.append("</foreach>");
         return sql.toString();
     }
 }
