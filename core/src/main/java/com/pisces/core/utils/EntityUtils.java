@@ -37,9 +37,6 @@ import com.pisces.core.entity.MultiEnum;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ConfigurationException;
-import com.pisces.core.exception.OperandException;
-import com.pisces.core.exception.RelationException;
-import com.pisces.core.exception.UpdateException;
 import com.pisces.core.relation.RelationKind;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.service.EntityService;
@@ -174,7 +171,7 @@ public class EntityUtils {
 			Sign sign = (Sign)field.get(null);
 			RelationKind kind = Primary.get().getRelationKind(clazz, sign);
 			if (kind == null) {
-				throw new RelationException(clazz.getName() + "`s field " + field.getName() + " not set relation annotation");
+				throw new UnsupportedOperationException(clazz.getName() + "`s field " + field.getName() + " not set relation annotation");
 			}
 			switch (kind) {
 			case Singleton:
@@ -240,7 +237,7 @@ public class EntityUtils {
 					Sign sign = (Sign)field.get(null);
 					RelationKind kind = Primary.get().getRelationKind(clazz, sign);
 					if (kind == null) {
-						throw new RelationException(clazz.getName() + "`s field " + field.getName() + " not set relation annotation");
+						throw new UnsupportedOperationException(clazz.getName() + "`s field " + field.getName() + " not set relation annotation");
 					}
 					switch (kind) {
 					case Singleton:
@@ -342,7 +339,7 @@ public class EntityUtils {
 		} else if (Collection.class.isAssignableFrom(clazz)) {
 			type = PROPERTY_TYPE.LIST;
 		} else {
-			throw new OperandException("not support type: " + clazz.getName());
+			throw new UnsupportedOperationException("not support type: " + clazz.getName());
 		}
 		return type;
 	}
@@ -381,7 +378,7 @@ public class EntityUtils {
 		try {
 			return defaultObjectMapper().writeValueAsString(value);
 		} catch (JsonProcessingException e) {
-			throw new OperandException();
+			throw new UnsupportedOperationException();
 		}
 	}
 	
@@ -395,12 +392,6 @@ public class EntityUtils {
 				property.setMethod.invoke(entity, value);
 			} else if (StringUtils.isEmpty(property.getExpression())) {
 				property.setMethod.invoke(entity, property.getCode(), value);
-			} else {
-				UpdateException exception = new UpdateException("cannot update");
-				exception.setEntity(entity);
-				exception.setProperty(property);
-				exception.setValue(value);
-				throw exception;
 			}
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
@@ -411,7 +402,7 @@ public class EntityUtils {
 		try {
 			return defaultObjectMapper().readValue(str, property.clazz);
 		} catch (IOException e) {
-			throw new OperandException();
+			throw new UnsupportedOperationException();
 		}
 	}
 	

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.RegisteredException;
 
 public final class FactoryManager {
 	private static List<Class<? extends EntityObject>> classes = new ArrayList<Class<? extends EntityObject>>();
@@ -62,7 +61,7 @@ public final class FactoryManager {
 	public static EntityFactory getFactory(Class<? extends EntityObject> clazz) {
 		EntityFactory factory = FactoryManager.factories.get(clazz);
 		if (factory == null) {
-			throw new RegisteredException(clazz.getName() + " has not registered!");
+			throw new UnsupportedOperationException(clazz.getName() + " has not registered!");
 		}
 		return factory;
 	}
@@ -84,7 +83,7 @@ public final class FactoryManager {
 	public static EntityFactory getFactory(String name) {
 		EntityFactory entityFactory = FactoryManager.factoryNames.get(name);
 		if (entityFactory == null) {
-			throw new RegisteredException(name + " has not registered!");
+			throw new UnsupportedOperationException(name + " has not registered!");
 		}
 		return entityFactory;
 	}

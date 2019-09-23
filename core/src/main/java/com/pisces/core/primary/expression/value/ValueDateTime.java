@@ -3,6 +3,7 @@ package com.pisces.core.primary.expression.value;
 import java.text.ParseException;
 import java.util.Date;
 
+import com.pisces.core.config.CoreMessage;
 import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ExpressionException;
 import com.pisces.core.utils.DateUtils;
@@ -24,7 +25,7 @@ public class ValueDateTime extends ValueAbstract {
 			format = DateUtils.SIMPLE_FROMAT;
 			break;
 		default:
-			throw new ExpressionException("not support time type: " + type);
+			throw new UnsupportedOperationException("not support time type: " + type);
 		}
 	}
 	
@@ -41,7 +42,7 @@ public class ValueDateTime extends ValueAbstract {
 					this.value = DateUtils.parse(str, DateUtils.TIME_FORMAT);
 					this.format = DateUtils.TIME_FORMAT;
 				} catch (ParseException e3) {
-					throw new ExpressionException("invalid date format: " + str);
+					throw new ExpressionException(CoreMessage.DateTimeError, str);
 				}
 			}
 		}
@@ -77,7 +78,7 @@ public class ValueDateTime extends ValueAbstract {
 	
 	private ValueAbstract addImpl(ValueInt rhs) {
 		if (format == DateUtils.TIME_FORMAT) {
-			throw new ExpressionException("not support by time format");
+			throw new ExpressionException(CoreMessage.NotSupportOperation, format + " + " + rhs.value);
 		}
 		if (this.value != DateUtils.INVALID) {
 			this.value.setTime(this.value.getTime() + rhs.value * DateUtils.PER_DAY);
@@ -106,7 +107,7 @@ public class ValueDateTime extends ValueAbstract {
 	
 	private ValueAbstract subImpl(ValueInt rhs) {
 		if (format == DateUtils.TIME_FORMAT) {
-			throw new ExpressionException("not support by time format");
+			throw new ExpressionException(CoreMessage.NotSupportOperation, format + " - " + rhs.value);
 		}
 		if (this.value != DateUtils.INVALID) {
 			this.value.setTime(this.value.getTime() - rhs.value * DateUtils.PER_DAY);

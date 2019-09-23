@@ -12,21 +12,20 @@ public abstract class BaseController {
 
 	private ResponseData result(boolean success, Object data, Enum<?> message, Object ...arguments) {
 		DaoManager.sync();
-		if (message == null) {
-			message = WebMessage.UNKNOWN;
-		}
 		ResponseData responseResult = new ResponseData();
 		responseResult.setSuccess(success);
-		responseResult.setStatus(message.ordinal());
-		responseResult.setName(message.name());
-		responseResult.setMessage(LocaleManager.getLanguage(message, arguments));
+		if (message != null) {
+			responseResult.setStatus(message.ordinal());
+			responseResult.setName(message.name());
+			responseResult.setMessage(LocaleManager.getLanguage(message, arguments));
+		}
 		responseResult.setData(data);
 		return responseResult;
 	}
 	
 	protected ResponseData exception(Exception ex, Enum<?> message, Object ...arguments) {
 		if (message == null) {
-			message = WebMessage.UNKNOWN;
+			message = WebMessage.SYSTEM;
 		}
 		ResponseData responseResult = new ResponseData();
 		responseResult.setSuccess(false);

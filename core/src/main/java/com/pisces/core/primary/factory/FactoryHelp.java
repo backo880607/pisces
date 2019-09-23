@@ -8,7 +8,6 @@ import java.util.List;
 import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.annotation.Relation;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.RelationException;
 import com.pisces.core.relation.RelationKind;
 import com.pisces.core.relation.RelationMap;
 import com.pisces.core.relation.Sign;
@@ -129,7 +128,7 @@ class FactoryHelp {
 		if (!relation.sign().isEmpty()) {
 			RelationData relaData = relaFactory.getSignData(relation.sign());
 			if (relaData == null) {
-				throw new RelationException(relaFactory.getEntityClass().getName() + " has not field " + relation.sign().toString());
+				throw new UnsupportedOperationException(relaFactory.getEntityClass().getName() + " has not field " + relation.sign().toString());
 			}
 			relaData.setFactory(factory);
 			relaData.setOwner(false);

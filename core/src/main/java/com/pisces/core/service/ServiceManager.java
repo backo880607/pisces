@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.RegisteredException;
+import com.pisces.core.exception.SystemException;
 import com.pisces.core.utils.Primary;
 
 public class ServiceManager {
@@ -12,7 +12,7 @@ public class ServiceManager {
 
 	public static void register(Class<? extends EntityObject> clazz, EntityService<? extends EntityObject> service) {
 		if (services.containsKey(clazz)) {
-			throw new RegisteredException(clazz.getName() + " has registered!");
+			throw new SystemException(clazz.getName() + " has registered!");
 		}
 		services.put(clazz, service);
 		Primary.get().registerEntityClass(clazz);
@@ -22,7 +22,7 @@ public class ServiceManager {
 	public static <T extends EntityObject> EntityService<T> getService(Class<T> clazz) {
 		EntityService<T> service = (EntityService<T>) services.get(clazz);
 		if (service == null) {
-			throw new RegisteredException(clazz.getName() + " has bind a service!");
+			throw new SystemException(clazz.getName() + " has bind a service!");
 		}
 		return service;
 	}

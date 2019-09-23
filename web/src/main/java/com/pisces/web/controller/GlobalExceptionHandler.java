@@ -55,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseData jsonHandler(HttpServletRequest request, Exception ex) throws Exception {
 		ex.printStackTrace();
 		ResponseData r = new ResponseData();
-		Enum<?> message = WebMessage.UNKNOWN;
+		Enum<?> message = WebMessage.SYSTEM;
 		
 		HandlerExecutionChain chain = webConfig.requestMappingHandlerMapping().getHandler(request);
 		HandlerMethod handlerMethod = (HandlerMethod)chain.getHandler();

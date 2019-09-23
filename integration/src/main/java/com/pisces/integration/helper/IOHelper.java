@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.exception.ExistedException;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.AppUtils;
@@ -46,7 +45,7 @@ public abstract class IOHelper {
 				}
 			}
 			if (!bFind) {
-				throw new ExistedException("missing primary key field " + property.getName() + " in table " + scheme.getOutName());
+				throw new UnsupportedOperationException("missing primary key field " + property.getName() + " in table " + scheme.getOutName());
 			}
 		}
 	}
@@ -56,7 +55,7 @@ public abstract class IOHelper {
 		for (FieldInfo field : fields) {
 			Property property = AppUtils.getPropertyService().get(clazz, field.getName());
 			if (property == null) {
-				throw new ExistedException("invalid field " + field.getExternName() + " in table " + scheme.getOutName());
+				throw new UnsupportedOperationException("invalid field " + field.getExternName() + " in table " + scheme.getOutName());
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 package com.pisces.core.exception;
 
 /**
- *  异常基类，所有自定义异常均由此类派生。
+ *  异常基类，所有需要进行多语言提示的异常均由此类派生。
  *  一下列出Java内置的异常，使用此类异常时不应暴露给用户，且不需要进行多语言化。
  *  ArithmeticExecption-算数异常类
  *  NullPointerException-空指针异常
@@ -24,6 +24,7 @@ package com.pisces.core.exception;
  *  HttpHostConnectException-网络请求异常
  *  IllegalArgumentException-非法参数异常
  *  ZeroException-参数不能小于0异常
+ *  IllegalMonitorStateException-监控器状态出错引起的异常
  * @author Jason
  *
  */
@@ -33,20 +34,24 @@ public class BaseException extends RuntimeException {
 	 * 
 	 */
 	private static final long serialVersionUID = -7541134573166923226L;
+	
+	private Enum<?> key;
+	private Object[] args;
+	
+	public BaseException(Enum<?> key, Object... args) {
+		this.key = key;
+		this.args = args;
+	}
+	
+	public Enum<?> getKey() {
+		return key;
+	}
 
-	public BaseException() {
-		super();
+	public void setKey(Enum<?> key) {
+		this.key = key;
 	}
-	
-	public BaseException(String message) {
-		super(message);
-	}
-	
-	public BaseException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
-	public BaseException(Throwable cause) {
-		super(cause);
+
+	public Object[] getArgs() {
+		return args;
 	}
 }

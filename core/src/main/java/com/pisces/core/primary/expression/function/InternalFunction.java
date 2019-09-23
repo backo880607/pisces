@@ -6,7 +6,8 @@ import java.util.List;
 
 import com.pisces.core.annotation.ELFunction;
 import com.pisces.core.annotation.ELParm;
-import com.pisces.core.exception.OperandException;
+import com.pisces.core.config.CoreMessage;
+import com.pisces.core.exception.ExpressionException;
 import com.pisces.core.primary.expression.value.*;
 import com.pisces.core.relation.RefBase;
 
@@ -115,7 +116,7 @@ class InternalFunction {
 	static ValueAbstract and(List<ValueAbstract> params) {
 		if (params.get(0).getType() != Type.BOOLEAN ||
 			params.get(1).getType() != Type.BOOLEAN) {
-			throw new OperandException(params.get(0) + " && " + params.get(1) + " is not supported!");
+			throw new ExpressionException(CoreMessage.NotSupportOperation, params.get(0) + " && " + params.get(1));
 		}
 		boolean result = ((ValueBoolean)params.get(0)).value && ((ValueBoolean)params.get(1)).value;
 		return new ValueBoolean(result);
@@ -131,7 +132,7 @@ class InternalFunction {
 		ValueAbstract param2 = params.get(1);
 		if (param1.getType() != Type.BOOLEAN || 
 			param2.getType() != Type.BOOLEAN) {
-			throw new OperandException(params.get(0) + " || " + params.get(1) + " is not supported!");
+			throw new ExpressionException(CoreMessage.NotSupportOperation, params.get(0) + " || " + params.get(1));
 		}
 		
 		boolean result = ((ValueBoolean)param1).value || ((ValueBoolean)param2).value;
@@ -145,7 +146,7 @@ class InternalFunction {
 	 */
 	static ValueAbstract not(List<ValueAbstract> params) {
 		if (params.get(0).getType() != Type.BOOLEAN) {
-			throw new OperandException(" ! " + params.get(0) + " is not supported!");
+			throw new ExpressionException(CoreMessage.NotSupportOperation, " ! " + params.get(0));
 		}
 		return new ValueBoolean(!((ValueBoolean)params.get(1)).value);
 	}

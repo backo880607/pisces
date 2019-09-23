@@ -1,7 +1,5 @@
 package com.pisces.core.primary.expression.value;
 
-import java.util.Date;
-
 import com.pisces.core.entity.DateDur;
 import com.pisces.core.utils.DateUtils;
 

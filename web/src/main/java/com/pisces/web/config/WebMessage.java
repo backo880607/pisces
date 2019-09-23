@@ -1,7 +1,7 @@
 package com.pisces.web.config;
 
 public enum WebMessage {
-	UNKNOWN,
+	SYSTEM,
 	CREATE,
 	INSERT,
 	UPDATE,

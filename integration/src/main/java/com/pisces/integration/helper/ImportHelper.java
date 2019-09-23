@@ -12,8 +12,6 @@ import org.apache.ibatis.datasource.DataSourceException;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.exception.ExistedException;
-import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.integration.bean.FieldInfo;
@@ -37,7 +35,7 @@ public class ImportHelper extends IOHelper {
 	public void execute(Collection<Scheme> schemes) {
 		for (Scheme scheme : schemes) {
 			if (scheme.getDataSource() == null) {
-				throw new ExistedException("missing datasource configuration in Scheme " + scheme.getName());
+				throw new UnsupportedOperationException("missing datasource configuration in Scheme " + scheme.getName());
 			}
 			try {
 				switchDataSourceService(scheme.getDataSource());
@@ -55,7 +53,7 @@ public class ImportHelper extends IOHelper {
 				if (adapter != null) {
 					adapter.close();
 				}
-				throw new OperandException(ex);
+				throw new UnsupportedOperationException(ex);
 			} finally {
 				if (adapter != null) {
 					adapter.close();
@@ -118,7 +116,7 @@ public class ImportHelper extends IOHelper {
 		try {
 			entity = clazz.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			throw new OperandException(e);
+			throw new UnsupportedOperationException(e);
 		}
 		return entity;
 	}

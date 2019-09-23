@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.OperType;
-import com.pisces.core.primary.expression.exception.FunctionException;
 import com.pisces.core.primary.expression.function.FunctionManager;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 
@@ -18,7 +17,7 @@ public class OperTypeCalculate implements Calculate {
 	
 	@Override
 	public ValueAbstract GetValue(EntityObject entity) {
-		throw new FunctionException();
+		throw new UnsupportedOperationException();
 	}
 	
 	public ValueAbstract GetValue(List<ValueAbstract> params, Object obj) {

@@ -17,8 +17,6 @@ import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.PROPERTY_TYPE;
-import com.pisces.core.exception.ExistedException;
-import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.core.utils.Primary;
 import com.pisces.rds.common.SQLDao;
@@ -136,7 +134,7 @@ public class PropertyDao implements BaseDao<Property> {
 	public int update(Property record) {
 		Property oldRecord = get(EntityUtils.getEntityClass(record.getBelongName()), record.getCode());
 		if (oldRecord == null) {
-			throw new ExistedException("update a not existed property class:" + record.getBelongName() + " property:" + record.getCode());
+			throw new UnsupportedOperationException("update a not existed property class:" + record.getBelongName() + " property:" + record.getCode());
 		}
 		
 		mapper.update(record);
@@ -163,7 +161,7 @@ public class PropertyDao implements BaseDao<Property> {
 		Property oldRecord = properties.get(record.getCode());
 		if (oldRecord != null) {
 			if (oldRecord.getInherent()) {
-				throw new OperandException("can`t delete a inherent property class:" + record.getBelongName() + " property:" + record.getCode());
+				throw new UnsupportedOperationException("can`t delete a inherent property class:" + record.getBelongName() + " property:" + record.getCode());
 			}
 			
 			mapper.delete(oldRecord);
@@ -185,7 +183,7 @@ public class PropertyDao implements BaseDao<Property> {
 			for (Entry<String, Property> iter : entry.getValue().entrySet()) {
 				if (iter.getValue().getId().equals(key)) {
 					if (iter.getValue().getInherent()) {
-						throw new OperandException("can`t delete a inherent property id:" + key);
+						throw new UnsupportedOperationException("can`t delete a inherent property id:" + key);
 					}
 					entry.getValue().remove(iter.getKey());
 					bFind = true;

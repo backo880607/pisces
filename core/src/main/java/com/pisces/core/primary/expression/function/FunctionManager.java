@@ -14,9 +14,10 @@ import javax.validation.ValidationException;
 
 import com.pisces.core.annotation.ELFunction;
 import com.pisces.core.annotation.ELParm;
+import com.pisces.core.config.CoreMessage;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.exception.ExpressionException;
 import com.pisces.core.primary.expression.OperType;
-import com.pisces.core.primary.expression.exception.FunctionException;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.service.EntityService;
 
@@ -55,7 +56,7 @@ public class FunctionManager {
 	public Data getFunction(String name) {
 		Data data = this.functions.get(name.trim().toUpperCase());
 		if (data == null) {
-			throw new FunctionException("unregister function: " + name);
+			throw new ExpressionException(CoreMessage.InvalidFunctionName, name);
 		}
 		
 		return data;
@@ -123,7 +124,7 @@ public class FunctionManager {
 	public void check(Data fun, List<Class<?>> argumentClazzs) {
 		Class<?>[] parameterClazzs =  fun.method.getParameterTypes();
 		if (argumentClazzs.size() > parameterClazzs.length) {
-			throw new FunctionException("Too many parameters: ");
+			throw new ExpressionException(CoreMessage.TooManyParams, "");
 		}
 		int index = 0;
 		for (Class<?> argClazz : argumentClazzs) {
@@ -137,15 +138,15 @@ public class FunctionManager {
 					}
 				}
 				if (!bMatch) {
-					throw new FunctionException("Invalid parameter type: " + argClazz.getName());
+					throw new ExpressionException(CoreMessage.InvalidParamType, argClazz.getName());
 				}
 			} else if (parameterClazzs[index] != argClazz) {
-				throw new FunctionException("Invalid parameter type: " + argClazz.getName());
+				throw new ExpressionException(CoreMessage.InvalidParamType, argClazz.getName());
 			}
 			++index;
 		}
 		if ((parameterClazzs.length - index) > fun.optionals) {
-			throw new FunctionException("缺少必填项!");
+			throw new ExpressionException(CoreMessage.LessParams);
 		}
 	}
 	
@@ -253,7 +254,7 @@ public class FunctionManager {
 			value = fun.method.invoke(null, params.get(0), params.get(1), params.get(2));
 			break;
 		default:
-			throw new FunctionException();
+			throw new UnsupportedOperationException();
 		}
 		
 		return (ValueAbstract)value;
@@ -280,7 +281,7 @@ public class FunctionManager {
 			value = fun.method.invoke(fun.service, getValue(params, 0), getValue(params, 1), getValue(params, 2));
 			break;
 		default:
-			throw new FunctionException();
+			throw new UnsupportedOperationException();
 		}
 		
 		return value;

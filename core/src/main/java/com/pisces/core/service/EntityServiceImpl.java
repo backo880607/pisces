@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pisces.core.dao.BaseDao;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.exception.OperandException;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.IExpression;
 import com.pisces.core.utils.PageParam;
@@ -54,7 +53,7 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 			entity = getEntityClass().newInstance();
 			entity.init();
 		} catch (InstantiationException | IllegalAccessException e) {
-			throw new OperandException(e);
+			throw new UnsupportedOperationException(e);
 		}
 		return entity;
 	}

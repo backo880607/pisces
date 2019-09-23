@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 
 import com.pisces.core.dao.DaoManager;
 import com.pisces.core.entity.Property;
-import com.pisces.core.exception.ExistedException;
+import com.pisces.core.exception.SystemException;
 import com.pisces.core.service.PropertyService;
 import com.pisces.core.service.ServiceManager;
 import com.pisces.core.startup.Initializer;
@@ -67,7 +67,7 @@ public class AppUtils {
 	public static <T> T getUserData(Class<T> clazz) {
 		UserData userData = curUserData.get();
 		if (userData == null) {
-			throw new ExistedException("current thread not bind user data");
+			throw new SystemException("current thread not bind user data");
 		}
 		
 		Object data = userData.data.get(clazz);
@@ -114,7 +114,7 @@ public class AppUtils {
 	public static PropertyService getPropertyService() {
 		UserData userData = curUserData.get();
 		if (userData == null) {
-			throw new ExistedException("current thread not bind user data");
+			throw new SystemException("current thread not bind user data");
 		}
 		
 		if (userData.propertyService == null) {

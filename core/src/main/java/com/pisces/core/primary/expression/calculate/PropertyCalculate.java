@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.pisces.core.config.CoreMessage;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ExpressionException;
-import com.pisces.core.primary.expression.exception.EntityAccessException;
-import com.pisces.core.primary.expression.exception.ValueException;
 import com.pisces.core.primary.expression.value.InvalidEnum;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueBoolean;
@@ -80,7 +79,7 @@ public class PropertyCalculate implements Calculate {
 			}
 		}
 		
-		throw new ValueException(this.property.getType() + " is not supported!");
+		throw new UnsupportedOperationException(this.property.getType() + " is not supported!");
 	}
 	
 	/**
@@ -107,7 +106,7 @@ public class PropertyCalculate implements Calculate {
 					}
 				}
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new EntityAccessException(e.getMessage());
+				throw new UnsupportedOperationException(e.getMessage());
 			}
 		}
 	}
@@ -151,6 +150,7 @@ public class PropertyCalculate implements Calculate {
 	
 	@SuppressWarnings("unchecked")
 	public int Parse(String str, int index, Class<? extends EntityObject> propertyClazz) {
+		final int origin = index;
 		int temp = index;
 		
 		this.property = null;
@@ -163,15 +163,15 @@ public class PropertyCalculate implements Calculate {
 				if (propertyClazz == null) {
 					propertyClazz = EntityUtils.getEntityClass(name);
 					if (propertyClazz == null) {
-						throw new ExpressionException("invalid object name: " + name);
+						throw new ExpressionException(CoreMessage.InvalidObjectName, name);
 					}
 				} else {
 					Property path = AppUtils.getPropertyService().get(propertyClazz, name);
 					if (path == null) {
-						throw new ExpressionException(propertyClazz.getName() + " has not property name: " + name);
+						throw new ExpressionException(CoreMessage.InvalidProperty, propertyClazz.getName(), name);
 					}
 					if (path.getType() != PROPERTY_TYPE.ENTITY && path.getType() != PROPERTY_TYPE.LIST) {
-						throw new ExpressionException(propertyClazz.getName() + "`s property : " + name + " is not obejct or object collection");
+						throw new ExpressionException(CoreMessage.NotEntityOrList, propertyClazz.getName(), name);
 					}
 					this.paths.add(path);
 					propertyClazz = (Class<? extends EntityObject>)path.clazz;
@@ -192,10 +192,10 @@ public class PropertyCalculate implements Calculate {
 			String name = str.substring(temp, index);
 			this.property = AppUtils.getPropertyService().get(propertyClazz, name);
 			if (this.property == null) {
-				throw new ExpressionException(propertyClazz.getName() + " has not property name : " + name);
+				throw new ExpressionException(CoreMessage.InvalidProperty, propertyClazz.getName(), name);
 			}
 			if (this.property.getType() == PROPERTY_TYPE.ENTITY) {
-				throw new ExpressionException("last property: " + name + " cannot be object");
+				//throw new ExpressionException("last property: " + name + " cannot be object");
 			}
 			if (this.property.getType() == PROPERTY_TYPE.LIST) {
 				this.isList = true;
@@ -204,7 +204,7 @@ public class PropertyCalculate implements Calculate {
 			return index;
 		}
 		
-		throw new ExpressionException("property expression is not correct ");
+		throw new ExpressionException(CoreMessage.ExpressionError, str.substring(origin));
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.pisces.core.primary.expression.value;
 
-import com.pisces.core.exception.OperandException;
+import com.pisces.core.config.CoreMessage;
+import com.pisces.core.exception.ExpressionException;
 
 public abstract class ValueAbstract {
 	public abstract Type getType();
@@ -14,44 +15,44 @@ public abstract class ValueAbstract {
 	}
 	
 	public ValueAbstract add(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " + " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " + " + formatType(rhs));
 	}
 	public ValueAbstract sub(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " - " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " - " + formatType(rhs));
 	}
 	public ValueAbstract multiply(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " * " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " * " + formatType(rhs));
 	}
 	public ValueAbstract division(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " / " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " / " + formatType(rhs));
 	}
 	
 	public ValueBoolean greater(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " > " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " > " + formatType(rhs));
 	}
 	public ValueBoolean greaterEqual(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " >= " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " >= " + formatType(rhs));
 	}
 	public ValueBoolean less(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " < " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " < " + formatType(rhs));
 	}
 	public ValueBoolean lessEqual(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " <= " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " <= " + formatType(rhs));
 	}
 	public ValueBoolean equal(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " == " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " == " + formatType(rhs));
 	}
 	public ValueBoolean notEqual(ValueAbstract rhs) {
-		throw new OperandException(formatType(this) + " != " + formatType(rhs) + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " != " + formatType(rhs));
 	}
 	
 	public ValueText toText() {
-		throw new OperandException(formatType(this) + " toText " + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " toText");
 	}
 	public ValueInt toInt() {
-		throw new OperandException(formatType(this) + " toInt " + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " toInt");
 	}
 	public ValueDouble toDouble() {
-		throw new OperandException(formatType(this) + " toDouble " + " is not supported!");
+		throw new ExpressionException(CoreMessage.NotSupportOperation, formatType(this) + " toDouble");
 	}
 }

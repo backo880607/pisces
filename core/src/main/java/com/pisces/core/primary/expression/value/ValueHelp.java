@@ -2,8 +2,6 @@ package com.pisces.core.primary.expression.value;
 
 import java.util.Date;
 
-import com.pisces.core.primary.expression.exception.ValueException;
-
 public class ValueHelp {
 	public static ValueAbstract get(Object value) {
 		return null;
@@ -23,6 +21,6 @@ public class ValueHelp {
 		} else if (clazz == Enum.class) {
 			return new ValueEnum(null);
 		}
-		throw new ValueException();
+		throw new UnsupportedOperationException();
 	}
 }

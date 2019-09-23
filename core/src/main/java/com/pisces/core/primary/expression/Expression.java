@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.pisces.core.config.CoreMessage;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.exception.ExpressionException;
 import com.pisces.core.primary.expression.calculate.BracketCalculate;
 import com.pisces.core.primary.expression.calculate.Calculate;
 import com.pisces.core.primary.expression.calculate.DateTimeCalculate;
@@ -19,7 +21,6 @@ import com.pisces.core.primary.expression.calculate.EntityCalculate;
 import com.pisces.core.primary.expression.calculate.OperTypeCalculate;
 import com.pisces.core.primary.expression.calculate.ReverseCalculate;
 import com.pisces.core.primary.expression.calculate.TextCalculate;
-import com.pisces.core.primary.expression.exception.FunctionException;
 import com.pisces.core.primary.expression.value.Type;
 import com.pisces.core.primary.expression.value.ValueAbstract;
 import com.pisces.core.primary.expression.value.ValueBoolean;
@@ -92,7 +93,7 @@ public class Expression implements IExpression {
 			return false;
 		}
 		if (value.getClass() != Boolean.class) {
-			throw new FunctionException();
+			throw new ExpressionException(CoreMessage.NotSupportOperation, value.getClass().getSimpleName() + " to Boolean");
 		}
 		
 		return (Boolean)value;

@@ -7,19 +7,7 @@ public class ExpressionException extends BaseException {
 	 */
 	private static final long serialVersionUID = -8094703802819527529L;
 
-	public ExpressionException() {
-		super();
-	}
-	
-	public ExpressionException(String message) {
-		super(message);
-	}
-	
-	public ExpressionException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
-	public ExpressionException(Throwable cause) {
-		super(cause);
+	public ExpressionException(Enum<?> key, Object... args) {
+		super(key, args);
 	}
 }

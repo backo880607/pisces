@@ -8,8 +8,6 @@ import org.apache.ibatis.datasource.DataSourceException;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.exception.ExistedException;
-import com.pisces.core.exception.OperandException;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.AppUtils;
@@ -38,7 +36,7 @@ public class ExportHelper extends IOHelper {
 	public void execute(Collection<Scheme> schemes) {
 		for (Scheme scheme : schemes) {
 			if (scheme.getDataSource() == null) {
-				throw new ExistedException("missing datasource configuration in Scheme " + scheme.getName());
+				throw new UnsupportedOperationException("missing datasource configuration in Scheme " + scheme.getName());
 			}
 			try {
 				switchDataSourceService(scheme.getDataSource());
@@ -56,7 +54,7 @@ public class ExportHelper extends IOHelper {
 				if (adapter != null) {
 					adapter.close();
 				}
-				throw new OperandException(ex);
+				throw new UnsupportedOperationException(ex);
 			} finally {
 				if (adapter != null) {
 					adapter.close();

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.pisces.core.exception.ExistedException;
 import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.user.bean.Account;
+import com.pisces.user.config.UserMessage;
 import com.pisces.user.dao.AccountDao;
 import com.pisces.user.service.AccountService;
 
@@ -75,7 +76,7 @@ class AccountServiceImpl extends EntityServiceImpl<Account, AccountDao> implemen
     	example.createCriteria().andEqualTo("username", account.getUsername());
     	Account existed = getDao().selectOneByExample(example);
     	if (existed != null) {
-    		throw new ExistedException(account.getUsername());
+    		throw new ExistedException(UserMessage.UserExisted, account.getUsername());
     	}
     	
     	getBaseDao().insert(account);
