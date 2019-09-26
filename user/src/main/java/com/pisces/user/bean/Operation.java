@@ -4,7 +4,7 @@ import javax.persistence.Table;
 
 import com.pisces.core.entity.EntityCoding;
 
-@Table(name = "user_operation")
+@Table(name = "USER_OPERATION")
 public class Operation extends EntityCoding {
 
 }

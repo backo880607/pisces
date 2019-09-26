@@ -1,25 +1,18 @@
 package com.pisces.rds.provider;
 
-import java.math.BigDecimal;
-import java.net.URL;
-import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.type.JdbcType;
 
-import com.pisces.core.entity.MultiEnum;
 import com.pisces.rds.provider.base.AdaptiveProvider;
 import com.pisces.rds.provider.base.DB2Provider;
-import com.pisces.rds.provider.base.MySQLProvider;
+import com.pisces.rds.provider.base.MySqlProvider;
 import com.pisces.rds.provider.base.OracleProvider;
 import com.pisces.rds.provider.base.SQLProvider;
-import com.pisces.rds.provider.base.SQLServerProvider;
 import com.pisces.rds.provider.base.SQLiteProvider;
+import com.pisces.rds.provider.base.SqlServerProvider;
 
 import tk.mybatis.mapper.mapperhelper.MapperHelper;
 import tk.mybatis.mapper.mapperhelper.MapperTemplate;
@@ -52,16 +45,14 @@ public abstract class BaseProvider extends MapperTemplate {
 						} else if (dbName.startsWith("Oracle")) {
 							this.provider = new OracleProvider();
 						} else if (dbName.startsWith("Microsoft SQL Server")) {
-							this.provider = new SQLServerProvider();
+							this.provider = new SqlServerProvider();
 						} else if (dbName.equals("Adaptive Server")) {
 							this.provider = new AdaptiveProvider();
 						} else if (dbName.equals("MySQL")) {
-							this.provider = new MySQLProvider();
+							this.provider = new MySqlProvider();
 						} else if (dbName.equals("sqlite")) {
 							this.provider = new SQLiteProvider();
 						}
-						this.provider.setDatabase(conn.getCatalog());
-						this.provider.setDbMetaData(dbmd);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					} finally {
@@ -71,44 +62,5 @@ public abstract class BaseProvider extends MapperTemplate {
 		}
 		
 		return this.provider;
-	}
-	
-	protected JdbcType getJdbcType(Class<?> javaType) throws SQLException {
-		if (javaType == null) {
-			throw new SQLException("javaType must be not null");
-		}
-		if (javaType == Boolean.class) {
-			return JdbcType.BIT;
-		} else if (javaType == Byte.class) {
-			return JdbcType.TINYINT;
-		} else if (javaType == Short.class) {
-			return JdbcType.SMALLINT;
-		} else if (javaType == Integer.class) {
-			return JdbcType.INTEGER;
-		} else if (javaType == Long.class) {
-			return JdbcType.BIGINT;
-		} else if (javaType == Float.class) {
-			return JdbcType.REAL;
-		} else if (javaType == Double.class) {
-			return JdbcType.DOUBLE;
-		} else if (javaType == BigDecimal.class) {
-			return JdbcType.DECIMAL;
-		} else if (javaType == String.class) {
-			return JdbcType.VARCHAR;
-		} else if (javaType == Date.class) {
-			return JdbcType.DATE;
-		} else if (javaType == Clob.class) {
-			return JdbcType.CLOB;
-		} else if (javaType == Blob.class) {
-			return JdbcType.BLOB;
-		} else if (javaType == URL.class) {
-			return JdbcType.DATALINK;
-		} else if (javaType.isEnum()) {
-			return JdbcType.VARCHAR;
-		} else if (MultiEnum.class.isAssignableFrom(javaType)) {
-			return JdbcType.INTEGER;
-		}
-		
-		throw new SQLException("don`t match jdbc type: " + javaType.getName());
 	}
 }

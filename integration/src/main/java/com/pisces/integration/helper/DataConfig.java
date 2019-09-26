@@ -3,8 +3,8 @@ package com.pisces.integration.helper;
 public class DataConfig {
 	private String sepField;
 	private String sepEntity;
-	private String replaceField;
-	private String replaceEntity;
+	private String replaceField = "▲";
+	private String replaceEntity = "◆";
 	
 	public String getSepField() {
 		return sepField;

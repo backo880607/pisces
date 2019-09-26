@@ -12,11 +12,13 @@ import com.pisces.core.relation.RelationKind;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertyMeta {
 	String name() default "";
-	// 仅供内部使用
-	boolean internal() default false;
 	boolean unique() default false;
 	boolean modifiable() default true;
-	boolean display() default true;
+	// 控制对外界是否可见，不可见的不会创建Property
+	// 若也不想进行持久化，请用transient修饰符。
+	boolean visiable() default true;
 	PROPERTY_TYPE type() default PROPERTY_TYPE.NONE;
 	RelationKind kind() default RelationKind.None;
+	// 是否为长度超大的数据类型
+	boolean large() default false;
 }

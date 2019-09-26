@@ -2,10 +2,12 @@ package com.pisces.integration.helper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.service.EntityService;
+import com.pisces.core.service.PropertyService;
 import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
@@ -17,6 +19,14 @@ import com.pisces.integration.service.DataSourceAdapter;
 public abstract class IOHelper {
 	protected DataSourceAdapter adapter;
 	private DataConfig config;
+	protected PropertyService propertyService;
+	
+	public IOHelper() {
+		Map<String, PropertyService> temp = AppUtils.getBeansOfType(PropertyService.class);
+		if (temp != null && !temp.isEmpty()) {
+			this.propertyService = temp.entrySet().iterator().next().getValue();
+		}
+	}
 	
 	public DataConfig getConfig() {
 		return this.config;
@@ -28,6 +38,7 @@ public abstract class IOHelper {
 		EntityService<? extends EntityObject> service = ServiceManager.getService(dataSource.getClass());
 		if (service != null) {
 			this.adapter = (DataSourceAdapter) service;
+			this.config = this.adapter.getDataConfig();
 		} else {
 			throw new UnsupportedOperationException("datasource " + dataSource.getName() + " not implement service class!");
 		}

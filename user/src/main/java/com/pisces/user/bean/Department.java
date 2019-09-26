@@ -4,7 +4,7 @@ import javax.persistence.Table;
 
 import com.pisces.core.entity.EntityCoding;
 
-@Table(name = "user_department")
+@Table(name = "USER_DEPARTMENT")
 public class Department extends EntityCoding {
 
 }

@@ -11,7 +11,7 @@ import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
 import com.pisces.integration.enums.SchemeType;
 
-@Table(name = "integration_scheme_group")
+@Table(name = "INTEGRATION_SCHEME_GROUP")
 public class SchemeGroup extends EntityCoding {
 	@NotNull
 	private SchemeType type;

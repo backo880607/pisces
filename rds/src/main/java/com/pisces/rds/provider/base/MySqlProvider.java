@@ -1,23 +1,26 @@
 package com.pisces.rds.provider.base;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.sql.Statement;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.ibatis.type.JdbcType;
 
 import tk.mybatis.mapper.entity.EntityColumn;
-import tk.mybatis.mapper.entity.EntityTable;
-import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
-public class MySQLProvider extends SQLProvider {
+public class MySqlProvider extends SQLProvider {
 	
 	@Override
-	public String getSQLType(EntityColumn column) throws SQLException {
-		JdbcType type = getJdbcType(column);
-		switch (type) {
+	public String getSQLType(JdbcType jdbcType) {
+		if (jdbcType == null) {
+			return "";
+		}
+		
+		switch (jdbcType) {
 		case ARRAY:
 			break;
 		case BIT:
@@ -83,49 +86,77 @@ public class MySQLProvider extends SQLProvider {
 		default:
 			break;
 		}
-		throw new SQLException("Unimplemented jdbc type: " + type.name());
+		return "";
 	}
 	
 	@Override
-	public String existedTable(String tableName) {
+	public String getDriverName() {
+		return "com.mysql.jdbc.Driver";
+	}
+	
+	@Override
+	public String getConnection(String host, int port, String dataBase, String charset) {
+		StringBuilder sql = new StringBuilder("jdbc:mysql://");
+		sql.append(host).append(":").append(port).append("/").append(dataBase);
+		sql.append("?autoReconnect=true&useSSL=false&characterEncoding=utf-8");
+		return sql.toString();
+	}
+	
+	@Override
+	public boolean existedDataBase(Connection conn, String dataBase) throws SQLException {
+		return true;
+	}
+	
+	@Override
+	public void createDataBase(Connection conn, String dataBase) throws SQLException {
+		
+	}
+	
+	@Override
+	public void dropDataBase(Connection conn, String dataBase) throws SQLException {
+		
+	}
+	
+	@Override
+	public boolean existedTable(Connection conn, String dataBase, String tableName) throws SQLException {
 		StringBuilder sql = new StringBuilder();
         sql.append("SELECT COUNT(*) ");
         sql.append("FROM information_schema.TABLES ");
-        sql.append("WHERE TABLE_SCHEMA='").append(getDatabase()).append("' ");
+        sql.append("WHERE TABLE_SCHEMA='").append(dataBase).append("' ");
         sql.append(" AND binary TABLE_NAME='").append(tableName).append("'");
-        return sql.toString();
+        try (Statement stmt = conn.createStatement()) {
+			ResultSet resultSet = stmt.executeQuery(sql.toString());
+			if (resultSet != null && resultSet.getInt(1) > 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
-	public boolean existedTable(ResultSet resultSet) throws SQLException {
-		return resultSet.getInt(1) > 0;
-	}
-	
-	@Override
-	public String createTable(String tableName, Class<?> entityClass) throws SQLException {
+	public void createTable(Connection conn, String tableName, Collection<EntityColumn> columns) throws SQLException {
 		StringBuilder sql = new StringBuilder();
 		sql.append("CREATE TABLE ").append(tableName).append(" (");
-		EntityTable table = EntityHelper.getEntityTable(entityClass);
-		for (EntityColumn column : table.getEntityClassColumns()) {
-			sql.append(column.getColumn()).append(" ").append(getSQLType(column)).append(",");
+		for (EntityColumn column : columns) {
+			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType())).append(",");
 		}
 		sql.append("PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;");
-		return sql.toString();
+		try (Statement stmt = conn.createStatement()) {
+			stmt.execute(sql.toString());
+		}
 	}
 	
-	/*@Override
-	public String existedColumn(MappedStatement ms) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT COUNT(*) ");
-		sql.append("FROM information_schema.COLUMNS ");
-		sql.append("WHERE TABLE_SCHEMA='test' ");
-		sql.append(" AND TABLE_NAME=").append("#{tableName}");
-		sql.append(" AND binary COLUMN_NAME=").append("#{columnName}");
-		return sql.toString();
-	}*/
+	@Override
+	public void dropTable(Connection conn, String tableName) throws SQLException {
+		StringBuilder sql = new StringBuilder("DROP TABLE ");
+		sql.append(tableName);
+		try (Statement stmt = conn.createStatement()) {
+			stmt.execute(sql.toString());
+		}
+	}
 	
 	@Override
-	public String addColumns(String tableName, List<EntityColumn> columns) throws SQLException {
+	public String addColumns(String tableName, Collection<EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE ").append(tableName).append(" ADD ");
 		sql.append("(");
@@ -134,7 +165,7 @@ public class MySQLProvider extends SQLProvider {
 			if (bFind) {
 				sql.append(",");
 			}
-			sql.append(column.getColumn()).append(" ").append(getSQLType(column));
+			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType()));
 			bFind = true;
 		}
 		sql.append(")");
@@ -142,18 +173,18 @@ public class MySQLProvider extends SQLProvider {
 	}
 
 	@Override
-	public String changeColumns(String tableName, List<EntityColumn> columns) throws SQLException {
+	public String changeColumns(String tableName, Collection<EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
 		for (EntityColumn column : columns) {
 			sql.append("ALTER TABLE ").append(tableName).append(" MODIFY ");
-			sql.append(column.getColumn()).append(" ").append(getSQLType(column));
+			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType()));
 			sql.append(";");
 		}
 		return sql.toString();
 	}
 
 	@Override
-	public String dropColumns(String tableName, Map<String, EntityColumn> columns) throws SQLException {
+	public String dropColumns(String tableName, Map<String, EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE ").append(tableName).append(" ");
 		boolean bFind = false;

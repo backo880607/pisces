@@ -1,8 +1,8 @@
 package com.pisces.rds.provider.base;
 
-import java.sql.ResultSet;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.ibatis.type.JdbcType;
@@ -12,9 +12,12 @@ import tk.mybatis.mapper.entity.EntityColumn;
 public class DB2Provider extends SQLProvider {
 	
 	@Override
-	public String getSQLType(EntityColumn column) throws SQLException {
-		JdbcType type = getJdbcType(column);
-		switch (type) {
+	public String getSQLType(JdbcType jdbcType) {
+		if (jdbcType == null) {
+			return "";
+		}
+		
+		switch (jdbcType) {
 		case ARRAY:
 		case BIT:
 		case TINYINT:
@@ -70,35 +73,68 @@ public class DB2Provider extends SQLProvider {
 	}
 
 	@Override
-	public String existedTable(String tableName) {
-		return null;
-	}
-	
-	@Override
-	public boolean existedTable(ResultSet resultSet) throws SQLException {
-		return resultSet.getInt(1) > 0;
-	}
-
-	@Override
-	public String createTable(String tableName, Class<?> entityClass) throws SQLException {
-		return null;
-	}
-
-	@Override
-	public String addColumns(String tableName, List<EntityColumn> columns) throws SQLException {
-		return null;
-	}
-
-	@Override
-	public String changeColumns(String tableName, List<EntityColumn> columns) throws SQLException {
+	public String getDriverName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String dropColumns(String tableName, Map<String, EntityColumn> columns) throws SQLException {
+	public String getConnection(String host, int port, String dataBase, String charset) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
+	public boolean existedDataBase(Connection conn, String dataBase) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void createDataBase(Connection conn, String dataBase) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dropDataBase(Connection conn, String dataBase) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean existedTable(Connection conn, String dataBase, String tableName) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void createTable(Connection conn, String tableName, Collection<EntityColumn> columns) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dropTable(Connection conn, String tableName) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String addColumns(String tableName, Collection<EntityColumn> columns) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String changeColumns(String tableName, Collection<EntityColumn> columns) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String dropColumns(String tableName, Map<String, EntityColumn> columns) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

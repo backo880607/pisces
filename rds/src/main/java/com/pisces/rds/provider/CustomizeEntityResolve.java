@@ -15,13 +15,15 @@ import com.pisces.rds.handler.MultiEnumTypeHandler;
 import com.pisces.rds.handler.SignTypeHandler;
 import com.pisces.rds.handler.UserFieldTypeHandler;
 
+import tk.mybatis.mapper.code.Style;
 import tk.mybatis.mapper.entity.Config;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.EntityField;
 import tk.mybatis.mapper.entity.EntityTable;
 import tk.mybatis.mapper.mapperhelper.resolve.DefaultEntityResolve;
+import tk.mybatis.mapper.util.StringUtil;
 
-public class RelationEntityResolve extends DefaultEntityResolve {
+public class CustomizeEntityResolve extends DefaultEntityResolve {
 	@Override
 	public EntityTable resolveEntity(Class<?> entityClass, Config config) {
 		EntityTable table = super.resolveEntity(entityClass, config);
@@ -39,7 +41,7 @@ public class RelationEntityResolve extends DefaultEntityResolve {
 		for (Field field : fields) {
 			if (Modifier.isStatic(field.getModifiers()) && field.getType() == Sign.class) {
 				EntityColumn column = new EntityColumn(table);
-				column.setColumn("fk_" + field.getName());
+				column.setColumn("FK_" + StringUtil.convertByStyle(field.getName(), Style.camelhumpAndUppercase));
 				column.setProperty(field.getName());
 				column.setJavaType(String.class);
 				column.setTypeHandler(SignTypeHandler.class);
@@ -63,7 +65,7 @@ public class RelationEntityResolve extends DefaultEntityResolve {
 					Transient tran = field.getAnnotation(Transient.class);
 					if (tran == null) {
 						EntityColumn column = new EntityColumn(table);
-						column.setColumn(field.getName());
+						column.setColumn(StringUtil.convertByStyle(field.getName(), Style.camelhumpAndUppercase));
 						column.setProperty(field.getName());
 						column.setJavaType(field.getType());
 						column.setJdbcType(JdbcType.INTEGER);
@@ -85,7 +87,7 @@ public class RelationEntityResolve extends DefaultEntityResolve {
 		if (clazz == EntityObject.class) {
 			Field field = clazz.getDeclaredField("userFields");
 			EntityColumn column = new EntityColumn(table);
-			column.setColumn(field.getName());
+			column.setColumn(StringUtil.convertByStyle(field.getName(), Style.camelhumpAndUppercase));
 			column.setProperty(field.getName());
 			column.setJavaType(field.getType());
 			column.setJdbcType(JdbcType.LONGVARCHAR);

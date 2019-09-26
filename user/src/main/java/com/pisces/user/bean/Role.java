@@ -4,6 +4,6 @@ import javax.persistence.Table;
 
 import com.pisces.core.entity.EntityCoding;
 
-@Table(name = "user_role")
+@Table(name = "USER_ROLE")
 public class Role extends EntityCoding {
 }

@@ -33,6 +33,9 @@ public class ImportHelper extends IOHelper {
 
 	@Override
 	public void execute(Collection<Scheme> schemes) {
+		if (propertyService == null) {
+			throw new UnsupportedOperationException();
+		}
 		for (Scheme scheme : schemes) {
 			if (scheme.getDataSource() == null) {
 				throw new UnsupportedOperationException("missing datasource configuration in Scheme " + scheme.getName());
@@ -79,11 +82,15 @@ public class ImportHelper extends IOHelper {
 						
 						int index = 0;
 						for (FieldInfo field : fields) {
-							String value = obtainValue(index);
-							++index;
+							String value = adapter.getData(index);
+							if (getConfig() != null) {
+								value.replace(getConfig().getReplaceField(), getConfig().getSepField());
+								value.replace(getConfig().getReplaceEntity(), getConfig().getSepEntity());
+							}
 							
 							Property property = AppUtils.getPropertyService().get(clazz, field.getName());
 							write(entity, property, value);
+							++index;
 						}
 						
 						Set<ConstraintViolation<EntityObject>> errors = getValidator().validate(entity, Default.class);
@@ -102,13 +109,6 @@ public class ImportHelper extends IOHelper {
 				}
 			}
 		}
-	}
-	
-	private String obtainValue(int index) throws Exception {
-		String value = adapter.getData(index);
-		value.replace(getConfig().getReplaceField(), getConfig().getSepField());
-		value.replace(getConfig().getReplaceEntity(), getConfig().getSepEntity());
-		return value;
 	}
 	
 	private EntityObject createEntity(Class<? extends EntityObject> clazz) {

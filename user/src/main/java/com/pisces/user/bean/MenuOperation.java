@@ -4,7 +4,7 @@ import javax.persistence.Table;
 
 import com.pisces.core.entity.EntityCoding;
 
-@Table(name = "user_menu_operation")
+@Table(name = "USER_MENU_OPERATION")
 public class MenuOperation extends EntityCoding {
 
 }

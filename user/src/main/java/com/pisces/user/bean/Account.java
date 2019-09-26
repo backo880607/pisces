@@ -18,7 +18,7 @@ import com.pisces.core.relation.RelationKind;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
 
-@Table(name = "user_account")
+@Table(name = "USER_ACCOUNT")
 @PrimaryKey(fields={"username"})
 public class Account extends EntityObject {
 	private String username;

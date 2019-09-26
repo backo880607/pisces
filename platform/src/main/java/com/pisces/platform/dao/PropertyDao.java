@@ -234,36 +234,51 @@ public class PropertyDao implements BaseDao<Property> {
 	
 	public List<Property> get(Class<? extends EntityObject> clazz) {
 		List<Property> result = new ArrayList<Property>();
-		Map<String, Property> properties = impl.get().properties.get(clazz);
-		if (properties != null) {
-			for (Entry<String, Property> entry : properties.entrySet()) {
-				result.add(entry.getValue());
+		do {
+			Map<String, Property> properties = impl.get().properties.get(clazz);
+			if (properties != null) {
+				for (Entry<String, Property> entry : properties.entrySet()) {
+					result.add(entry.getValue());
+				}
 			}
-		}
+			clazz = Primary.get().getSuperClass(clazz);
+		} while (clazz != null);
 		
 		return result;
 	}
 	
 	public Property get(Class<? extends EntityObject> clazz, String code) {
-		Map<String, Property> properties = impl.get().properties.get(clazz);
-		return properties != null ? properties.get(code) : null;
+		do {
+			Map<String, Property> properties = impl.get().properties.get(clazz);
+			if (properties != null) {
+				Property property = properties.get(code);
+				if (property != null) {
+					return property;
+				}
+			}
+			clazz = Primary.get().getSuperClass(clazz);
+		} while (clazz != null);
+		return null;
 	}
 	
 	public List<Property> getPrimaries(Class<? extends EntityObject> clazz) {
 		List<Property> result = new ArrayList<Property>();
-		Map<String, Property> properties = impl.get().properties.get(clazz);
-		if (properties != null) {
-			for (Entry<String, Property> entry : properties.entrySet()) {
-				if (entry.getValue().getPrimaryKey()) {
-					result.add(entry.getValue());
+		do {
+			Map<String, Property> properties = impl.get().properties.get(clazz);
+			if (properties != null) {
+				for (Entry<String, Property> entry : properties.entrySet()) {
+					if (entry.getValue().getPrimaryKey()) {
+						result.add(entry.getValue());
+					}
 				}
 			}
 			
-			if (result.isEmpty()) {
-				result.add(properties.get("id"));
-			}
-		}
+			clazz = Primary.get().getSuperClass(clazz);
+		} while (clazz != null);
 		
+		if (result.isEmpty()) {
+			result.add(impl.get().properties.get(EntityObject.class).get("id"));
+		}
 		return result;
 	}
 }

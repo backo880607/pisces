@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.util.Collection;
 
 import org.springframework.stereotype.Service;
@@ -16,7 +15,9 @@ import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsExcelCsv;
 import com.pisces.integration.bean.FieldInfo;
+import com.pisces.integration.bean.Scheme;
 import com.pisces.integration.dao.DsExcelCsvDao;
+import com.pisces.integration.helper.DataConfig;
 import com.pisces.integration.service.DsExcelCsvService;
 
 @Service
@@ -26,8 +27,16 @@ class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao>
 	private String[] lineData;
 	private CSVWriter writer;
 	
+	@Override
+	public DataConfig getDataConfig() {
+		DataConfig config = new DataConfig();
+		config.setSepField(",");
+		config.setSepEntity("\n");
+		return config;
+	}
+	
 	private String getPath(DsExcelCsv excel, String tableName) {
-		String path = excel.getPath();
+		String path = excel.getHost();
 		if (!path.endsWith(File.separator)) {
 			path += File.separator;
 		}
@@ -93,26 +102,31 @@ class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao>
 	}
 
 	@Override
-	public String getData(Field field) throws Exception {
-		return null;
-	}
-
-	@Override
-	public void writeHeader(Collection<FieldInfo> fields) {
+	public void beforeWriteTable(Scheme scheme, Collection<FieldInfo> fields) throws Exception {
+		lineData = new String[fields.size()];
+		int index = 0;
+		for (FieldInfo field : fields) {
+			lineData[index++] = field.getExternName();
+		}
 		
+		writer.writeNext(lineData);
 	}
 	
 	@Override
-	public void beforeWriteEntity(EntityObject entity) {
-		
+	public void beforeWriteEntity(EntityObject entity) throws Exception {
 	}
 	
 	@Override
 	public void write(int index, String data) throws Exception {
+		lineData[index] = data;
 	}
 
 	@Override
-	public void afterWriteEntity(EntityObject entity) {
-		
+	public void afterWriteEntity(EntityObject entity) throws Exception {
+		writer.writeNext(lineData);
+	}
+
+	@Override
+	public void afterWriteTable(Scheme scheme) throws Exception {
 	}
 }

@@ -6,7 +6,7 @@ import javax.persistence.Table;
 
 import com.pisces.core.entity.EffectTaskType;
 
-@Table(name = "user_data_set")
+@Table(name = "USER_DATA_SET")
 public class DataSet extends EntityCoding {
 	private EffectTaskType type;
 	

@@ -13,7 +13,7 @@ import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
 import com.pisces.integration.enums.ImportType;
 
-@Table(name = "integration_scheme")
+@Table(name = "INTEGRATION_SCHEME")
 public class Scheme extends EntityCoding {
 	@NotNull
 	private ImportType importType;

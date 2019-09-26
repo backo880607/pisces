@@ -1,78 +1,62 @@
 package com.pisces.rds.provider.base;
 
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.type.JdbcType;
 
 import com.pisces.core.entity.MultiEnum;
+import com.pisces.core.enums.PROPERTY_TYPE;
 
 import tk.mybatis.mapper.entity.EntityColumn;
 
 public abstract class SQLProvider {
-	private String database;
-	private DatabaseMetaData dbMetaData;
 	
-	public String getDatabase() {
-		return database;
-	}
+	public abstract String getSQLType(JdbcType jdbcType);
 	
-	public void setDatabase(String database) {
-		this.database = database;
-	}
-
-	public DatabaseMetaData getDbMetaData() {
-		return dbMetaData;
-	}
-
-	public void setDbMetaData(DatabaseMetaData dbMetaData) {
-		this.dbMetaData = dbMetaData;
-	}
-	
-	public abstract String getSQLType(EntityColumn column) throws SQLException;
-	protected JdbcType getJdbcType(EntityColumn column) {
-		if (column.getJdbcType() != null) {
-			return column.getJdbcType();
-		}
-		if (column.getJavaType() == Boolean.class) {
+	public JdbcType getJdbcType(Class<?> javaType, PROPERTY_TYPE type, boolean large) {
+		if (javaType == Boolean.class) {
 			return JdbcType.BOOLEAN;
-		} else if (column.getJavaType() == Short.class) {
+		} else if (javaType == Short.class) {
 			return JdbcType.SMALLINT;
-		} else if (column.getJavaType() == Integer.class) {
+		} else if (javaType == Integer.class) {
 			return JdbcType.INTEGER;
-		} else if (column.getJavaType() == Long.class) {
+		} else if (javaType == Long.class) {
 			return JdbcType.BIGINT;
-		} else if (column.getJavaType() == Float.class) {
+		} else if (javaType == Float.class) {
 			return JdbcType.FLOAT;
-		} else if (column.getJavaType() == Double.class) {
+		} else if (javaType == Double.class) {
 			return JdbcType.DOUBLE;
-		} else if (column.getJavaType() == Character.class) {
+		} else if (javaType == Character.class) {
 			return JdbcType.CHAR;
-		} else if (column.getJavaType() == String.class) {
-			return JdbcType.VARCHAR;
-		} else if (column.getJavaType() == Date.class) {
+		} else if (javaType == String.class) {
+			return large ? JdbcType.LONGNVARCHAR : JdbcType.NVARCHAR;
+		} else if (javaType == Date.class) {
 			return JdbcType.DATE;
-		} else if (column.getJavaType().isEnum()) {
+		} else if (javaType.isEnum()) {
 			return JdbcType.VARCHAR;
-		} else if (MultiEnum.class.isAssignableFrom(column.getJavaType())) {
+		} else if (MultiEnum.class.isAssignableFrom(javaType)) {
 			return JdbcType.VARCHAR;
 		}
 		
 		return JdbcType.OTHER;
 	}
-	
-	ResultSet getColumns(String tableName) throws SQLException {
-		return this.dbMetaData.getColumns(this.getDatabase(), null, tableName, "mediaType");
-	}
 
-	public abstract String existedTable(String tableName);
-	public abstract boolean existedTable(ResultSet resultSet) throws SQLException;
-	public abstract String createTable(String tableName, Class<?> entityClass) throws SQLException;
-	public abstract String addColumns(String tableName, List<EntityColumn> columns) throws SQLException;
-	public abstract String changeColumns(String tableName, List<EntityColumn> columns) throws SQLException;
-	public abstract String dropColumns(String tableName, Map<String, EntityColumn> columns) throws SQLException;
+	public abstract String getDriverName();
+	public abstract String getConnection(String host, int port, String dataBase, String charset);
+	
+	public abstract boolean existedDataBase(Connection conn, String dataBase) throws SQLException;
+	public abstract void createDataBase(Connection conn, String dataBase) throws SQLException;
+	public abstract void dropDataBase(Connection conn, String dataBase) throws SQLException;
+	
+	public abstract boolean existedTable(Connection conn, String dataBase, String tableName) throws SQLException;
+	public abstract void createTable(Connection conn, String tableName, Collection<EntityColumn> columns) throws SQLException;
+	public abstract void dropTable(Connection conn, String tableName) throws SQLException;
+	
+	public abstract String addColumns(String tableName, Collection<EntityColumn> columns);
+	public abstract String changeColumns(String tableName, Collection<EntityColumn> columns);
+	public abstract String dropColumns(String tableName, Map<String, EntityColumn> columns);
 }

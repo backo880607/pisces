@@ -66,7 +66,7 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 		Class<? extends EntityObject> propertyClazz = property.sign.getEntityClass();
 		try {
 			if (property.getType() == PROPERTY_TYPE.ENTITY) {
-				EntityObject relaEntity = EntityUtils.createObjectMapper().readValue(p, propertyClazz);
+				EntityObject relaEntity = EntityUtils.defaultObjectMapper().readValue(p, propertyClazz);
 				Ioc.set(entity, property.sign, relaEntity);
 				return true;
 			}
@@ -86,10 +86,8 @@ public class SignFieldHandler extends DeserializationProblemHandler {
 	}
 	
 	private boolean handleUserProperty(EntityObject entity, Property property, JsonParser p) throws IOException {
-		if (property.getModifiable()) {
-			JsonNode node = p.getCodec().readTree(p);
-			EntityUtils.setTextValue(entity, property, node.textValue());
-		}
+		JsonNode node = p.getCodec().readTree(p);
+		EntityUtils.setTextValue(entity, property, node.textValue());
 		return true;
 	}
 }

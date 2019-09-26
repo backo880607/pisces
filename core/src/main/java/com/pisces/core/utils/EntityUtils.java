@@ -101,7 +101,7 @@ public class EntityUtils {
 	public static List<Property> getDefaultProperties() {
 		List<Property> result = new ArrayList<>();
 		for (Class<? extends EntityObject> clazz : getEntityClasses()) {
-			getDefaultPropertiesImpl(result, clazz, clazz);
+			getDefaultPropertiesImpl(result, clazz);
 		}
 		
 		return result;
@@ -109,22 +109,20 @@ public class EntityUtils {
 
 	public static List<Property> getDefaultProperties(Class<? extends EntityObject> clazz) {
 		List<Property> result = new LinkedList<>();
-		getDefaultPropertiesImpl(result, clazz, clazz);
+		getDefaultPropertiesImpl(result, clazz);
 		return result;
 	}
 	
-	private static void getDefaultPropertiesImpl(List<Property> result, Class<? extends EntityObject> clazz, Class<? extends EntityObject> belongClass) {
+	private static void getDefaultPropertiesImpl(List<Property> result, Class<? extends EntityObject> clazz) {
 		if (clazz == null) {
 			return;
 		}
-		
-		getDefaultPropertiesImpl(result, Primary.get().getSuperClass(clazz), belongClass);
 		
 		Map<String, Property> codeMapProperties = new HashMap<String, Property>();
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			try {
-				Property property = createProperty(clazz, belongClass, field);
+				Property property = createProperty(clazz, field);
 				if (property != null) {
 					result.add(property);
 					codeMapProperties.put(property.getCode(), property);
@@ -149,24 +147,24 @@ public class EntityUtils {
 		
 	}
 	
-	private static Property createProperty(Class<? extends EntityObject> clazz, Class<? extends EntityObject> belongClass, Field field) throws Exception {
+	private static Property createProperty(Class<? extends EntityObject> clazz, Field field) throws Exception {
 		if (Modifier.isTransient(field.getModifiers())) {
-			return null;
-		}
-		PropertyMeta meta = field.getAnnotation(PropertyMeta.class);
-		if (meta != null && meta.internal()) {
 			return null;
 		}
 		if (Modifier.isStatic(field.getModifiers()) && field.getType() != Sign.class) {
 			return null;
 		}
+		PropertyMeta meta = field.getAnnotation(PropertyMeta.class);
+		if (meta != null && !meta.visiable()) {
+			return null;
+		}
 		Property property = new Property();
 		property.init();
 		property.setInherent(true);
-		property.setBelongName(belongClass.getSimpleName());
+		property.setBelongName(clazz.getSimpleName());
 		property.setCode(field.getName());
 		property.setName(property.getCode());
-		property.belongClazz = belongClass;
+		property.belongClazz = clazz;
 		if (field.getType() == Sign.class) {
 			Sign sign = (Sign)field.get(null);
 			RelationKind kind = Primary.get().getRelationKind(clazz, sign);
@@ -199,8 +197,9 @@ public class EntityUtils {
 		}
 		
 		if (meta != null) {
+			property.setIsUnique(meta.unique());
 			property.setModifiable(meta.modifiable());
-			property.setDisplay(meta.display());
+			property.setLarge(meta.large());
 			if (meta.type() != PROPERTY_TYPE.NONE) {
 				property.setType(meta.type());
 			}
@@ -223,11 +222,12 @@ public class EntityUtils {
 				if (Modifier.isTransient(field.getModifiers())) {
 					continue;
 				}
-				PropertyMeta meta = field.getAnnotation(PropertyMeta.class);
-				if (meta != null && meta.internal()) {
+				if (Modifier.isStatic(field.getModifiers()) && field.getType() != Sign.class) {
 					continue;
 				}
-				if (Modifier.isStatic(field.getModifiers()) && field.getType() != Sign.class) {
+				
+				PropertyMeta meta = field.getAnnotation(PropertyMeta.class);
+				if (meta != null && !meta.visiable()) {
 					continue;
 				}
 				
@@ -370,6 +370,10 @@ public class EntityUtils {
 	
 	
 	public static String getTextValue(EntityObject entity, Property property) {
+		if (property.getType() == PROPERTY_TYPE.ENTITY || property.getType() == PROPERTY_TYPE.LIST) {
+			throw new UnsupportedOperationException();
+		}
+		
 		Object value = getValue(entity, property);
 		if (value == null) {
 			return "";
@@ -399,6 +403,10 @@ public class EntityUtils {
 	}
 	
 	public static Object convertTextValue(Property property, String str) {
+		if (property.getType() == PROPERTY_TYPE.ENTITY || property.getType() == PROPERTY_TYPE.LIST) {
+			throw new UnsupportedOperationException();
+		}
+		
 		try {
 			return defaultObjectMapper().readValue(str, property.clazz);
 		} catch (IOException e) {
@@ -431,16 +439,16 @@ public class EntityUtils {
         return mapper;
 	}
 	
-	private static ObjectMapper defaultMapper;
+	private static ThreadLocal<ObjectMapper> defaultMapper = new ThreadLocal<ObjectMapper>();
 	public static ObjectMapper defaultObjectMapper() {
-		if (defaultMapper == null) {
+		if (defaultMapper.get() == null) {
 			synchronized (EntityUtils.class) {
-				if (defaultMapper == null) {
-					defaultMapper = createObjectMapper();
+				if (defaultMapper.get() == null) {
+					defaultMapper.set(createObjectMapper());
 				}
 			}
 		}
-		return defaultMapper;
+		return defaultMapper.get();
 	}
 	
 	public static <T extends EntityObject> void copyIgnoreNull(T src, T target) {

@@ -1,7 +1,6 @@
 package com.pisces.integration.bean;
 
 public class SqlDataSource extends DataSource {
-	private String ip;
 	private Integer port;
 	private String username;
 	private String password;
@@ -10,19 +9,10 @@ public class SqlDataSource extends DataSource {
 	@Override
 	public void init() {
 		super.init();
-		ip = "";
 		port = 0;
 		username = "";
 		password = "";
 		dataBase = "";
-	}
-	
-	public final String getIp() {
-		return ip;
-	}
-	
-	public final void setIp(String ip) {
-		this.ip = ip;
 	}
 	
 	public final Integer getPort() {

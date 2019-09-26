@@ -3,7 +3,6 @@ package com.pisces.integration.service.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,7 +20,9 @@ import com.pisces.core.utils.StringUtils;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsExcel;
 import com.pisces.integration.bean.FieldInfo;
+import com.pisces.integration.bean.Scheme;
 import com.pisces.integration.dao.DsExcelDao;
+import com.pisces.integration.helper.DataConfig;
 import com.pisces.integration.service.DsExcelService;
 
 @Service
@@ -29,10 +30,15 @@ public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> i
 	private Workbook book;
 	private Sheet sheet;
 	private Row row;
-	private int readNum;
+	private int rowNumber;
+	
+	@Override
+	public DataConfig getDataConfig() {
+		return null;
+	}
 	
 	private String getPath(DsExcel excel, String tableName) {
-		String path = excel.getPath();
+		String path = excel.getHost();
 		if (StringUtils.getTail(path, ".").equalsIgnoreCase(excel.getExtension())) {
 			return path;
 		}
@@ -69,7 +75,7 @@ public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> i
 			}
 		}
 		
-		readNum = sheet.getFirstRowNum();
+		rowNumber = sheet.getFirstRowNum();
 		return true;
 	}
 
@@ -90,7 +96,6 @@ public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> i
 	@Override
 	public boolean executeQuery(DataSource dataSource, String tableName, Collection<FieldInfo> fields)
 			throws Exception {
-		// skip the header
 		step();
 		return true;
 	}
@@ -98,7 +103,7 @@ public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> i
 	@Override
 	public Collection<FieldInfo> getFields() throws Exception {
 		Collection<FieldInfo> result = new ArrayList<FieldInfo>();
-		row = sheet.getRow(readNum);
+		row = sheet.getRow(rowNumber);
 		row.forEach((Cell cell) -> {
 			FieldInfo field = new FieldInfo();
 			field.setName(cell.getStringCellValue());
@@ -110,12 +115,12 @@ public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> i
 
 	@Override
 	public boolean step() throws Exception {
-		if (sheet == null || readNum > sheet.getLastRowNum()) {
+		if (sheet == null || rowNumber > sheet.getLastRowNum()) {
 			return false;
 		}
 		
-		row = sheet.getRow(readNum);
-		++readNum;
+		row = sheet.getRow(rowNumber);
+		++rowNumber;
 		return row != null;
 	}
 
@@ -123,29 +128,31 @@ public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> i
 	public String getData(int index) throws Exception {
 		return row.getCell(index).getStringCellValue();
 	}
-
+	
 	@Override
-	public String getData(Field field) throws Exception {
-		return null;
+	public void beforeWriteTable(Scheme scheme, Collection<FieldInfo> fields) throws Exception {
+		row = sheet.createRow(rowNumber++);
+		int index = 0;
+		for (FieldInfo field : fields) {
+			row.createCell(index++).setCellValue(field.getExternName());
+		}
 	}
 	
 	@Override
-	public void writeHeader(Collection<FieldInfo> fields) {
-	}
-	
-	@Override
-	public void beforeWriteEntity(EntityObject entity) {
-		
+	public void beforeWriteEntity(EntityObject entity) throws Exception {
+		row = sheet.createRow(rowNumber++);
 	}
 
 	@Override
 	public void write(int index, String data) throws Exception {
-		
+		row.createCell(index).setCellValue(data);
 	}
 
 	@Override
-	public void afterWriteEntity(EntityObject entity) {
-		
+	public void afterWriteEntity(EntityObject entity) throws Exception {
 	}
 
+	@Override
+	public void afterWriteTable(Scheme scheme) throws Exception {
+	}
 }

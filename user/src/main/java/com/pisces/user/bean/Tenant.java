@@ -9,7 +9,7 @@ import com.pisces.core.entity.EntityCoding;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.utils.DateUtils;
 
-@Table(name = "user_tenant")
+@Table(name = "USER_TENANT")
 public class Tenant extends EntityCoding {
 	private Date endDate;
 	private Integer maxLoginQty;

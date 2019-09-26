@@ -1,23 +1,26 @@
 package com.pisces.rds.provider.base;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.sql.Statement;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.ibatis.type.JdbcType;
 
 import tk.mybatis.mapper.entity.EntityColumn;
-import tk.mybatis.mapper.entity.EntityTable;
-import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
-public class SQLServerProvider extends SQLProvider {
+public class SqlServerProvider extends SQLProvider {
 	
 	@Override
-	public String getSQLType(EntityColumn column) throws SQLException {
-		JdbcType type = getJdbcType(column);
-		switch (type) {
+	public String getSQLType(JdbcType jdbcType) {
+		if (jdbcType == null) {
+			return "";
+		}
+		
+		switch (jdbcType) {
 		case ARRAY:
 		case BIT:
 			return "bit";
@@ -83,34 +86,72 @@ public class SQLServerProvider extends SQLProvider {
 		}
 		return "";
 	}
+	
+	@Override
+	public String getDriverName() {
+		return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+	}
 
 	@Override
-	public String existedTable(String tableName) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT * FROM sysobjects WHERE id = object_id('");
-		sql.append(tableName).append("')");
+	public String getConnection(String host, int port, String dataBase, String charset) {
+		StringBuilder sql = new StringBuilder("jdbc:sqlserver://");
+		sql.append(host).append(":").append(port).append(";DatabaseName=").append(dataBase);
 		return sql.toString();
+	}
+
+	@Override
+	public boolean existedDataBase(Connection conn, String dataBase) throws SQLException {
+		return false;
+	}
+
+	@Override
+	public void createDataBase(Connection conn, String dataBase) throws SQLException {
+		
+	}
+
+	@Override
+	public void dropDataBase(Connection conn, String dataBase) throws SQLException {
+		
 	}
 	
 	@Override
-	public boolean existedTable(ResultSet resultSet) throws SQLException {
-		return !resultSet.getString(1).isEmpty();
+	public boolean existedTable(Connection conn, String dataBase, String tableName) throws SQLException {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT * FROM sysobjects WHERE id = object_id('");
+		sql.append(tableName).append("')");
+		try (Statement stmt = conn.createStatement()) {
+			ResultSet resultSet = stmt.executeQuery(sql.toString());
+			if (resultSet != null && !resultSet.getString(1).isEmpty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
-	public String createTable(String tableName, Class<?> entityClass) throws SQLException {
+	public void createTable(Connection conn, String tableName, Collection<EntityColumn> columns) throws SQLException {
 		StringBuilder sql = new StringBuilder();
 		sql.append("CREATE TABLE ").append(tableName).append(" (");
-		EntityTable table = EntityHelper.getEntityTable(entityClass);
-		for (EntityColumn column : table.getEntityClassColumns()) {
-			sql.append(column.getColumn()).append(" ").append(getSQLType(column)).append(",");
+		for (EntityColumn column : columns) {
+			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType())).append(",");
 		}
 		sql.append("PRIMARY KEY (id))");
-		return sql.toString();
+		try (Statement stmt = conn.createStatement()) {
+			stmt.execute(sql.toString());
+		}
+	}
+	
+	@Override
+	public void dropTable(Connection conn, String tableName) throws SQLException {
+		StringBuilder sql = new StringBuilder("DROP TABLE ");
+		sql.append(tableName);
+		try (Statement stmt = conn.createStatement()) {
+			stmt.execute(sql.toString());
+		}
 	}
 
 	@Override
-	public String addColumns(String tableName, List<EntityColumn> columns) throws SQLException {
+	public String addColumns(String tableName, Collection<EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE ").append(tableName).append(" ADD ");
 		sql.append("(");
@@ -119,7 +160,7 @@ public class SQLServerProvider extends SQLProvider {
 			if (bFind) {
 				sql.append(",");
 			}
-			sql.append(column.getColumn()).append(" ").append(getSQLType(column));
+			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType()));
 			bFind = true;
 		}
 		sql.append(")");
@@ -127,18 +168,18 @@ public class SQLServerProvider extends SQLProvider {
 	}
 
 	@Override
-	public String changeColumns(String tableName, List<EntityColumn> columns) throws SQLException {
+	public String changeColumns(String tableName, Collection<EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
 		for (EntityColumn column : columns) {
 			sql.append("ALTER TABLE ").append(tableName).append(" MODIFY ");
-			sql.append(column.getColumn()).append(" ").append(getSQLType(column));
+			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType()));
 			sql.append(";");
 		}
 		return sql.toString();
 	}
 
 	@Override
-	public String dropColumns(String tableName, Map<String, EntityColumn> columns) throws SQLException {
+	public String dropColumns(String tableName, Map<String, EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE ").append(tableName).append(" ");
 		boolean bFind = false;
@@ -151,5 +192,4 @@ public class SQLServerProvider extends SQLProvider {
 		}
 		return sql.toString();
 	}
-
 }

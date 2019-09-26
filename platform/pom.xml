@@ -19,7 +19,6 @@
     <integration.version>0.0.1-SNAPSHOT</integration.version>
     <language.version>0.0.1-SNAPSHOT</language.version>
     <report.version>0.0.1-SNAPSHOT</report.version>
-    <nosql.version>0.0.1-SNAPSHOT</nosql.version>
   </properties>
 
   <dependencies>
@@ -38,11 +37,11 @@
 	  <artifactId>language</artifactId>
 	  <version>${language.version}</version>
 	</dependency>
-	<dependency>
+	<!-- <dependency>
 	  <groupId>com.pisces</groupId>
 	  <artifactId>nosql</artifactId>
 	  <version>${nosql.version}</version>
-	</dependency>
+	</dependency> -->
 	<dependency>
 	  <groupId>com.pisces</groupId>
 	  <artifactId>report</artifactId>

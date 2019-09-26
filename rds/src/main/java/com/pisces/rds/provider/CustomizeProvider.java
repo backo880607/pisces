@@ -17,24 +17,15 @@ import com.pisces.rds.config.EntityWrapperFactory;
 import com.pisces.rds.config.MybatisEntityFactory;
 
 import tk.mybatis.mapper.entity.EntityColumn;
+import tk.mybatis.mapper.entity.EntityTable;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
 import tk.mybatis.mapper.mapperhelper.MapperHelper;
 import tk.mybatis.mapper.mapperhelper.SqlHelper;
 
-public class SQLProvider extends BaseProvider {
+public class CustomizeProvider extends BaseProvider {
 
-	public SQLProvider(Class<?> mapperClazz, MapperHelper mapperHelper) {
+	public CustomizeProvider(Class<?> mapperClazz, MapperHelper mapperHelper) {
 		super(mapperClazz, mapperHelper);
-	}
-	
-	public String existedTable(MappedStatement ms) {
-		Class<?> entityClazz = getEntityClass(ms);
-		return this.getProvider(ms).existedTable(tableName(entityClazz));
-	}
-	
-	public String createTable(MappedStatement ms) throws SQLException {
-		Class<?> entityClazz = getEntityClass(ms);
-		return this.getProvider(ms).createTable(tableName(entityClazz), entityClazz);
 	}
 	
 	private static boolean notChecked = true;
@@ -60,7 +51,7 @@ public class SQLProvider extends BaseProvider {
 				if (existedColumn != null) {
 					JdbcType jdbcType = column.getJdbcType();
 					if (jdbcType == null) {
-						jdbcType = getJdbcType(column.getJavaType());
+						jdbcType = getProvider(ms).getJdbcType(column.getJavaType(), null, false);
 					}
 					if (!jdbcType.equals(existedColumn.getJdbcType())) {
 						changeColumns.add(column);
@@ -86,20 +77,14 @@ public class SQLProvider extends BaseProvider {
 	}
 	
 	private boolean doExistedTable(Connection conn, MappedStatement ms) throws SQLException {
-		boolean bOK = false;
-		try (PreparedStatement stmt = conn.prepareStatement(existedTable(ms)); 
-				ResultSet resultSet = stmt.executeQuery()) {
-			if (resultSet.next()) {
-				bOK = getProvider(ms).existedTable(resultSet);
-			}
-		}
-		return bOK;
+		Class<?> entityClazz = getEntityClass(ms);
+		return getProvider(ms).existedTable(conn, conn.getCatalog(), tableName(entityClazz));
 	}
 	
 	private void doCreateTable(Connection conn, MappedStatement ms) throws SQLException {
-		try (PreparedStatement stmt = conn.prepareStatement(createTable(ms))) {
-			stmt.execute();
-		}
+		Class<?> entityClazz = getEntityClass(ms);
+		EntityTable table = EntityHelper.getEntityTable(entityClazz);
+		this.getProvider(ms).createTable(conn, tableName(entityClazz), table.getEntityClassColumns());
 	}
 	
 	private Map<String, EntityColumn> getExistedColumns(Connection conn, Class<?> entityClazz) throws SQLException {
@@ -164,9 +149,7 @@ public class SQLProvider extends BaseProvider {
      */
     public String insertList(MappedStatement ms) {
         final Class<?> entityClazz = getEntityClass(ms);
-        //开始拼sql
         StringBuilder sql = new StringBuilder();
-        //sql.append("<bind name=\"listNotEmptyCheck\" value=\"@tk.mybatis.mapper.util.OGNL@notEmptyCollectionCheck(list, '" + ms.getId() + " 方法参数为空')\"/>");
         sql.append(SqlHelper.insertIntoTable(entityClazz, tableName(entityClazz)));
         sql.append(SqlHelper.insertColumns(entityClazz, false, false, false));
         sql.append(" VALUES ");
@@ -191,10 +174,10 @@ public class SQLProvider extends BaseProvider {
      * @return
      */
     public String update(MappedStatement ms) {
-        Class<?> entityClass = getEntityClass(ms);
+    	Class<?> entityClass = getEntityClass(ms);
         StringBuilder sql = new StringBuilder();
         sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
-        sql.append(SqlHelper.updateSetColumns(entityClass, null, true, isNotEmpty()));
+        sql.append(SqlHelper.updateSetColumns(entityClass, null, false, false));
         sql.append(SqlHelper.wherePKColumns(entityClass, true));
         return sql.toString();
     }
@@ -207,9 +190,11 @@ public class SQLProvider extends BaseProvider {
     public String updateList(MappedStatement ms) {
         Class<?> entityClass = getEntityClass(ms);
         StringBuilder sql = new StringBuilder();
+        sql.append("<foreach item=\"item\" index=\"index\" collection=\"list\" open=\"(\" separator=\",\" close=\")\">");
         sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
         sql.append(SqlHelper.updateSetColumns(entityClass, null, true, isNotEmpty()));
         sql.append(SqlHelper.wherePKColumns(entityClass, true));
+        sql.append("</foreach>");
         return sql.toString();
     }
 
@@ -220,22 +205,11 @@ public class SQLProvider extends BaseProvider {
      */
     public String deleteList(MappedStatement ms) {
         final Class<?> entityClazz = getEntityClass(ms);
-        //开始拼sql
         StringBuilder sql = new StringBuilder();
-        sql.append(SqlHelper.insertIntoTable(entityClazz, tableName(entityClazz)));
-        sql.append(SqlHelper.insertColumns(entityClazz, false, false, false));
-        sql.append(" VALUES ");
-        sql.append("<foreach collection=\"list\" item=\"record\" separator=\",\" >");
-        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
-        //获取全部列
-        Set<EntityColumn> columnList = EntityHelper.getColumns(entityClazz);
-        //当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
-        for (EntityColumn column : columnList) {
-            if (column.isInsertable()) {
-                sql.append(column.getColumnHolder("record") + ",");
-            }
-        }
-        sql.append("</trim>");
+        sql.append(SqlHelper.deleteFromTable(entityClazz, tableName(entityClazz)));
+        sql.append(" WHERE id IN ");
+        sql.append("<foreach item=\"item\" index=\"index\" collection=\"list\" open=\"(\" separator=\",\" close=\")\">");
+        sql.append("#{item.id}");
         sql.append("</foreach>");
         return sql.toString();
     }
@@ -247,22 +221,11 @@ public class SQLProvider extends BaseProvider {
      */
     public String deleteByPrimaryKeys(MappedStatement ms) {
         final Class<?> entityClazz = getEntityClass(ms);
-        //开始拼sql
         StringBuilder sql = new StringBuilder();
-        sql.append(SqlHelper.insertIntoTable(entityClazz, tableName(entityClazz)));
-        sql.append(SqlHelper.insertColumns(entityClazz, false, false, false));
-        sql.append(" VALUES ");
-        sql.append("<foreach collection=\"list\" item=\"record\" separator=\",\" >");
-        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
-        //获取全部列
-        Set<EntityColumn> columnList = EntityHelper.getColumns(entityClazz);
-        //当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
-        for (EntityColumn column : columnList) {
-            if (column.isInsertable()) {
-                sql.append(column.getColumnHolder("record") + ",");
-            }
-        }
-        sql.append("</trim>");
+        sql.append(SqlHelper.deleteFromTable(entityClazz, tableName(entityClazz)));
+        sql.append(" WHERE id IN ");
+        sql.append("<foreach item=\"item\" index=\"index\" collection=\"list\" open=\"(\" separator=\",\" close=\")\">");
+        sql.append("#{item}");
         sql.append("</foreach>");
         return sql.toString();
     }

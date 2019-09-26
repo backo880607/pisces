@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.persistence.Table;
+
 import org.apache.ibatis.type.JdbcType;
 
 import com.pisces.core.annotation.PropertyMeta;
@@ -14,10 +16,11 @@ import com.pisces.rds.handler.LocaleHandler;
 
 import tk.mybatis.mapper.annotation.ColumnType;
 
+@Table(name = "LANGUAGE")
 public class Language extends EntityObject {
 	public static final String ERROR = "#error#";
 	@ColumnType(jdbcType = JdbcType.VARCHAR, typeHandler = LocaleHandler.class)
-	@PropertyMeta(internal = true)
+	@PropertyMeta(visiable = false)
 	private Locale locale = Locale.getDefault();
 	private transient List<ResourceBundle> bundles = new ArrayList<>();
 	

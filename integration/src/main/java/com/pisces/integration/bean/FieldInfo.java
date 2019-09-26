@@ -7,7 +7,7 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 
-@Table(name = "integration_field_info")
+@Table(name = "INTEGRATION_FIELD_INFO")
 public class FieldInfo extends EntityObject {
 	@NotBlank
 	private String name;

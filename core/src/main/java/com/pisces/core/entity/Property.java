@@ -3,6 +3,8 @@ package com.pisces.core.entity;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
+import javax.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
@@ -10,6 +12,7 @@ import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.validator.InsertGroup;
 
+@Table(name = "PROPERTY")
 @PrimaryKey(fields={"belongName"}, groups = {InsertGroup.class})
 public class Property extends EntityCoding implements Serializable {
 	/**
@@ -20,29 +23,29 @@ public class Property extends EntityCoding implements Serializable {
 	private String belongName;	// 属性所属类
 	private PROPERTY_TYPE type;	// 属性类型
 	private String typeName;	// 属性类型名称，包含包路径
-	private Boolean inherent = false;	// 是否是内部固有属性
+	private boolean large;		// 是否为长度超大的数据类型
+	private Boolean inherent;	// 是否内部固有属性
+	private Boolean isUnique;	// 是否唯一
 	private Boolean modifiable;	// 是否可以修改
-	private Boolean visiable;	// 由用户控制是否显示
-	private Boolean display;	// 是否能够在界面上显示
 	private Short preci;		// 对于double类型控制显示精度
 	private String tips;		// 属性的提示信息
 	private String expression;	// 属性取值表达式
 	private Boolean primaryKey;	// 是否为主键字段，自定义字段不能作为主键
 	
 	@JsonIgnore
-	@PropertyMeta(internal=true)
+	@PropertyMeta(visiable = false)
 	public transient Class<? extends EntityObject> belongClazz;
 	@JsonIgnore
-	@PropertyMeta(internal=true)
+	@PropertyMeta(visiable = false)
 	public transient Class<?> clazz;
 	@JsonIgnore
-	@PropertyMeta(internal=true)
+	@PropertyMeta(visiable = false)
 	public transient Sign sign;
 	@JsonIgnore
-	@PropertyMeta(internal=true)
+	@PropertyMeta(visiable = false)
 	public transient Method getMethod;
 	@JsonIgnore
-	@PropertyMeta(internal=true)
+	@PropertyMeta(visiable = false)
 	public transient Method setMethod;
 	
 	@Override
@@ -50,9 +53,11 @@ public class Property extends EntityCoding implements Serializable {
 		super.init();
 		belongName = "";
 		type = PROPERTY_TYPE.LONG;
+		typeName = "";
+		large = false;
+		inherent = false;
+		isUnique = false;
 		modifiable = true;
-		visiable = true;
-		display = true;
 		preci = 7;
 		tips = "";
 		expression = "";
@@ -83,6 +88,14 @@ public class Property extends EntityCoding implements Serializable {
 		this.typeName = typeName;
 	}
 	
+	public boolean getLarge() {
+		return large;
+	}
+
+	public void setLarge(boolean large) {
+		this.large = large;
+	}
+	
 	public Boolean getInherent() {
 		return inherent;
 	}
@@ -91,28 +104,20 @@ public class Property extends EntityCoding implements Serializable {
 		this.inherent = inherent;
 	}
 	
+	public Boolean getIsUnique() {
+		return isUnique;
+	}
+
+	public void setIsUnique(Boolean isUnique) {
+		this.isUnique = isUnique;
+	}
+	
 	public Boolean getModifiable() {
 		return modifiable;
 	}
 	
 	public void setModifiable(Boolean modifiable) {
 		this.modifiable = modifiable;
-	}
-	
-	public Boolean getVisiable() {
-		return visiable;
-	}
-	
-	public void setVisiable(Boolean visiable) {
-		this.visiable = visiable;
-	}
-
-	public Boolean getDisplay() {
-		return display;
-	}
-
-	public void setDisplay(Boolean display) {
-		this.display = display;
 	}
 	
 	public Short getPreci() {
