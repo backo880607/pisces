@@ -15,6 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.entity.Property;
 import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.core.utils.StringUtils;
 import com.pisces.integration.bean.DataSource;
@@ -154,5 +155,10 @@ public class DsExcelServiceImpl extends EntityServiceImpl<DsExcel, DsExcelDao> i
 
 	@Override
 	public void afterWriteTable(Scheme scheme) throws Exception {
+	}
+	
+	@Override
+	public String obtainValue(EntityObject entity, Property property) {
+		return null;
 	}
 }

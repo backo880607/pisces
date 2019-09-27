@@ -1,6 +1,7 @@
 package com.pisces.core.utils;
 
 import java.util.List;
+import java.util.Set;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.relation.RelationKind;
@@ -29,7 +30,7 @@ public interface Primary {
 	IExpression createExpression(String str);
 	
 	void registerEntityClass(Class<? extends EntityObject> clazz);
-	List<Class<? extends EntityObject>> getEntityClasses();
+	Set<Class<? extends EntityObject>> getEntityClasses();
 	Class<? extends EntityObject> getEntityClass(String name);
 	
 	Class<? extends EntityObject> getSuperClass(Class<? extends EntityObject> clazz);

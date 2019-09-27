@@ -19,6 +19,7 @@
     <integration.version>0.0.1-SNAPSHOT</integration.version>
     <language.version>0.0.1-SNAPSHOT</language.version>
     <report.version>0.0.1-SNAPSHOT</report.version>
+    <nosql.version>0.0.1-SNAPSHOT</nosql.version>
   </properties>
 
   <dependencies>
@@ -37,37 +38,15 @@
 	  <artifactId>language</artifactId>
 	  <version>${language.version}</version>
 	</dependency>
-	<!-- <dependency>
+	<dependency>
 	  <groupId>com.pisces</groupId>
 	  <artifactId>nosql</artifactId>
 	  <version>${nosql.version}</version>
-	</dependency> -->
+	</dependency>
 	<dependency>
 	  <groupId>com.pisces</groupId>
 	  <artifactId>report</artifactId>
 	  <version>${report.version}</version>
 	</dependency>
   </dependencies>
-  
-  <!-- <build>
-	<plugins>
-	 <plugin>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-maven-plugin</artifactId>
-		<configuration>
-		  <mainClass>com.pisces.core.startup.Application</mainClass>
-		  <layout>JAR</layout>
-		</configuration>
-		<executions>
-		  <execution>
-			<id>spring boot</id>
-			<phase>package</phase>
-			<goals>
-			  <goal>repackage</goal>
-			</goals>
-		  </execution>
-		</executions>
-	  </plugin>
-	</plugins>
-  </build> -->
 </project>

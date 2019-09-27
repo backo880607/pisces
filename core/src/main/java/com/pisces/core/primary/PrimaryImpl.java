@@ -2,6 +2,7 @@ package com.pisces.core.primary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.Expression;
@@ -39,7 +40,7 @@ public class PrimaryImpl implements Primary {
 	}
 
 	@Override
-	public List<Class<? extends EntityObject>> getEntityClasses() {
+	public Set<Class<? extends EntityObject>> getEntityClasses() {
 		return FactoryManager.getEntityClasses();
 	}
 

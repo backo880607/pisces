@@ -2,18 +2,22 @@ package com.pisces.rds.provider;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.persistence.Transient;
 
 import org.apache.ibatis.type.JdbcType;
 
+import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.MultiEnum;
 import com.pisces.core.relation.Sign;
+import com.pisces.core.utils.EntityUtils;
 import com.pisces.rds.handler.MultiEnumTypeHandler;
 import com.pisces.rds.handler.SignTypeHandler;
 import com.pisces.rds.handler.UserFieldTypeHandler;
+import com.pisces.rds.provider.base.SQLProvider;
 
 import tk.mybatis.mapper.code.Style;
 import tk.mybatis.mapper.entity.Config;
@@ -37,30 +41,36 @@ public class CustomizeEntityResolve extends DefaultEntityResolve {
 	
 	protected void addRelationColumns(Class<?> entityClazz, EntityTable table) throws Exception {
 		Set<EntityColumn> columns = table.getEntityClassColumns();
-		Field[] fields = entityClazz.getFields();
-		for (Field field : fields) {
-			if (Modifier.isStatic(field.getModifiers()) && field.getType() == Sign.class) {
-				EntityColumn column = new EntityColumn(table);
-				column.setColumn("FK_" + StringUtil.convertByStyle(field.getName(), Style.camelhumpAndUppercase));
-				column.setProperty(field.getName());
-				column.setJavaType(String.class);
-				column.setTypeHandler(SignTypeHandler.class);
-				column.setJdbcType(JdbcType.LONGVARCHAR);
-				EntityField entityField = new EntityField(null, null);
-				modify(entityField, "name", field.getName());
-				modify(entityField, "field", field);
-				modify(entityField, "javaType", String.class);
-				modify(entityField, "setter", null);
-				modify(entityField, "getter", null);
-				column.setEntityField(entityField);
-				columns.add(column);
+		for (EntityColumn column : columns) {
+			EntityField field = column.getEntityField();
+			if (field.getJavaType() == Locale.class) {
+				column.setJdbcType(JdbcType.VARCHAR);
+			} else {
+				PropertyMeta meta = field.getAnnotation(PropertyMeta.class);
+				column.setJdbcType(SQLProvider.getJdbcType(EntityUtils.getPropertyType(field.getJavaType()), meta != null && meta.large()));
 			}
 		}
-		
 		Class<?> clazz = entityClazz;
 		while (clazz != EntityObject.class) {
-			fields = clazz.getDeclaredFields();
+			Field[] fields = clazz.getDeclaredFields();
 			for (Field field : fields) {
+				if (Modifier.isStatic(field.getModifiers()) && field.getType() == Sign.class) {
+					EntityColumn column = new EntityColumn(table);
+					column.setColumn("FK_" + StringUtil.convertByStyle(field.getName(), Style.camelhumpAndUppercase));
+					column.setProperty(field.getName());
+					column.setJavaType(String.class);
+					column.setTypeHandler(SignTypeHandler.class);
+					column.setJdbcType(JdbcType.LONGVARCHAR);
+					EntityField entityField = new EntityField(null, null);
+					modify(entityField, "name", field.getName());
+					modify(entityField, "field", field);
+					modify(entityField, "javaType", String.class);
+					modify(entityField, "setter", null);
+					modify(entityField, "getter", null);
+					column.setEntityField(entityField);
+					columns.add(column);
+				}
+				
 				if (!Modifier.isStatic(field.getModifiers()) && MultiEnum.class.isAssignableFrom(field.getType())) {
 					Transient tran = field.getAnnotation(Transient.class);
 					if (tran == null) {

@@ -5,23 +5,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-/*import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;*/
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 //import com.mongodb.client.result.UpdateResult;
 import com.pisces.core.dao.BaseDao;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.entity.Property;
-import com.pisces.core.utils.AppUtils;
-import com.pisces.core.utils.EntityUtils;
 
 public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	private Class<T> clazz;
-	//@Autowired
-    //private MongoTemplate mongoTemplate;
+	@Autowired
+    private MongoTemplate mongoTemplate;
 	
 	@SuppressWarnings("unchecked")
 	public MongoDao() {
@@ -59,7 +53,7 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 
 	@Override
 	public int insert(T record) {
-		//mongoTemplate.save(record);
+		mongoTemplate.save(record);
 		return 1;
 	}
 

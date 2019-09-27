@@ -4,22 +4,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.pisces.core.entity.EntityObject;
 
 public final class FactoryManager {
-	private static List<Class<? extends EntityObject>> classes = new ArrayList<Class<? extends EntityObject>>();
+	//private static List<Class<? extends EntityObject>> classes = new ArrayList<Class<? extends EntityObject>>();
 	private static Map<Class<? extends EntityObject>, EntityFactory> factories = new HashMap<>();
 	private static Map<String, EntityFactory> factoryNames = new HashMap<>();
 	
+	static {
+		EntityFactory factory = new EntityFactory(EntityObject.class);
+		FactoryManager.factories.put(EntityObject.class, factory);
+		FactoryManager.factoryNames.put(EntityObject.class.getSimpleName(), factory);
+	}
+	
 	public static void init() {
-		for (Class<? extends EntityObject> clazz : classes) {
-			EntityFactory factory = new EntityFactory(clazz);
-			FactoryManager.factories.put(clazz, factory);
-			FactoryManager.factoryNames.put(clazz.getSimpleName(), factory);
-		}
-		
-		for (Class<? extends EntityObject> clazz : classes) {
+		for (Class<? extends EntityObject> clazz : factories.keySet()) {
 			@SuppressWarnings("unchecked")
 			Class<? extends EntityObject> superClazz = (Class<? extends EntityObject>) clazz.getSuperclass();
 			EntityFactory factory = FactoryManager.factories.get(clazz);
@@ -33,12 +34,19 @@ public final class FactoryManager {
 		FactoryHelp.initRelation();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void registerEntityClass(Class<? extends EntityObject> clazz) {
-		classes.add(clazz);
+		if (factories.containsKey(clazz)) {
+			return;
+		}
+		EntityFactory factory = new EntityFactory(clazz);
+		FactoryManager.factories.put(clazz, factory);
+		FactoryManager.factoryNames.put(clazz.getSimpleName(), factory);
+		registerEntityClass((Class<? extends EntityObject>)clazz.getSuperclass());
 	}
 	
-	public static List<Class<? extends EntityObject>> getEntityClasses() {
-		return classes;
+	public static Set<Class<? extends EntityObject>> getEntityClasses() {
+		return factories.keySet();
 	}
 	
 	public static Class<? extends EntityObject> getEntityClass(String name) {

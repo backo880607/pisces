@@ -10,10 +10,9 @@ import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.relation.Sign;
-import com.pisces.core.validator.InsertGroup;
 
 @Table(name = "PROPERTY")
-@PrimaryKey(fields={"belongName"}, groups = {InsertGroup.class})
+@PrimaryKey(fields={"belongName"})
 public class Property extends EntityCoding implements Serializable {
 	/**
 	 * 

@@ -1,7 +1,6 @@
 package com.pisces.web.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -57,7 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and() // 基于token，所以不需要session
 			.httpBasic().and()
 			.authorizeRequests()
-				.requestMatchers(EndpointRequest.to("health", "info")).permitAll()
+				//.requestMatchers(EndpointRequest.to("health", "info")).permitAll()
 				.antMatchers("/**").hasRole("ROOT")
 				.antMatchers("/admin/**").hasRole("ADMIN")
 				.antMatchers("/dba/**").access("hasRole('ADMIN') and hasRole('DBA')")

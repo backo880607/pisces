@@ -2,7 +2,9 @@ package com.pisces.rds.provider.base;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.Map;
 
@@ -87,55 +89,54 @@ public class SQLiteProvider extends SQLProvider {
 
 	@Override
 	public boolean existedDataBase(Connection conn, String dataBase) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void createDataBase(Connection conn, String dataBase) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void dropDataBase(Connection conn, String dataBase) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public boolean existedTable(Connection conn, String dataBase, String tableName) throws SQLException {
-		// TODO Auto-generated method stub
+		StringBuilder sql = new StringBuilder();
+        sql.append("SELECT * FROM sqlite_master WHERE type='table' AND name='").append(tableName).append("'");
+        try (Statement stmt = conn.createStatement()) {
+			ResultSet resultSet = stmt.executeQuery(sql.toString());
+			if (resultSet != null && resultSet.next()) {
+				return true;
+			}
+		}
 		return false;
 	}
 
 	@Override
 	public void createTable(Connection conn, String tableName, Collection<EntityColumn> columns) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void dropTable(Connection conn, String tableName) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public String addColumns(String tableName, Collection<EntityColumn> columns) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String changeColumns(String tableName, Collection<EntityColumn> columns) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String dropColumns(String tableName, Map<String, EntityColumn> columns) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

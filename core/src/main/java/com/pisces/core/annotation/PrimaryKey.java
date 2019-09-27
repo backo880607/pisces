@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
+import com.pisces.core.validator.InsertGroup;
 import com.pisces.core.validator.PrimaryKeyValidator;
 
 @Target({ElementType.TYPE})
@@ -16,6 +17,6 @@ import com.pisces.core.validator.PrimaryKeyValidator;
 public @interface PrimaryKey {
 	String[] fields() default {};
 	String message() default "{WebMessage.CREATE}";
-    Class<?>[] groups() default {};
+    Class<?>[] groups() default {InsertGroup.class};
     Class<? extends Payload>[] payload() default {};
 }

@@ -117,6 +117,11 @@ public class ExportHelper extends IOHelper {
 	
 	@SuppressWarnings("unchecked")
 	private String obtainValue(EntityObject entity, Property property) {
+		String userValue = this.adapter.obtainValue(entity, property);
+		if (userValue != null) {
+			return userValue;
+		}
+		
 		if (property.getType() == PROPERTY_TYPE.ENTITY) {
 			Object value = EntityUtils.getValue(entity, property);
 			return value != null ? getPrimaryValue((EntityObject) value) : "";

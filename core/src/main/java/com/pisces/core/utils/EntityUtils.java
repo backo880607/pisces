@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.util.StringUtils;
 
@@ -54,7 +55,7 @@ public class EntityUtils {
 		}
 	}
 	
-	public static List<Class<? extends EntityObject>> getEntityClasses() {
+	public static Set<Class<? extends EntityObject>> getEntityClasses() {
 		return Primary.get().getEntityClasses();
 	}
 	
@@ -287,8 +288,7 @@ public class EntityUtils {
 	}
 	
 	public static void checkEntity() throws Exception {
-		List<Class<? extends EntityObject>> clazzs = getEntityClasses();
-		for (Class<? extends EntityObject> clazz : clazzs) {
+		for (Class<? extends EntityObject> clazz : getEntityClasses()) {
 			if (clazz.getSimpleName().equals("Property") ||
 				clazz.getSimpleName().equals("EntityObject")) {
 				continue;

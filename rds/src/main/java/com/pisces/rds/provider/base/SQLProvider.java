@@ -3,12 +3,10 @@ package com.pisces.rds.provider.base;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 import org.apache.ibatis.type.JdbcType;
 
-import com.pisces.core.entity.MultiEnum;
 import com.pisces.core.enums.PROPERTY_TYPE;
 
 import tk.mybatis.mapper.entity.EntityColumn;
@@ -17,32 +15,52 @@ public abstract class SQLProvider {
 	
 	public abstract String getSQLType(JdbcType jdbcType);
 	
-	public JdbcType getJdbcType(Class<?> javaType, PROPERTY_TYPE type, boolean large) {
-		if (javaType == Boolean.class) {
-			return JdbcType.BOOLEAN;
-		} else if (javaType == Short.class) {
-			return JdbcType.SMALLINT;
-		} else if (javaType == Integer.class) {
-			return JdbcType.INTEGER;
-		} else if (javaType == Long.class) {
-			return JdbcType.BIGINT;
-		} else if (javaType == Float.class) {
-			return JdbcType.FLOAT;
-		} else if (javaType == Double.class) {
-			return JdbcType.DOUBLE;
-		} else if (javaType == Character.class) {
-			return JdbcType.CHAR;
-		} else if (javaType == String.class) {
-			return large ? JdbcType.LONGNVARCHAR : JdbcType.NVARCHAR;
-		} else if (javaType == Date.class) {
-			return JdbcType.DATE;
-		} else if (javaType.isEnum()) {
-			return JdbcType.VARCHAR;
-		} else if (MultiEnum.class.isAssignableFrom(javaType)) {
-			return JdbcType.VARCHAR;
+	public static JdbcType getJdbcType(PROPERTY_TYPE type, boolean large) {
+		JdbcType jdbcType = JdbcType.OTHER;
+		switch (type) {
+		case BOOLEAN:
+			jdbcType = JdbcType.BOOLEAN;
+			break;
+		case CHAR:
+			jdbcType = JdbcType.CHAR;
+			break;
+		case LONG:
+			jdbcType = JdbcType.BIGINT;
+			break;
+		case DOUBLE:
+			jdbcType = JdbcType.DOUBLE;
+			break;
+		case DATE:
+			jdbcType = JdbcType.DATE;
+			break;
+		case TIME:
+			jdbcType = JdbcType.TIME;
+			break;
+		case DATE_TIME:
+			jdbcType = JdbcType.TIMESTAMP;
+			break;
+		case DURATION:
+			jdbcType = JdbcType.VARCHAR;
+			break;
+		case ENUM:
+			jdbcType = JdbcType.INTEGER;
+			break;
+		case MULTI_ENUM:
+			jdbcType = JdbcType.INTEGER;
+			break;
+		case STRING:
+			jdbcType = large ? JdbcType.LONGVARCHAR : JdbcType.VARCHAR;
+			break;
+		case ENTITY:
+			jdbcType = JdbcType.LONGVARCHAR;
+			break;
+		case LIST:
+			jdbcType = JdbcType.LONGVARCHAR;
+			break;
+		default:
+			break;
 		}
-		
-		return JdbcType.OTHER;
+		return jdbcType;
 	}
 
 	public abstract String getDriverName();

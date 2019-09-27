@@ -147,7 +147,7 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 			
 			Property property = this.propertyService.get(entityClass, field.getName());
 			if (property.getLarge()) {
-				column.setJdbcType(this.provider.getJdbcType(property.clazz, property.getType(), property.getLarge()));
+				column.setJdbcType(this.provider.getJdbcType(property.getType(), property.getLarge()));
 			}
 			columns.add(column);
 		}
@@ -183,5 +183,10 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 	public void afterWriteTable(Scheme scheme) throws Exception {
 		this.conn.commit();
 		this.conn.setAutoCommit(true);
+	}
+	
+	@Override
+	public String obtainValue(EntityObject entity, Property property) {
+		return null;
 	}
 }

@@ -126,7 +126,7 @@ public class MySqlProvider extends SQLProvider {
         sql.append(" AND binary TABLE_NAME='").append(tableName).append("'");
         try (Statement stmt = conn.createStatement()) {
 			ResultSet resultSet = stmt.executeQuery(sql.toString());
-			if (resultSet != null && resultSet.getInt(1) > 0) {
+			if (resultSet.next() && resultSet.getInt(1) > 0) {
 				return true;
 			}
 		}

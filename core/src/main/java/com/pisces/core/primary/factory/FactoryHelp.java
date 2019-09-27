@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.annotation.Relation;
@@ -17,7 +18,7 @@ import com.pisces.core.utils.EntityUtils;
 class FactoryHelp {
 	
 	public static void initRelation() {
-		List<Class<? extends EntityObject>> clazzs = EntityUtils.getEntityClasses();
+		Set<Class<? extends EntityObject>> clazzs = EntityUtils.getEntityClasses();
 		for (Class<? extends EntityObject> clazz : clazzs) {
 			initRelationData(clazz);
 		}

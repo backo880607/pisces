@@ -49,11 +49,7 @@ public class CustomizeProvider extends BaseProvider {
 			for (EntityColumn column : EntityHelper.getColumns(entityClazz)) {
 				EntityColumn existedColumn = existedColumns.get(column.getColumn());
 				if (existedColumn != null) {
-					JdbcType jdbcType = column.getJdbcType();
-					if (jdbcType == null) {
-						jdbcType = getProvider(ms).getJdbcType(column.getJavaType(), null, false);
-					}
-					if (!jdbcType.equals(existedColumn.getJdbcType())) {
+					if (!column.getJdbcType().equals(existedColumn.getJdbcType())) {
 						changeColumns.add(column);
 					}
 					existedColumns.remove(column.getColumn());

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.entity.Property;
 import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsExcelCsv;
@@ -128,5 +129,10 @@ class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao>
 
 	@Override
 	public void afterWriteTable(Scheme scheme) throws Exception {
+	}
+	
+	@Override
+	public String obtainValue(EntityObject entity, Property property) {
+		return null;
 	}
 }
