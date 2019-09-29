@@ -121,7 +121,7 @@ public class SqlServerProvider extends SQLProvider {
 		sql.append(tableName).append("')");
 		try (Statement stmt = conn.createStatement()) {
 			ResultSet resultSet = stmt.executeQuery(sql.toString());
-			if (resultSet != null && !resultSet.getString(1).isEmpty()) {
+			if (resultSet != null && resultSet.next()) {
 				return true;
 			}
 		}
@@ -154,7 +154,6 @@ public class SqlServerProvider extends SQLProvider {
 	public String addColumns(String tableName, Collection<EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("ALTER TABLE ").append(tableName).append(" ADD ");
-		sql.append("(");
 		boolean bFind = false;
 		for (EntityColumn column : columns) {
 			if (bFind) {
@@ -163,7 +162,6 @@ public class SqlServerProvider extends SQLProvider {
 			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType()));
 			bFind = true;
 		}
-		sql.append(")");
 		return sql.toString();
 	}
 
@@ -181,13 +179,13 @@ public class SqlServerProvider extends SQLProvider {
 	@Override
 	public String dropColumns(String tableName, Map<String, EntityColumn> columns) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("ALTER TABLE ").append(tableName).append(" ");
+		sql.append("ALTER TABLE ").append(tableName).append(" DROP ");
 		boolean bFind = false;
 		for (Entry<String, EntityColumn> entry : columns.entrySet()) {
 			if (bFind) {
 				sql.append(",");
 			}
-			sql.append("DROP ").append(entry.getKey());
+			sql.append("COLUMN ").append(entry.getKey());
 			bFind = true;
 		}
 		return sql.toString();

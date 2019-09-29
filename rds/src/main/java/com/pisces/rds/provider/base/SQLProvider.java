@@ -14,12 +14,16 @@ import tk.mybatis.mapper.entity.EntityColumn;
 public abstract class SQLProvider {
 	
 	public abstract String getSQLType(JdbcType jdbcType);
+	// 由数据库的类型获取内部支持的Jdbc数据类型。
+	public boolean compatible(JdbcType lhs, JdbcType rhs) {
+		return lhs == rhs;
+	}
 	
 	public static JdbcType getJdbcType(PROPERTY_TYPE type, boolean large) {
 		JdbcType jdbcType = JdbcType.OTHER;
 		switch (type) {
 		case BOOLEAN:
-			jdbcType = JdbcType.BOOLEAN;
+			jdbcType = JdbcType.BIT;
 			break;
 		case CHAR:
 			jdbcType = JdbcType.CHAR;

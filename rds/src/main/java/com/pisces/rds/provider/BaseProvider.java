@@ -50,7 +50,7 @@ public abstract class BaseProvider extends MapperTemplate {
 							this.provider = new AdaptiveProvider();
 						} else if (dbName.equals("MySQL")) {
 							this.provider = new MySqlProvider();
-						} else if (dbName.equals("sqlite")) {
+						} else if (dbName.equals("SQLite")) {
 							this.provider = new SQLiteProvider();
 						}
 					} catch (SQLException e) {

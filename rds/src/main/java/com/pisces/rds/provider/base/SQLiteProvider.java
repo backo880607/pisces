@@ -21,58 +21,46 @@ public class SQLiteProvider extends SQLProvider {
 		}
 		
 		switch (jdbcType) {
-		case ARRAY:
 		case BIT:
-		case TINYINT:
-		case SMALLINT:
-		case INTEGER:
-			return "int";
-		case BIGINT:
-			return "";
-		case FLOAT:
-			return "";
-		case REAL:
-			return "";
-		case DOUBLE:
-			return "";
-		case NUMERIC:
-			return "";
-		case DECIMAL:
-			return "";
 		case CHAR:
-			return "";
+		case INTEGER:
+		case BIGINT:
+			return "INTEGER";
+		case DOUBLE:
+			return "REAL";
 		case VARCHAR:
-			return "";
 		case LONGVARCHAR:
 		case DATE:
 		case TIME:
 		case TIMESTAMP:
-		case BINARY:
-		case VARBINARY:
-		case LONGVARBINARY:
-		case NULL:
-		case OTHER:
-		case BLOB:
-		case CLOB:
-		case BOOLEAN:
-		case CURSOR:
-		case UNDEFINED:
-		case NVARCHAR:
-		case NCHAR:
-		case NCLOB:
-		case STRUCT:
-		case JAVA_OBJECT:
-		case DISTINCT:
-		case REF:
-		case DATALINK:
-		case ROWID:
-		case LONGNVARCHAR:
-		case SQLXML:
-		case DATETIMEOFFSET:
+			return "TEXT";
 		default:
 			break;
 		}
 		return "";
+	}
+	
+	@Override
+	public boolean compatible(JdbcType lhs, JdbcType rhs) {
+		switch (lhs) {
+		case BIT:
+		case CHAR:
+		case INTEGER:
+		case BIGINT:
+			return rhs == JdbcType.INTEGER;
+		case DOUBLE:
+			return rhs == JdbcType.REAL;
+		case VARCHAR:
+		case LONGVARCHAR:
+		case DATE:
+		case TIME:
+		case TIMESTAMP:
+			return rhs == JdbcType.VARCHAR;
+		default:
+			break;
+		}
+		
+		return false;
 	}
 
 	@Override
@@ -117,7 +105,23 @@ public class SQLiteProvider extends SQLProvider {
 
 	@Override
 	public void createTable(Connection conn, String tableName, Collection<EntityColumn> columns) throws SQLException {
-		
+		StringBuilder sql = new StringBuilder();
+		sql.append("CREATE TABLE ").append(tableName).append(" (");
+		boolean bFind = false;
+		for (EntityColumn column : columns) {
+			if (bFind) {
+				sql.append(",");
+			}
+			sql.append(column.getColumn()).append(" ").append(getSQLType(column.getJdbcType()));
+			if (column.getProperty().equals("id")) {
+				sql.append(" PRIMARY KEY");
+			}
+			bFind = true;
+		}
+		sql.append(")");
+		try (Statement stmt = conn.createStatement()) {
+			stmt.execute(sql.toString());
+		}
 	}
 
 	@Override
