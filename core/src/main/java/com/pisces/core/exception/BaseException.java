@@ -29,10 +29,6 @@ package com.pisces.core.exception;
  *
  */
 public class BaseException extends RuntimeException {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7541134573166923226L;
 	
 	private Enum<?> key;

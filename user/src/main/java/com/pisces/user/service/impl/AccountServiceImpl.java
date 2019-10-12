@@ -59,9 +59,6 @@ class AccountServiceImpl extends EntityServiceImpl<Account, AccountDao> implemen
 	private List<SimpleGrantedAuthority> getAuthorities(String role) {
 		List<SimpleGrantedAuthority> authList = new ArrayList<>();
 		
-		//you can also add different roles here
-		//for example, the user is also an admin of the site, then you can add ROLE_ADMIN
-		//so that he can view pages that are ROLE_ADMIN specific
 		if (role != null && role.trim().length() > 0) {
 			if (role.equals("root")) {
 				authList.add(new SimpleGrantedAuthority("ROLE_ROOT"));

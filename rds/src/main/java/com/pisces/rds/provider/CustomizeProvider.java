@@ -120,11 +120,6 @@ public class CustomizeProvider extends BaseProvider {
 		}
 	}
 	
-	/**
-     * 由对象id列表获取实际的对象集合
-     *
-     * @param ms
-     */
     public String selectByIds(MappedStatement ms) {
         final Class<?> entityClass = getEntityClass(ms);
         setResultType(ms, entityClass);
@@ -138,11 +133,6 @@ public class CustomizeProvider extends BaseProvider {
         return sql.toString();
     }
 	
-	/**
-     * 批量插入
-     *
-     * @param ms
-     */
     public String insertList(MappedStatement ms) {
         final Class<?> entityClazz = getEntityClass(ms);
         StringBuilder sql = new StringBuilder();
@@ -164,11 +154,6 @@ public class CustomizeProvider extends BaseProvider {
         return sql.toString();
     }
     
-    /**
-     * 更新单个对象
-     * @param ms
-     * @return
-     */
     public String update(MappedStatement ms) {
     	Class<?> entityClass = getEntityClass(ms);
         StringBuilder sql = new StringBuilder();
@@ -178,11 +163,6 @@ public class CustomizeProvider extends BaseProvider {
         return sql.toString();
     }
     
-    /**
-     * 批量更新对象
-     * @param ms
-     * @return
-     */
     public String updateList(MappedStatement ms) {
         Class<?> entityClass = getEntityClass(ms);
         StringBuilder sql = new StringBuilder();
@@ -194,11 +174,6 @@ public class CustomizeProvider extends BaseProvider {
         return sql.toString();
     }
 
-    /**
-     * 批量删除
-     *
-     * @param ms
-     */
     public String deleteList(MappedStatement ms) {
         final Class<?> entityClazz = getEntityClass(ms);
         StringBuilder sql = new StringBuilder();
@@ -209,12 +184,6 @@ public class CustomizeProvider extends BaseProvider {
         sql.append("</foreach>");
         return sql.toString();
     }
-    
-    /**
-     * 批量删除
-     *
-     * @param ms
-     */
     public String deleteByPrimaryKeys(MappedStatement ms) {
         final Class<?> entityClazz = getEntityClass(ms);
         StringBuilder sql = new StringBuilder();

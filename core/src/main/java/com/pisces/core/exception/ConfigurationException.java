@@ -1,10 +1,6 @@
 package com.pisces.core.exception;
 
 public class ConfigurationException extends RuntimeException {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3824627521737787544L;
 
 	public ConfigurationException() {

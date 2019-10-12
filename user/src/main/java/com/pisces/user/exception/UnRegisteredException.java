@@ -1,10 +1,6 @@
 package com.pisces.user.exception;
 
 public class UnRegisteredException extends UserException {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5838160633388320158L;
 
 	public UnRegisteredException() {

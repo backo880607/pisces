@@ -5,17 +5,8 @@ import java.util.List;
 import com.pisces.core.entity.EntityObject;
 
 public interface IExpression {
-	/**
-	 * 解析表达式
-	 * @param str
-	 * @return
-	 */
 	boolean Parse(String str);
 	
-	/**
-	 * 获取表达式的值
-	 * @return
-	 */
 	Object getValue();
 	Object getValue(EntityObject entity);
 	boolean getBoolean();

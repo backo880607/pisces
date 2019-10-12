@@ -10,10 +10,6 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.utils.EntityUtils;
 
 public class RefSequence extends LinkedList<EntityObject> implements RefBase {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 7023267463036954038L;
 	private Sign sign;
 	private List<Long> ids;

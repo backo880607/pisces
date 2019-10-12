@@ -9,7 +9,6 @@ import java.util.Set;
 import com.pisces.core.entity.EntityObject;
 
 public final class FactoryManager {
-	//private static List<Class<? extends EntityObject>> classes = new ArrayList<Class<? extends EntityObject>>();
 	private static Map<Class<? extends EntityObject>, EntityFactory> factories = new HashMap<>();
 	private static Map<String, EntityFactory> factoryNames = new HashMap<>();
 	
@@ -53,19 +52,10 @@ public final class FactoryManager {
 		return getFactory(name).getEntityClass();
 	}
 	
-	/**
-	 * 获取所有工厂类
-	 * @return
-	 */
 	public static List<EntityFactory> getFactories() {
 		return new ArrayList<>(FactoryManager.factories.values());
 	}
 	
-	/**
-	 * 由类的Class获取对应的工厂类
-	 * @param clazz
-	 * @return
-	 */
 	public static EntityFactory getFactory(Class<? extends EntityObject> clazz) {
 		EntityFactory factory = FactoryManager.factories.get(clazz);
 		if (factory == null) {
@@ -74,20 +64,10 @@ public final class FactoryManager {
 		return factory;
 	}
 	
-	/**
-	 * 判断类的class是否存在对于的工厂类
-	 * @param clazz
-	 * @return
-	 */
 	public static boolean hasFactory(Class<? extends EntityObject> clazz) {
 		return FactoryManager.factories.containsKey(clazz);
 	}
 	
-	/**
-	 * 由类名获取对应的工厂类
-	 * @param name
-	 * @return
-	 */
 	public static EntityFactory getFactory(String name) {
 		EntityFactory entityFactory = FactoryManager.factoryNames.get(name);
 		if (entityFactory == null) {

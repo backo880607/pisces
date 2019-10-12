@@ -13,6 +13,14 @@ public class Guard {
 		return arg != null ? arg : def;
 	}
 	
+	public static boolean value(Boolean arg) {
+		return arg != null ? arg : false;
+	}
+	
+	public static boolean value(Boolean arg, boolean def) {
+		return arg != null ? arg : def;
+	}
+	
 	public static short value(Short arg) {
 		return arg != null ? arg : 0;
 	}

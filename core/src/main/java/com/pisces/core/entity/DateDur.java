@@ -54,42 +54,22 @@ public class DateDur {
 		parse();
 	}
 	
-	/**
-	 * 返回原始的时间区间字符串。
-	 * @return
-	 */
 	public String getValue() {
 		return this.value;
 	}
 	
-	/**
-	 * 是否为有效时间区间，若用户指定了时间区间，但解析错误，其时间区间为0
-	 * @return
-	 */
 	public boolean Valid() {
 		return this.bValid;
 	}
 	
-	/**
-	 * 对于无效的时间区间，返回0。单位为秒。
-	 * @return
-	 */
 	public int getTime() {
 		return this.time;
 	}
 	
-	/**
-     * 设置新的时间区间。
-     * @return
-     */
     public void setTime(int time) {
         this.time = time;
     }
 	
-	/**
-	 * 对于无效的时间区间，返回0。单位为毫秒。
-	 * @return
-	 */
 	public long getTimeInMillis() {
 		return this.time * DateUtils.PER_SECOND;
 	}
@@ -147,11 +127,6 @@ public class DateDur {
 		this.value = getString();
 	}
 	
-	/**
-	 * 对于无效的时间区间，返回0。单位为秒
-	 * @param amount
-	 * @return
-	 */
 	public long getTime(double amount) {
 		if (amount < PRECISION)
 			return getTime();
@@ -160,11 +135,6 @@ public class DateDur {
 		return (long)Math.ceil(result);
 	}
 	
-	/**
-	 * 对于无效的时间区间，返回0。单位为毫秒
-	 * @param amount
-	 * @return
-	 */
 	public long getTimeInMillis(double amount) {
 		return this.getTime(amount) * DateUtils.PER_SECOND;
 	}

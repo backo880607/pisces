@@ -58,12 +58,6 @@ public class DateUtils {
 		return ZoneTime;
 	}
 	
-	/**
-	 * 使用format格式化日期
-	 * @param date 日期
-	 * @param format 日期格式(例："yyyy-MM-dd")
-	 * @return String
-	 */
 	public static String format(Date date, String format) {
 		if (date == null || date.getTime() == 0 || date == DateUtils.INVALID) {
 			return "";
@@ -75,13 +69,6 @@ public class DateUtils {
 		return format(date, SIMPLE_FROMAT);
 	}
 	
-	/**
-	 * 使用format解析日期
-	 * @param value
-	 * @param format
-	 * @return
-	 * @throws ParseException
-	 */
 	public static Date parse(String value, String format) throws ParseException {
 		if (value == null || value.isEmpty()) {
 			return DateUtils.INVALID;

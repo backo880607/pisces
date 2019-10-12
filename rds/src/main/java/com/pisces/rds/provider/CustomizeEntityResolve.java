@@ -12,6 +12,7 @@ import org.apache.ibatis.type.JdbcType;
 import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.MultiEnum;
+import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.rds.handler.MultiEnumTypeHandler;
@@ -46,8 +47,18 @@ public class CustomizeEntityResolve extends DefaultEntityResolve {
 			if (field.getJavaType() == Locale.class) {
 				column.setJdbcType(JdbcType.VARCHAR);
 			} else {
+				PROPERTY_TYPE type = EntityUtils.getPropertyType(field.getJavaType());
+				boolean large = false;
 				PropertyMeta meta = field.getAnnotation(PropertyMeta.class);
-				column.setJdbcType(SQLProvider.getJdbcType(EntityUtils.getPropertyType(field.getJavaType()), meta != null && meta.large()));
+				if (meta != null) {
+					type = meta.type();
+					large = meta.large();
+				}
+				if (type == PROPERTY_TYPE.ENUM) {
+					column.setJdbcType(JdbcType.VARCHAR);
+				} else {
+					column.setJdbcType(SQLProvider.getJdbcType(type, large));
+				}
 			}
 		}
 		Class<?> clazz = entityClazz;

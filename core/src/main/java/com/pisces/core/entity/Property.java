@@ -14,15 +14,12 @@ import com.pisces.core.relation.Sign;
 @Table(name = "PROPERTY")
 @PrimaryKey(fields={"belongName"})
 public class Property extends EntityCoding implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7594283934306849106L;
 	
 	private String belongName;	// 属性所属类
 	private PROPERTY_TYPE type;	// 属性类型
 	private String typeName;	// 属性类型名称，包含包路径
-	private boolean large;		// 是否为长度超大的数据类型
+	private Boolean large;		// 是否为长度超大的数据类型
 	private Boolean inherent;	// 是否内部固有属性
 	private Boolean isUnique;	// 是否唯一
 	private Boolean modifiable;	// 是否可以修改
@@ -87,11 +84,11 @@ public class Property extends EntityCoding implements Serializable {
 		this.typeName = typeName;
 	}
 	
-	public boolean getLarge() {
+	public Boolean getLarge() {
 		return large;
 	}
 
-	public void setLarge(boolean large) {
+	public void setLarge(Boolean large) {
 		this.large = large;
 	}
 	

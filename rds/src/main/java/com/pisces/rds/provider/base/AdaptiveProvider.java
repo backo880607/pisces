@@ -74,67 +74,56 @@ public class AdaptiveProvider extends SQLProvider {
 
 	@Override
 	public String getDriverName() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getConnection(String host, int port, String dataBase, String charset) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public boolean existedDataBase(Connection conn, String dataBase) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void createDataBase(Connection conn, String dataBase) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void dropDataBase(Connection conn, String dataBase) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public boolean existedTable(Connection conn, String dataBase, String tableName) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void createTable(Connection conn, String tableName, Collection<EntityColumn> columns) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void dropTable(Connection conn, String tableName) throws SQLException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public String addColumns(String tableName, Collection<EntityColumn> columns) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String changeColumns(String tableName, Collection<EntityColumn> columns) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String dropColumns(String tableName, Map<String, EntityColumn> columns) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

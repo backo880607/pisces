@@ -12,24 +12,10 @@ public class StringUtils {
 		return fun != null ? fun.apply(obj) : obj.toString();
 	}
 	
-	/**
-	 * 将集合拼接成字符串。
-	 * @param collection
-	 * @param separator
-	 * @param fun
-	 * @return
-	 */
 	public static <T> String join(Collection<T> collection, String separator) {
 		return join(collection.iterator(), separator, null);
 	}
 	
-	/**
-	 * 将集合拼接成字符串。
-	 * @param collection
-	 * @param separator
-	 * @param fun
-	 * @return
-	 */
 	public static <T> String join(Collection<T> collection, String separator, Function<T, String> fun) {
 		if (collection == null) {
 			return "";
@@ -38,13 +24,6 @@ public class StringUtils {
 		return join(collection.iterator(), separator, fun);
 	}
 	
-	/**
-	 * 将迭代器所指向的集合拼接成字符串。
-	 * @param iterator
-	 * @param separator
-	 * @param fun
-	 * @return
-	 */
 	public static <T> String join(Iterator<T> iterator, String separator, Function<T, String> fun) {
 		if (iterator == null || !(iterator.hasNext())) {
 			return "";

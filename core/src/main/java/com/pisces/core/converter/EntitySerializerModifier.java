@@ -16,10 +16,6 @@ import com.pisces.core.utils.EntityUtils;
 public class EntitySerializerModifier extends BeanSerializerModifier {
 	
 	public static class UserFieldWriter extends BeanPropertyWriter {
-
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 5358862065792784550L;
 		
 		@Override

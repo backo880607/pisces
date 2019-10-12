@@ -216,7 +216,7 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 			}
 			
 			IExpression exp = Primary.get().createExpression(strExpes[0]);
-			if (exp == null) {	// 排序表达式错误
+			if (exp == null) {
 				return false;
 			}
 			

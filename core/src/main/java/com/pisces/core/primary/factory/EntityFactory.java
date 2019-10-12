@@ -42,20 +42,10 @@ public final class EntityFactory {
 		return this.childFactories;
 	}
 	
-	/**
-	 * 是否为有效关联标识
-	 * @param sign
-	 * @return
-	 */
 	public boolean validSign(Sign sign) {
 		return this.relations != null && this.relations.get(sign) != null;
 	}
 	
-	/**
-	 * 由关联标识，取关联数据
-	 * @param sign
-	 * @return
-	 */
 	public RelationData getSignData(Sign sign) {
 		if (validSign(sign)) {
 			return this.relations.get(sign);
@@ -64,21 +54,11 @@ public final class EntityFactory {
 		return this.superFactory != null ? this.superFactory.getSignData(sign) : null;
 	}
 	
-	/**
-	 * 由关联名，取关联数据
-	 * @param signName
-	 * @return
-	 */
 	public RelationData getSignData(String signName) {
 		Sign sign = this.getSign(signName);
 		return sign != null ? this.getSignData(sign) : null;
 	}
 	
-	/**
-	 * 由关联名，取关联标识
-	 * @param signName
-	 * @return
-	 */
 	public Sign getSign(String signName) {
 		Sign sign = this.signsName.get(signName);
 		if (sign != null) {
@@ -87,70 +67,36 @@ public final class EntityFactory {
 		return this.superFactory != null ? this.superFactory.getSign(signName) : null;
 	}
 	
-	/**
-	 * 由关联标识，获取反向关联标识
-	 * @param sign
-	 * @return
-	 */
 	public Sign getReverse(Sign sign) {
 		RelationData data = getSignData(sign);
 		return data != null ? data.getReverse() : null;
 	}
 	
-	/**
-	 * 由关联名，获取反向关联标识
-	 * @param signName
-	 * @return
-	 */
 	public Sign getReverse(String signName) {
 		RelationData data = getSignData(signName);
 		return data != null ? data.getReverse() : null;
 	}
 	
-	/**
-	 * 由关联标识，获取关联对象的工厂
-	 * @param sign
-	 * @return
-	 */
 	public EntityFactory getRelationFactory(Sign sign) {
 		RelationData data = getSignData(sign);
 		return data != null ? data.getFactory() : null;
 	}
 	
-	/**
-	 * 由关联名，获取关联对象的工厂
-	 * @param signName
-	 * @return
-	 */
 	public EntityFactory getRelationFactory(String signName) {
 		RelationData data = getSignData(signName);
 		return data != null ? data.getFactory() : null;
 	}
 	
-	/**
-	 * 由关联标识，获取关联类型
-	 * @param sign
-	 * @return
-	 */
 	public Type getRelationType(Sign sign) {
 		RelationData data = getSignData(sign);
 		return data != null ? data.getType() : null;
 	}
 	
-	/**
-	 * 由关联标识，获取关联对象的数据类型
-	 * @param sign
-	 * @return
-	 */
 	public RelationKind getRelationKind(Sign sign) {
 		RelationData data = getSignData(sign);
 		return data != null ? data.getKind() : null;
 	}
 	
-	/**
-	 * 获取拥有关联标识
-	 * @return
-	 */
 	public List<Sign> getOwners() {
 		List<Sign> result = new ArrayList<>();
 		for (Entry<Sign, RelationData> entry : this.relations.entrySet()) {
@@ -162,10 +108,6 @@ public final class EntityFactory {
 		return result;
 	}
 	
-	/**
-	 * 获取非拥有关联标识
-	 * @return
-	 */
 	public List<Sign> getNotOwners() {
 		List<Sign> result = new ArrayList<>();
 		for (Entry<Sign, RelationData> entry : this.relations.entrySet()) {

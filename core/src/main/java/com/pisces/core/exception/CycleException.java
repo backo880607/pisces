@@ -3,10 +3,6 @@ package com.pisces.core.exception;
 import com.pisces.core.entity.EntityObject;
 
 public class CycleException extends RuntimeException {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6468776684821094915L;
 	
 	private EntityObject entity;

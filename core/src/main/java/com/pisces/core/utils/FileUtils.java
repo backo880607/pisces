@@ -117,10 +117,6 @@ public class FileUtils {
         }
     }
     
-    /**
-	 * 将指定包下的类加载到内存中
-	 * @param packName
-	 */
 	public static List<Class<?>> loadClass(String packName) {
 		List<Class<?>> clses = new ArrayList<>();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -184,9 +180,7 @@ public class FileUtils {
 			final String jarEntryName = jarEntry.getName();
 			if (jarEntryName.endsWith(".class")) {
 				String clsName = jarEntryName.replace("/", ".");
-				if (clsName.startsWith(packName) && !clsName.contains("com.mwc2m.aps.bean.dto")
-						&& !clsName.contains("com.mwc2m.aps.bean.enums")
-						&& !clsName.contains("com.mwc2m.aps.bean.vo")) {
+				if (clsName.startsWith(packName)) {
 					clsName = clsName.substring(0, clsName.length() - 6);
 					try {
 						clses.add(Class.forName(clsName));

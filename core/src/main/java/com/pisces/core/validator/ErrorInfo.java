@@ -8,7 +8,6 @@ public class ErrorInfo {
 	private String field;
 	private String message;
 	private String value;
-	// 校验失败时对于对象的主键值
 	private Map<String, String> entity = new HashMap<>();
 	
 	public String getClazz() {

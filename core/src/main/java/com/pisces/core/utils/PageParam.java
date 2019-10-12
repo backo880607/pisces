@@ -4,7 +4,7 @@ public class PageParam {
 	private int pageNum;
 	private int pageSize;
 	private String orderBy;
-	private String filter;	// 筛选条件
+	private String filter;
 	
 	public int getPageNum() {
 		return pageNum;

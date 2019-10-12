@@ -10,10 +10,6 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.utils.EntityUtils;
 
 public class RefSet extends TreeSet<EntityObject> implements RefBase {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3488730949083149412L;
 	private Sign sign;
 	private List<Long> ids;
