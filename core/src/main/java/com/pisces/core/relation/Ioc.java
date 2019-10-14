@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.service.EntityService;
+import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.Primary;
 
 public class Ioc {
@@ -184,6 +186,11 @@ public class Ioc {
 			for (EntityObject relaEntity : relaEntities) {
 				delete(relaEntity);
 			}
+		}
+		
+		EntityService<? extends EntityObject> service = ServiceManager.getService(entity.getClass());
+		if (service != null) {
+			service.deleteImpl(entity);
 		}
 		
 		List<Sign> notOwnerSigns = Primary.get().getRelationNotOwners(entity.getClass());

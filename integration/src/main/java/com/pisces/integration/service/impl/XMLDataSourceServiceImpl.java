@@ -2,17 +2,15 @@ package com.pisces.integration.service.impl;
 
 import java.util.Collection;
 
-import com.pisces.core.dao.BaseDao;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
+import com.pisces.integration.helper.AdapterRegister;
 import com.pisces.integration.helper.DataConfig;
-import com.pisces.integration.service.XMLDataSourceService;
 
-public class XMLDataSourceServiceImpl<T extends DataSource, D extends BaseDao<T>> extends EntityServiceImpl<T, D> implements XMLDataSourceService<T> {
+abstract class XMLDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegister<T> {
 
 	@Override
 	public DataConfig getDataConfig() {
@@ -20,12 +18,12 @@ public class XMLDataSourceServiceImpl<T extends DataSource, D extends BaseDao<T>
 	}
 
 	@Override
-	public boolean validConnection(DataSource dataSource, String tableName) throws Exception {
+	public boolean validConnection(DataSource dataSource, String tableName, boolean export) throws Exception {
 		return false;
 	}
 
 	@Override
-	public boolean open(DataSource dataSource, String tableName) throws Exception {
+	public boolean open(DataSource dataSource, String tableName, boolean export) throws Exception {
 		return false;
 	}
 

@@ -9,12 +9,12 @@ import com.pisces.core.annotation.Relation;
 import com.pisces.core.entity.EntityCoding;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
-import com.pisces.integration.enums.SchemeType;
+import com.pisces.integration.enums.SCHEME_TYPE;
 
 @Table(name = "INTEGRATION_SCHEME_GROUP")
 public class SchemeGroup extends EntityCoding {
 	@NotNull
-	private SchemeType type;
+	private SCHEME_TYPE type;
 	
 	@Relation(clazz="Scheme", sign="schemeGroup", type=Type.OneToMulti, owner=true)
 	public static final Sign schemes = sign();
@@ -22,14 +22,14 @@ public class SchemeGroup extends EntityCoding {
 	@Override
 	public void init() {
 		super.init();
-		type = SchemeType.Export;
+		type = SCHEME_TYPE.Export;
 	}
 
-	public final SchemeType getType() {
+	public final SCHEME_TYPE getType() {
 		return type;
 	}
 
-	public final void setType(SchemeType type) {
+	public final void setType(SCHEME_TYPE type) {
 		this.type = type;
 	}
 	

@@ -30,7 +30,7 @@ public class DaoHelper {
 						if (id == null) {
 							continue;
 						}
-						EntityObject relaEntity = relaService.selectById(id);
+						EntityObject relaEntity = relaService.getById(id);
 						Ioc.set(entity, entryData.getKey(), relaEntity);
 					}
 				}

@@ -27,9 +27,4 @@ public class ServiceManager {
 		return service;
 	}
 	
-	public static void init() {
-		for (EntityService<? extends EntityObject> service : services.values()) {
-			service.init();
-		}
-	}
 }

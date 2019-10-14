@@ -36,41 +36,41 @@ public abstract class EntityController<T extends EntityObject, S extends EntityS
 		return succeed(this.service.create());
 	}
 	
-	@GetMapping("select")
-	@ExceptionMessage(clazz = WebMessage.class, name = "SELECT")
-	public ResponseData select() {
-		return succeed(this.service.select());
+	@GetMapping("get")
+	@ExceptionMessage(clazz = WebMessage.class, name = "GET")
+	public ResponseData get() {
+		return succeed(this.service.get());
 	}
 	
-	@GetMapping("selectAll")
-	@ExceptionMessage(clazz = WebMessage.class, name = "SELECT")
-	public ResponseData selectAll() {
-		return succeed(this.service.selectAll());
+	@GetMapping("getAll")
+	@ExceptionMessage(clazz = WebMessage.class, name = "GET")
+	public ResponseData getAll() {
+		return succeed(this.service.getAll());
 	}
 	
-	@GetMapping(value = "selectByPage")
-	@ExceptionMessage(clazz = WebMessage.class, name = "SELECT")
-	public ResponseData selectByPage(@RequestParam(required = true) int pageNum, @RequestParam(required = true) int pageSize, 
+	@GetMapping(value = "getByPage")
+	@ExceptionMessage(clazz = WebMessage.class, name = "GET")
+	public ResponseData getByPage(@RequestParam(required = true) int pageNum, @RequestParam(required = true) int pageSize, 
 			@RequestParam(required = true) String orderBy, @RequestParam(required = true) String filter) {
 		PageParam param = new PageParam();
 		param.setPageNum(pageNum);
 		param.setPageSize(pageSize);
 		param.setOrderBy(orderBy);
 		param.setFilter(filter);
-		return succeed(this.service.select(param));
+		return succeed(this.service.get(param));
 	}
 	
-	@GetMapping("selectById")
-	@ExceptionMessage(clazz = WebMessage.class, name = "SELECT")
-	public ResponseData selectById(@RequestParam long id) {
-		final T entity = this.service.selectById(id);
+	@GetMapping("getById")
+	@ExceptionMessage(clazz = WebMessage.class, name = "GET")
+	public ResponseData getById(@RequestParam long id) {
+		final T entity = this.service.getById(id);
 		return entity != null ? succeed(entity) : failed(id, WebMessage.NOT_EXISTED);
 	}
 	
-	@GetMapping("selectByIds")
-	@ExceptionMessage(clazz = WebMessage.class, name = "SELECT")
-	public ResponseData selectByIds(@RequestBody List<Long> ids) {
-		return succeed(this.service.selectByIds(ids));
+	@GetMapping("getByIds")
+	@ExceptionMessage(clazz = WebMessage.class, name = "GET")
+	public ResponseData getByIds(@RequestBody List<Long> ids) {
+		return succeed(this.service.getByIds(ids));
 	}
 	
 	@PostMapping("insert")

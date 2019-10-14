@@ -9,6 +9,7 @@ import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pisces.core.enums.CREATE_UPDATE_TYPE;
+import com.pisces.core.enums.ENTITY_STATUS;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.utils.DateUtils;
@@ -40,6 +41,7 @@ public class EntityObject implements Comparable<EntityObject> {
 	private Date updateDate;
 	private CREATE_UPDATE_TYPE createType;
 	private CREATE_UPDATE_TYPE updateType;
+	private ENTITY_STATUS status;
 	
 	public EntityObject() {
 		Primary.get().createRelation(this);
@@ -66,6 +68,7 @@ public class EntityObject implements Comparable<EntityObject> {
 		updateDate = DateUtils.INVALID;
 		createType = CREATE_UPDATE_TYPE.SYSTEM;
 		updateType = CREATE_UPDATE_TYPE.SYSTEM;
+		status = ENTITY_STATUS.ENABLE;
 		initialized = true;
 	}
 	
@@ -173,6 +176,14 @@ public class EntityObject implements Comparable<EntityObject> {
 	
 	public void setUpdateType(CREATE_UPDATE_TYPE updateType) {
 		this.updateType = updateType;
+	}
+	
+	public ENTITY_STATUS getStatus() {
+		return status;
+	}
+	
+	public void setStatus(ENTITY_STATUS status) {
+		this.status = status;
 	}
 
 	@Override

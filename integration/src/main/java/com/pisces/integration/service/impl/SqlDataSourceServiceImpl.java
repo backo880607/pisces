@@ -13,29 +13,27 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.pisces.core.dao.BaseDao;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.core.service.PropertyService;
 import com.pisces.core.utils.Primary;
 import com.pisces.integration.bean.DataSource;
+import com.pisces.integration.bean.DsSql;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
-import com.pisces.integration.bean.SqlDataSource;
+import com.pisces.integration.helper.AdapterRegister;
 import com.pisces.integration.helper.DataConfig;
-import com.pisces.integration.service.SqlDataSourceService;
 import com.pisces.rds.provider.base.SQLProvider;
 
 import tk.mybatis.mapper.entity.EntityColumn;
 
-abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseDao<T>> extends EntityServiceImpl<T, D> implements SqlDataSourceService<T> {
+abstract class SqlDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegister<T> {
 	private SQLProvider provider;
 	private Connection conn;
 	private Statement stmt;
 	private PreparedStatement pstmt;
 	private ResultSet resultSet;
-	private SqlDataSource dataSource;
+	private DsSql dataSource;
 	
 	@Autowired
 	private PropertyService propertyService;
@@ -50,23 +48,23 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 	}
 	
 	@Override
-	public boolean validConnection(DataSource dataSource, String tableName) throws Exception {
-		if (!(dataSource instanceof SqlDataSource)) {
+	public boolean validConnection(DataSource dataSource, String tableName, boolean export) throws Exception {
+		if (!(dataSource instanceof DsSql)) {
 			return false;
 		}
 		Class.forName(this.provider.getDriverName());
-		this.dataSource = (SqlDataSource)dataSource;
+		this.dataSource = (DsSql)dataSource;
 		this.conn = DriverManager.getConnection(this.provider.getConnection(this.dataSource.getHost(), this.dataSource.getPort(), this.dataSource.getDataBase(), this.dataSource.getCharset()), 
 				this.dataSource.getUsername(), this.dataSource.getPassword());
-		return this.provider.existedTable(this.conn, this.dataSource.getDataBase(), tableName);
+		return export ? true : this.provider.existedTable(this.conn, this.dataSource.getDataBase(), tableName);
 	}
 
 	@Override
-	public boolean open(DataSource dataSource, String tableName) throws Exception {
-		if (!(dataSource instanceof SqlDataSource)) {
+	public boolean open(DataSource dataSource, String tableName, boolean export) throws Exception {
+		if (!(dataSource instanceof DsSql)) {
 			return false;
 		}
-		this.dataSource = (SqlDataSource)dataSource;
+		this.dataSource = (DsSql)dataSource;
 		Class.forName(this.provider.getDriverName());
 		this.conn = DriverManager.getConnection(this.provider.getConnection(this.dataSource.getHost(), this.dataSource.getPort(), this.dataSource.getDataBase(), this.dataSource.getCharset()), 
 				this.dataSource.getUsername(), this.dataSource.getPassword());
@@ -146,9 +144,8 @@ abstract class SqlDataSourceServiceImpl<T extends SqlDataSource, D extends BaseD
 			column.setColumn(field.getExternName());
 			
 			Property property = this.propertyService.get(entityClass, field.getName());
-			if (property.getLarge()) {
-				column.setJdbcType(this.provider.getJdbcType(property.getType(), property.getLarge()));
-			}
+			column.setJavaType(property.clazz);
+			column.setJdbcType(SQLProvider.getJdbcType(property.getType(), property.getLarge()));
 			columns.add(column);
 		}
 		this.provider.createTable(conn, scheme.getOutName(), columns);

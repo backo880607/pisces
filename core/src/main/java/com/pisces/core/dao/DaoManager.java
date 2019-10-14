@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.service.ServiceManager;
 
 public class DaoManager {
 	private static class UserData {
@@ -67,7 +66,6 @@ public class DaoManager {
 					for (Entry<BaseDao<? extends EntityObject>, DaoImpl> entry : userData.daoImpls.entrySet()) {
 						entry.getKey().loadData();
 					}
-					ServiceManager.init();
 				}
 				userData.bInit = true;
 			}

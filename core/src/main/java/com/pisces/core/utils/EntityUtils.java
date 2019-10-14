@@ -72,7 +72,7 @@ public class EntityUtils {
 		EntityService<T> service = ServiceManager.getService(clazz);
 		T entity = null;
 		if (service != null) {
-			entity = service.selectById(id);
+			entity = service.getById(id);
 		}
 		
 		if (entity == null) {
@@ -102,7 +102,7 @@ public class EntityUtils {
 	public static List<Property> getDefaultProperties() {
 		List<Property> result = new ArrayList<>();
 		for (Class<? extends EntityObject> clazz : getEntityClasses()) {
-			getDefaultPropertiesImpl(result, clazz);
+			getDefaultPropertiesImpl(result, clazz, clazz);
 		}
 		
 		return result;
@@ -110,20 +110,22 @@ public class EntityUtils {
 
 	public static List<Property> getDefaultProperties(Class<? extends EntityObject> clazz) {
 		List<Property> result = new LinkedList<>();
-		getDefaultPropertiesImpl(result, clazz);
+		getDefaultPropertiesImpl(result, clazz, clazz);
 		return result;
 	}
 	
-	private static void getDefaultPropertiesImpl(List<Property> result, Class<? extends EntityObject> clazz) {
+	private static void getDefaultPropertiesImpl(List<Property> result, Class<? extends EntityObject> clazz, Class<? extends EntityObject> belongClass) {
 		if (clazz == null) {
 			return;
 		}
+		
+		getDefaultPropertiesImpl(result, Primary.get().getSuperClass(clazz), belongClass);
 		
 		Map<String, Property> codeMapProperties = new HashMap<String, Property>();
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			try {
-				Property property = createProperty(clazz, field);
+				Property property = createProperty(clazz, belongClass, field);
 				if (property != null) {
 					result.add(property);
 					codeMapProperties.put(property.getCode(), property);
@@ -148,7 +150,7 @@ public class EntityUtils {
 		
 	}
 	
-	private static Property createProperty(Class<? extends EntityObject> clazz, Field field) throws Exception {
+	private static Property createProperty(Class<? extends EntityObject> clazz, Class<? extends EntityObject> belongClass, Field field) throws Exception {
 		if (Modifier.isTransient(field.getModifiers())) {
 			return null;
 		}
@@ -162,10 +164,10 @@ public class EntityUtils {
 		Property property = new Property();
 		property.init();
 		property.setInherent(true);
-		property.setBelongName(clazz.getSimpleName());
+		property.setBelongName(belongClass.getSimpleName());
 		property.setCode(field.getName());
 		property.setName(property.getCode());
-		property.belongClazz = clazz;
+		property.belongClazz = belongClass;
 		if (field.getType() == Sign.class) {
 			Sign sign = (Sign)field.get(null);
 			RelationKind kind = Primary.get().getRelationKind(clazz, sign);

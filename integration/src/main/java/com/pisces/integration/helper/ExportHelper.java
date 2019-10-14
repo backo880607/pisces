@@ -2,10 +2,13 @@ package com.pisces.integration.helper;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
+import com.pisces.core.enums.ENTITY_STATUS;
 import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
@@ -28,7 +31,6 @@ public class ExportHelper extends IOHelper {
 			FieldInfo info = new FieldInfo();
 			info.setName(property.getCode());
 			info.setExternName(property.getName());
-			info.setScheme(scheme);
 			infos.add(info);
 		}
 		return infos;
@@ -39,14 +41,23 @@ public class ExportHelper extends IOHelper {
 		if (propertyService == null) {
 			throw new UnsupportedOperationException();
 		}
-		for (Scheme scheme : schemes) {
+		List<Scheme> targetSchemes = new LinkedList<Scheme>(schemes);
+		Iterator<Scheme> iter = targetSchemes.iterator();
+		while (iter.hasNext()) {
+			Scheme scheme = iter.next();
+			if (scheme.getStatus() == ENTITY_STATUS.DISABLE) {
+				iter.remove();
+				continue;
+			}
+			
 			if (scheme.getDataSource() == null) {
 				throw new UnsupportedOperationException("missing datasource configuration in Scheme " + scheme.getName());
 			}
 			try {
 				switchDataSourceService(scheme.getDataSource());
-				if (!adapter.validConnection(scheme.getDataSource(), scheme.getOutName())) {
-					throw new DataSourceException(IntegrationMessage.ConnectFailed, scheme.getDataSource().getClass().getSimpleName().substring(2), scheme.getDataSource().getHost());
+				if (!adapter.validConnection(scheme.getDataSource(), scheme.getOutName(), true)) {
+					iter.remove();
+					continue;
 				}
 				
 				Collection<FieldInfo> fields = scheme.getFields();
@@ -59,7 +70,7 @@ public class ExportHelper extends IOHelper {
 				if (adapter != null) {
 					adapter.close();
 				}
-				throw new UnsupportedOperationException(ex);
+				throw new DataSourceException(IntegrationMessage.ConnectFailed, scheme.getDataSource().getClass().getSimpleName().substring(2), scheme.getDataSource().getHost());
 			} finally {
 				if (adapter != null) {
 					adapter.close();
@@ -67,10 +78,10 @@ public class ExportHelper extends IOHelper {
 			}
 		}
 		
-		for (Scheme scheme : schemes) {
+		for (Scheme scheme : targetSchemes) {
 			try {
 				switchDataSourceService(scheme.getDataSource());
-				adapter.open(scheme.getDataSource(), scheme.getOutName());
+				adapter.open(scheme.getDataSource(), scheme.getOutName(), true);
 				Collection<FieldInfo> fieldInfos = scheme.getFields();
 				if (fieldInfos.isEmpty()) {
 					fieldInfos = getDefaultFields(scheme);
@@ -87,7 +98,7 @@ public class ExportHelper extends IOHelper {
 				PageParam pageParam = new PageParam();
 				pageParam.setFilter(scheme.getFilter());
 				pageParam.setOrderBy(scheme.getOrderBy());
-				List<? extends EntityObject> entities = service.select(pageParam);
+				List<? extends EntityObject> entities = service.get(pageParam);
 				for (EntityObject entity : entities) {
 					adapter.beforeWriteEntity(entity);
 					int index = 0;

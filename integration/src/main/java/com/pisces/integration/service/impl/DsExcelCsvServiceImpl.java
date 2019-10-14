@@ -2,8 +2,10 @@ package com.pisces.integration.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Collection;
 
 import org.springframework.stereotype.Service;
@@ -12,21 +14,25 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.integration.bean.DataSource;
-import com.pisces.integration.bean.DsExcelCsv;
+import com.pisces.integration.bean.DsLocaleFile;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
-import com.pisces.integration.dao.DsExcelCsvDao;
+import com.pisces.integration.enums.LOCALE_FILE_TYPE;
 import com.pisces.integration.helper.DataConfig;
-import com.pisces.integration.service.DsExcelCsvService;
+import com.pisces.integration.helper.AdapterRegister;
 
 @Service
-class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao> implements DsExcelCsvService {
+class DsExcelCsvService extends AdapterRegister<LOCALE_FILE_TYPE> {
 	
 	private CSVReader reader;
 	private String[] lineData;
 	private CSVWriter writer;
+	
+	@Override
+	public LOCALE_FILE_TYPE getType() {
+		return LOCALE_FILE_TYPE.CSV;
+	}
 	
 	@Override
 	public DataConfig getDataConfig() {
@@ -36,7 +42,7 @@ class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao>
 		return config;
 	}
 	
-	private String getPath(DsExcelCsv excel, String tableName) {
+	private String getPath(DsLocaleFile excel, String tableName) {
 		String path = excel.getHost();
 		if (!path.endsWith(File.separator)) {
 			path += File.separator;
@@ -45,27 +51,43 @@ class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao>
 	}
 
 	@Override
-	public boolean validConnection(DataSource dataSource, String tableName) throws Exception {
-		if (!(dataSource instanceof DsExcelCsv)) {
+	public boolean validConnection(DataSource dataSource, String tableName, boolean export) throws Exception {
+		if (!(dataSource instanceof DsLocaleFile)) {
 			return false;
 		}
 		
-		DsExcelCsv excel = (DsExcelCsv)dataSource;
-		reader = new CSVReader(new InputStreamReader(new FileInputStream(
-				getPath(excel, tableName)), excel.getCharset()));
-		return reader != null;
+		DsLocaleFile csv = (DsLocaleFile)dataSource;
+		File file = new File(getPath(csv, tableName));
+		if (!file.exists()) {
+			if (!export) {
+				return false;
+			}
+			
+			file.createNewFile();
+		}
+		if (export) {
+			this.writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(file), csv.getCharset()));
+		} else {
+			this.reader = new CSVReader(new InputStreamReader(new FileInputStream(file), csv.getCharset()));
+		}
+		return this.reader != null || this.writer != null;
 	}
 
 	@Override
-	public boolean open(DataSource dataSource, String tableName) throws Exception {
-		if (!(dataSource instanceof DsExcelCsv)) {
+	public boolean open(DataSource dataSource, String tableName, boolean export) throws Exception {
+		if (!(dataSource instanceof DsLocaleFile)) {
 			return false;
 		}
 		
-		DsExcelCsv excel = (DsExcelCsv)dataSource;
-		this.reader = new CSVReader(new InputStreamReader(new FileInputStream(
-					getPath(excel, tableName)), excel.getCharset()));
-		return this.reader != null;
+		DsLocaleFile csv = (DsLocaleFile)dataSource;
+		if (export) {
+			this.writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(
+					getPath(csv, tableName)), csv.getCharset()));
+		} else {
+			this.reader = new CSVReader(new InputStreamReader(new FileInputStream(
+					getPath(csv, tableName)), csv.getCharset()));
+		}
+		return reader != null || writer != null;
 	}
 
 	@Override
@@ -104,13 +126,13 @@ class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao>
 
 	@Override
 	public void beforeWriteTable(Scheme scheme, Collection<FieldInfo> fields) throws Exception {
-		lineData = new String[fields.size()];
+		this.lineData = new String[fields.size()];
 		int index = 0;
 		for (FieldInfo field : fields) {
-			lineData[index++] = field.getExternName();
+			this.lineData[index++] = field.getExternName();
 		}
 		
-		writer.writeNext(lineData);
+		this.writer.writeNext(lineData);
 	}
 	
 	@Override
@@ -119,16 +141,17 @@ class DsExcelCsvServiceImpl extends EntityServiceImpl<DsExcelCsv, DsExcelCsvDao>
 	
 	@Override
 	public void write(int index, String data) throws Exception {
-		lineData[index] = data;
+		this.lineData[index] = data;
 	}
 
 	@Override
 	public void afterWriteEntity(EntityObject entity) throws Exception {
-		writer.writeNext(lineData);
+		this.writer.writeNext(lineData);
 	}
 
 	@Override
 	public void afterWriteTable(Scheme scheme) throws Exception {
+		this.writer.flush();
 	}
 	
 	@Override

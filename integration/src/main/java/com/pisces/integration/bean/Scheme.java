@@ -11,12 +11,12 @@ import com.pisces.core.entity.EntityCoding;
 import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
-import com.pisces.integration.enums.ImportType;
+import com.pisces.integration.enums.IMPORT_TYPT;
 
 @Table(name = "INTEGRATION_SCHEME")
 public class Scheme extends EntityCoding {
 	@NotNull
-	private ImportType importType;
+	private IMPORT_TYPT importType;
 	private String filter;
 	private String orderBy;
 	@NotBlank
@@ -28,24 +28,24 @@ public class Scheme extends EntityCoding {
 	@Relation(clazz="DataSource", type=Type.MultiToOne)
 	public static final Sign dataSource = sign();
 	
-	@Relation(clazz="FieldInfo", sign="scheme", type=Type.OneToMulti, owner=true)
+	@Relation(clazz="FieldInfo", type=Type.OneToMulti, owner=true)
 	public static final Sign fields = sign();
 	
 	@Override
 	public void init() {
 		super.init();
-		importType = ImportType.ReplaceImport;
+		importType = IMPORT_TYPT.ReplaceImport;
 		filter = "";
 		orderBy = "";
 		outName = "";
 		inName = "";
 	}
 	
-	public final ImportType getImportType() {
+	public final IMPORT_TYPT getImportType() {
 		return importType;
 	}
 	
-	public final void setImportType(ImportType importType) {
+	public final void setImportType(IMPORT_TYPT importType) {
 		this.importType = importType;
 	}
 	

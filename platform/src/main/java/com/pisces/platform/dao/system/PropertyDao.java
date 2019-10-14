@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import com.pisces.rds.common.SQLDao;
 public class PropertyDao implements BaseDao<Property> {
 	class PropertyDaoImpl implements DaoImpl {
 		public Map<Class<? extends EntityObject>, Map<String, Property>> properties = new HashMap<>();
-		public void insert(Property property) {
+		private void fill(Property property) {
 			if (!property.getInitialized()) {
 				Property newRecord = new Property();
 				newRecord.init();
@@ -71,7 +72,19 @@ public class PropertyDao implements BaseDao<Property> {
 			if (!StringUtils.isEmpty(property.getExpression())) {
 				property.setModifiable(false);
 			}
+		}
+		protected void insert(Property property) {
+			fill(property);
 			properties.get(property.belongClazz).put(property.getCode(), property);
+		}
+		
+		protected void replace(Property property) {
+			fill(property);
+			Map<String, Property> temp = properties.get(property.belongClazz);
+			if (temp == null) {
+				return;
+			}
+			temp.put(property.getCode(), property);
 		}
 	}
 	private ThreadLocal<PropertyDaoImpl> impl = new ThreadLocal<>();
@@ -215,15 +228,16 @@ public class PropertyDao implements BaseDao<Property> {
 	@Override
 	public void loadData() {
 		for (Class<? extends EntityObject> clazz : EntityUtils.getEntityClasses()) {
-			impl.get().properties.put(clazz, new HashMap<String, Property>());
+			impl.get().properties.put(clazz, new TreeMap<String, Property>());
 		}
-		List<Property> properties = mapper.selectAll();
-		if (properties.isEmpty()) {
-			properties = EntityUtils.getDefaultProperties();
-			mapper.insertList(properties);
-		}
+		List<Property> properties = EntityUtils.getDefaultProperties();
 		for (Property property : properties) {
 			impl.get().insert(property);
+		}
+		
+		properties = mapper.selectAll();
+		for (Property property : properties) {
+			impl.get().replace(property);
 		}
 	}
 
@@ -234,51 +248,36 @@ public class PropertyDao implements BaseDao<Property> {
 	
 	public List<Property> get(Class<? extends EntityObject> clazz) {
 		List<Property> result = new ArrayList<Property>();
-		do {
-			Map<String, Property> properties = impl.get().properties.get(clazz);
-			if (properties != null) {
-				for (Entry<String, Property> entry : properties.entrySet()) {
-					result.add(entry.getValue());
-				}
+		Map<String, Property> properties = impl.get().properties.get(clazz);
+		if (properties != null) {
+			for (Entry<String, Property> entry : properties.entrySet()) {
+				result.add(entry.getValue());
 			}
-			clazz = Primary.get().getSuperClass(clazz);
-		} while (clazz != null);
+		}
 		
 		return result;
 	}
 	
 	public Property get(Class<? extends EntityObject> clazz, String code) {
-		do {
-			Map<String, Property> properties = impl.get().properties.get(clazz);
-			if (properties != null) {
-				Property property = properties.get(code);
-				if (property != null) {
-					return property;
-				}
-			}
-			clazz = Primary.get().getSuperClass(clazz);
-		} while (clazz != null);
-		return null;
+		Map<String, Property> properties = impl.get().properties.get(clazz);
+		return properties != null ? properties.get(code) : null;
 	}
 	
 	public List<Property> getPrimaries(Class<? extends EntityObject> clazz) {
 		List<Property> result = new ArrayList<Property>();
-		do {
-			Map<String, Property> properties = impl.get().properties.get(clazz);
-			if (properties != null) {
-				for (Entry<String, Property> entry : properties.entrySet()) {
-					if (entry.getValue().getPrimaryKey()) {
-						result.add(entry.getValue());
-					}
+		Map<String, Property> properties = impl.get().properties.get(clazz);
+		if (properties != null) {
+			for (Entry<String, Property> entry : properties.entrySet()) {
+				if (entry.getValue().getPrimaryKey()) {
+					result.add(entry.getValue());
 				}
 			}
 			
-			clazz = Primary.get().getSuperClass(clazz);
-		} while (clazz != null);
-		
-		if (result.isEmpty()) {
-			result.add(impl.get().properties.get(EntityObject.class).get("id"));
+			if (result.isEmpty()) {
+				result.add(properties.get("id"));
+			}
 		}
+		
 		return result;
 	}
 }

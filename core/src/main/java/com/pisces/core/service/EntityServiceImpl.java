@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.pisces.core.dao.BaseDao;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.relation.Ioc;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.IExpression;
 import com.pisces.core.utils.PageParam;
@@ -44,9 +45,6 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 	}
 	
 	@Override
-	public void init() {}
-	
-	@Override
 	public T create() {
 		T entity = null;
 		try {
@@ -59,29 +57,29 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 	}
 	
 	@Override
-	public T select() {
+	public T get() {
 		return this.dao.select();
 	}
 
 	@Override
-	public List<T> selectAll() {
+	public List<T> getAll() {
 		return this.dao.selectAll();
 	}
 	
 	@Override
-	public T selectById(long id) {
+	public T getById(long id) {
 		return this.dao.selectByPrimaryKey(id);
 	}
 	
 	@Override
-	public List<T> selectByIds(List<Long> ids) {
+	public List<T> getByIds(List<Long> ids) {
 		return this.dao.selectByIds(ids);
 	}
 	
 	@Override
-	public List<T> select(PageParam param) {
+	public List<T> get(PageParam param) {
 		List<T> result = new LinkedList<>();
-		List<T> records = this.selectAll();
+		List<T> records = this.getAll();
 		IExpression filterExp = Primary.get().createExpression(param.getFilter());
 		if (filterExp != null) {
 			for (T entity : records) {
@@ -100,9 +98,9 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 	}
 	
 	@Override
-	public T select(Predicate<T> filter) {
+	public T get(Predicate<T> filter) {
 		T result = null;
-		final List<T> records = this.selectAll();
+		final List<T> records = this.getAll();
 		for (T record : records) {
 			if (filter.test(record)) {
 				result = record;
@@ -114,9 +112,9 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 	}
 	
 	@Override
-	public List<T> selectList(Predicate<T> filter) {
+	public List<T> getList(Predicate<T> filter) {
 		List<T> result = new ArrayList<>();
-		final List<T> records = this.selectAll();
+		final List<T> records = this.getAll();
 		for (T record : records) {
 			if (filter.test(record)) {
 				result.add(record);
@@ -180,22 +178,42 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 
 	@Override
 	public int delete(T entity) {
+		Ioc.delete(entity);
 		return this.dao.delete(entity);
 	}
 	
 	@Override
 	public int deleteList(List<T> entities) {
+		for (T entity : entities) {
+			Ioc.delete(entity);
+		}
 		return this.dao.deleteList(entities);
 	}
 
 	@Override
 	public int deleteById(long id) {
+		Ioc.delete(getById(id));
 		return this.dao.deleteByPrimaryKey(id);
 	}
 	
 	@Override
 	public int deleteByIds(List<Long> ids) {
+		for (Long id : ids) {
+			Ioc.delete(getById(id));
+		}
 		return this.dao.deleteByPrimaryKeys(ids);
+	}
+	
+	@Override
+	public void deleteImpl(EntityObject entity) {
+		
+	}
+	
+	@Override
+	public void clear() {
+		for (T entity : getAll()) {
+			Ioc.delete(entity);
+		}
 	}
 	
 	public static <T extends EntityObject> boolean sort(List<T> entities, String str) {

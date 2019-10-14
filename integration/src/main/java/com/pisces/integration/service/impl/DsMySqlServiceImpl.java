@@ -2,15 +2,18 @@ package com.pisces.integration.service.impl;
 
 import org.springframework.stereotype.Service;
 
-import com.pisces.integration.bean.DsMySql;
-import com.pisces.integration.dao.DsMySqlDao;
-import com.pisces.integration.service.DsMySqlService;
+import com.pisces.integration.enums.SQL_TYPE;
 import com.pisces.rds.provider.base.MySqlProvider;
 
 @Service
-class DsMySqlServiceImpl extends SqlDataSourceServiceImpl<DsMySql, DsMySqlDao> implements DsMySqlService {
+class DsMySqlServiceImpl extends SqlDataSourceServiceImpl<SQL_TYPE> {
 
 	public DsMySqlServiceImpl() {
 		super(new MySqlProvider());
+	}
+
+	@Override
+	public SQL_TYPE getType() {
+		return SQL_TYPE.MYSQL;
 	}
 }

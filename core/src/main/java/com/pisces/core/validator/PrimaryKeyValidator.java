@@ -28,7 +28,7 @@ public class PrimaryKeyValidator implements ConstraintValidator<PrimaryKey, Enti
 		Set<String> primaryKeys = new HashSet<>();
 		EntityService<? extends EntityObject> service = ServiceManager.getService(value.getClass());
 		if (service != null) {
-			List<? extends EntityObject> entities = service.selectAll();
+			List<? extends EntityObject> entities = service.getAll();
 			for (EntityObject entity : entities) {
 				String temp = StringUtils.join(properties, "\t", (Property property) -> {
 					return EntityUtils.getTextValue(entity, property);

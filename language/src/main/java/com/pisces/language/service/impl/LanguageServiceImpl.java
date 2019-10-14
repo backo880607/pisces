@@ -21,12 +21,12 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 
 	@Override
 	public Locale getLocale() {
-		return select().getLocale();
+		return get().getLocale();
 	}
 	
 	@Override
 	public void switchLocale(Locale locale) {
-		Language language = select();
+		Language language = get();
 		language.setLocale(locale);
 		language.clearBundles();
 		for (LanguageAnnotation resource : languageMgr.getResources()) {
@@ -40,7 +40,7 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		if (key == null) {
 			return Language.ERROR;
 		}
-		return select().get(key.getDeclaringClass().getSimpleName() + "." + key.name(), arguments);
+		return get().get(key.getDeclaringClass().getSimpleName() + "." + key.name(), arguments);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		if (StringUtils.isEmpty(key)) {
 			return Language.ERROR;
 		}
-		return select().get(key, arguments);
+		return get().get(key, arguments);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		if (clazz == null) {
 			return Language.ERROR;
 		}
-		return select().get(clazz.getSimpleName());
+		return get().get(clazz.getSimpleName());
 	}
 
 	@Override
@@ -64,7 +64,7 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		if (field == null) {
 			return Language.ERROR;
 		}
-		return select().get(field.getDeclaringClass().getSimpleName() + "." + field.getName());
+		return get().get(field.getDeclaringClass().getSimpleName() + "." + field.getName());
 	}
 	
 	@Override
@@ -72,7 +72,7 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		if (clazz == null) {
 			return Language.ERROR;
 		}
-		return select().get(clazz.getSimpleName() + "." + field);
+		return get().get(clazz.getSimpleName() + "." + field);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		if (clazz == null) {
 			return Language.ERROR;
 		}
-		return select().get("tips." + clazz.getSimpleName());
+		return get().get("tips." + clazz.getSimpleName());
 	}
 
 	@Override
@@ -88,6 +88,6 @@ class LanguageServiceImpl extends EntityServiceImpl<Language, LanguageDao> imple
 		if (field == null) {
 			return Language.ERROR;
 		}
-		return select().get("tips" + field.getDeclaringClass().getSimpleName() + "." + field.getName());
+		return get().get("tips" + field.getDeclaringClass().getSimpleName() + "." + field.getName());
 	}
 }

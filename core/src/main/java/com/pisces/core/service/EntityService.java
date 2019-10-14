@@ -9,16 +9,15 @@ import com.pisces.core.utils.PageParam;
 
 public interface EntityService<T extends EntityObject> extends BaseService {
 	BaseDao<T> getBaseDao();
-	void init();
 	T create();
 	
-	T select();
-	List<T> selectAll();
-	T selectById(long id);
-	List<T> selectByIds(List<Long> ids);
-	List<T> select(PageParam param);
-	T select(Predicate<T> filter);
-	List<T> selectList(Predicate<T> filter);
+	T get();
+	List<T> getAll();
+	T getById(long id);
+	List<T> getByIds(List<Long> ids);
+	List<T> get(PageParam param);
+	T get(Predicate<T> filter);
+	List<T> getList(Predicate<T> filter);
 	
 	boolean exist(long id);
 	
@@ -32,4 +31,8 @@ public interface EntityService<T extends EntityObject> extends BaseService {
 	int deleteList(List<T> entities);
 	int deleteById(long id);
 	int deleteByIds(List<Long> ids);
+	
+	void clear();
+	
+	void deleteImpl(EntityObject entity);
 }

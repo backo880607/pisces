@@ -6,15 +6,12 @@ import java.util.Map;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
-import com.pisces.core.service.EntityService;
 import com.pisces.core.service.PropertyService;
-import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
-import com.pisces.integration.service.DataSourceAdapter;
 
 public abstract class IOHelper {
 	protected DataSourceAdapter adapter;
@@ -35,9 +32,8 @@ public abstract class IOHelper {
 	public abstract void execute(Collection<Scheme> schemes);
 	
 	protected void switchDataSourceService(DataSource dataSource) {
-		EntityService<? extends EntityObject> service = ServiceManager.getService(dataSource.getClass());
-		if (service != null) {
-			this.adapter = (DataSourceAdapter) service;
+		this.adapter = AdapterManager.getAdapter(dataSource);
+		if (this.adapter != null) {
 			this.config = this.adapter.getDataConfig();
 		} else {
 			throw new UnsupportedOperationException("datasource " + dataSource.getName() + " not implement service class!");

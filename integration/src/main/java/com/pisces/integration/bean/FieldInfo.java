@@ -4,8 +4,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.relation.Ioc;
-import com.pisces.core.relation.Sign;
 
 @Table(name = "INTEGRATION_FIELD_INFO")
 public class FieldInfo extends EntityObject {
@@ -13,8 +11,6 @@ public class FieldInfo extends EntityObject {
 	private String name;
 	@NotBlank
 	private String externName;
-	
-	public static final Sign scheme = sign();
 	
 	@Override
 	public void init() {
@@ -37,13 +33,5 @@ public class FieldInfo extends EntityObject {
 	
 	public final void setExternName(String externName) {
 		this.externName = externName;
-	}
-	
-	public final Scheme getScheme() {
-		return getEntity(scheme);
-	}
-	
-	public void setScheme(Scheme scheme) {
-		Ioc.set(this, FieldInfo.scheme, scheme);
 	}
 }

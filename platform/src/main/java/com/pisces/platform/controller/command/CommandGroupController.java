@@ -15,6 +15,6 @@ public class CommandGroupController extends EntityController<CommandGroup, Comma
 	
 	@GetMapping(value = "execute")
 	public void execute(@RequestParam() Long groupId) {
-		getService().execute(getService().selectById(groupId));
+		getService().execute(getService().getById(groupId));
 	}
 }

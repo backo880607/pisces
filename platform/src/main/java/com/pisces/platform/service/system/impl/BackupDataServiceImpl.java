@@ -24,12 +24,12 @@ public class BackupDataServiceImpl extends EntityServiceImpl<BackupData, BackupD
 	}
 
 	@Override
-	public boolean validConnection(DataSource dataSource, String tableName) throws Exception {
+	public boolean validConnection(DataSource dataSource, String tableName, boolean export) throws Exception {
 		return false;
 	}
 
 	@Override
-	public boolean open(DataSource dataSource, String tableName) throws Exception {
+	public boolean open(DataSource dataSource, String tableName, boolean export) throws Exception {
 		return false;
 	}
 

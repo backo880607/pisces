@@ -14,7 +14,7 @@ public class SchemeGroupController extends EntityController<SchemeGroup, SchemeG
 	
 	@RequestMapping("/execute")
 	public ResponseData execute(SchemeGroup schemeGroup) {
-		SchemeGroup group = getService().selectById(schemeGroup.getId());
+		SchemeGroup group = getService().getById(schemeGroup.getId());
 		if (group != null) {
 			getService().execute(group);
 		}
