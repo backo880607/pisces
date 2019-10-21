@@ -53,7 +53,7 @@ public class SqlServerProvider extends SQLProvider {
 		case TIME:
 			return "time(7)";
 		case TIMESTAMP:
-			return "timestamp";
+			return "datetime";
 		case BINARY:
 			return "binary(50)";
 		case VARBINARY:

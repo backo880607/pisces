@@ -9,15 +9,15 @@ import java.util.List;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.ENTITY_STATUS;
-import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 import com.pisces.core.utils.PageParam;
-import com.pisces.core.utils.StringUtils;
+import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
+import com.pisces.integration.bean.SchemeGroup;
 import com.pisces.integration.config.IntegrationMessage;
 import com.pisces.integration.exception.DataSourceException;
 
@@ -37,10 +37,14 @@ public class ExportHelper extends IOHelper {
 	}
 
 	@Override
-	public void execute(Collection<Scheme> schemes) {
-		if (propertyService == null) {
-			throw new UnsupportedOperationException();
+	public void execute(SchemeGroup schemeGroup) {
+		DataSource dataSource = schemeGroup.getDataSource();
+		if (dataSource == null) {
+			throw new UnsupportedOperationException("missing datasource configuration in SchemeGroup " + schemeGroup.getName());
 		}
+		switchDataSourceService(dataSource);
+		
+		Collection<Scheme> schemes = schemeGroup.getSchemes();
 		List<Scheme> targetSchemes = new LinkedList<Scheme>(schemes);
 		Iterator<Scheme> iter = targetSchemes.iterator();
 		while (iter.hasNext()) {
@@ -49,15 +53,10 @@ public class ExportHelper extends IOHelper {
 				iter.remove();
 				continue;
 			}
-			
-			if (scheme.getDataSource() == null) {
-				throw new UnsupportedOperationException("missing datasource configuration in Scheme " + scheme.getName());
-			}
+
 			try {
-				switchDataSourceService(scheme.getDataSource());
-				if (!adapter.validConnection(scheme.getDataSource(), scheme.getOutName(), true)) {
-					iter.remove();
-					continue;
+				if (!adapter.validConnection(dataSource, scheme.getOutName(), true)) {
+					return;
 				}
 				
 				Collection<FieldInfo> fields = scheme.getFields();
@@ -70,7 +69,7 @@ public class ExportHelper extends IOHelper {
 				if (adapter != null) {
 					adapter.close();
 				}
-				throw new DataSourceException(IntegrationMessage.ConnectFailed, scheme.getDataSource().getClass().getSimpleName().substring(2), scheme.getDataSource().getHost());
+				throw new DataSourceException(IntegrationMessage.ConnectFailed, dataSource.getClass().getSimpleName().substring(2), dataSource.getHost());
 			} finally {
 				if (adapter != null) {
 					adapter.close();
@@ -80,8 +79,7 @@ public class ExportHelper extends IOHelper {
 		
 		for (Scheme scheme : targetSchemes) {
 			try {
-				switchDataSourceService(scheme.getDataSource());
-				adapter.open(scheme.getDataSource(), scheme.getOutName(), true);
+				adapter.open(dataSource, scheme.getOutName(), true);
 				Collection<FieldInfo> fieldInfos = scheme.getFields();
 				if (fieldInfos.isEmpty()) {
 					fieldInfos = getDefaultFields(scheme);
@@ -103,9 +101,11 @@ public class ExportHelper extends IOHelper {
 					adapter.beforeWriteEntity(entity);
 					int index = 0;
 					for (Property property : properties) {
-						String value = obtainValue(entity, property);
-						if (getConfig() != null) {
+						String value = getConfig().getMapper().getTextValue(entity, property);
+						if (getConfig().getSepField() != null) {
 							value.replace(getConfig().getSepField(), getConfig().getReplaceField());
+						}
+						if (getConfig().getSepEntity() != null) {
 							value.replace(getConfig().getSepEntity(), getConfig().getReplaceEntity());
 						}
 						
@@ -124,31 +124,5 @@ public class ExportHelper extends IOHelper {
 				}
 			}
 		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private String obtainValue(EntityObject entity, Property property) {
-		String userValue = this.adapter.obtainValue(entity, property);
-		if (userValue != null) {
-			return userValue;
-		}
-		
-		if (property.getType() == PROPERTY_TYPE.ENTITY) {
-			Object value = EntityUtils.getValue(entity, property);
-			return value != null ? getPrimaryValue((EntityObject) value) : "";
-		} else if (property.getType() == PROPERTY_TYPE.LIST) {
-			Object value = EntityUtils.getValue(entity, property);
-			return StringUtils.join((List<EntityObject>)value, ";", (EntityObject temp) -> {
-				return getPrimaryValue(temp);
-			});
-		}
-		return EntityUtils.getTextValue(entity, property);
-	}
-
-	private String getPrimaryValue(EntityObject entity) {
-		List<Property> properties = propertyService.getPrimaries(entity.getClass());
-		return StringUtils.join(properties, ",", (Property property) -> {
-			return EntityUtils.getTextValue(entity, property);
-		});
 	}
 }

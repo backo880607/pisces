@@ -3,7 +3,6 @@ package com.pisces.core.enums;
 public enum PROPERTY_TYPE {
 	NONE,
 	BOOLEAN,
-	CHAR,
 	LONG,
 	DOUBLE,
 	DATE,

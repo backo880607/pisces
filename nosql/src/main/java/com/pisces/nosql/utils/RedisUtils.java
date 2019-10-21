@@ -17,7 +17,7 @@ public class RedisUtils {
 		redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         // 解决查询缓存转换异常的问题
         Jackson2JsonRedisSerializer<T> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<T>(clazz);
-        jackson2JsonRedisSerializer.setObjectMapper(EntityUtils.createObjectMapper());
+        jackson2JsonRedisSerializer.setObjectMapper(EntityUtils.createEntityMapper());
         redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
         return redisTemplate;
 	}

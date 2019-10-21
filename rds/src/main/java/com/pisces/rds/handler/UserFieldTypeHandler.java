@@ -46,10 +46,10 @@ public class UserFieldTypeHandler extends BaseTypeHandler<Map<String, Object>> {
 				Property property = AppUtils.getPropertyService().get(entityClazz.get(), fieldName);
 				if (property != null)
 				{
-					Object userValue = EntityUtils.convertTextValue(property, parser.getText());
-					if (userValue != null) {
-						result.put(fieldName, userValue);
-					}
+					/*
+					 * Object userValue = EntityUtils.convertTextValue(property, parser.getText(),
+					 * null); if (userValue != null) { result.put(fieldName, userValue); }
+					 */
 				}
 			}
 		} catch (IOException e) {

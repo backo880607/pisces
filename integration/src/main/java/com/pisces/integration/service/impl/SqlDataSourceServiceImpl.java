@@ -43,8 +43,7 @@ abstract class SqlDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegist
 	}
 	
 	@Override
-	public DataConfig getDataConfig() {
-		return null;
+	public void modifyConfig(DataConfig config) {
 	}
 	
 	@Override
@@ -168,7 +167,7 @@ abstract class SqlDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegist
 	
 	@Override
 	public void write(int index, String data) throws Exception {
-		this.pstmt.setString(index, data);
+		this.pstmt.setString(index + 1, data);
 	}
 	
 	@Override
@@ -180,10 +179,5 @@ abstract class SqlDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegist
 	public void afterWriteTable(Scheme scheme) throws Exception {
 		this.conn.commit();
 		this.conn.setAutoCommit(true);
-	}
-	
-	@Override
-	public String obtainValue(EntityObject entity, Property property) {
-		return null;
 	}
 }

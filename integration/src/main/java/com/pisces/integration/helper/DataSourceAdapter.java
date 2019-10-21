@@ -4,13 +4,12 @@ import java.io.Closeable;
 import java.util.Collection;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.entity.Property;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
 
 public interface DataSourceAdapter extends Closeable {
-	DataConfig getDataConfig();
+	void modifyConfig(DataConfig config);
 	
 	boolean validConnection(DataSource dataSource, String tableName, boolean export) throws Exception;
 	boolean open(DataSource dataSource, String tableName, boolean export) throws Exception;
@@ -26,12 +25,4 @@ public interface DataSourceAdapter extends Closeable {
 	void write(int index, String data) throws Exception;
 	void afterWriteEntity(EntityObject entity) throws Exception;
 	void afterWriteTable(Scheme scheme) throws Exception;
-	
-	/**
-	 * 自定义获取对象属性的值
-	 * @param entity
-	 * @param property
-	 * @return 返回null，则获取默认的值
-	 */
-	String obtainValue(EntityObject entity, Property property);
 }

@@ -126,7 +126,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 						EntityObject entity = (EntityObject)rootValue;
 						List<Property> properties = AppUtils.getPropertyService().getPrimaries(entity.getClass());
 						for (Property property : properties) {
-							info.getEntity().put(property.getName(), EntityUtils.getTextValue(entity, property));
+							//info.getEntity().put(property.getName(), EntityUtils.getTextValue(entity, property, null));
 						}
 					} else if (info.getValue() == null) {
 						info.setValue(rootValue.toString());

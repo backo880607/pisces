@@ -20,9 +20,10 @@ public class PrimaryKeyValidator implements ConstraintValidator<PrimaryKey, Enti
 	
 	@Override
 	public boolean isValid(EntityObject value, ConstraintValidatorContext context) {
-		List<Property> properties = AppUtils.getPropertyService().getPrimaries(value.getClass());
+		return true;
+		/*List<Property> properties = AppUtils.getPropertyService().getPrimaries(value.getClass());
 		String key = StringUtils.join(properties, "\t", (Property property) -> {
-			return EntityUtils.getTextValue(value, property);
+			return EntityUtils.getTextValue(value, property, null);
 		});
 		
 		Set<String> primaryKeys = new HashSet<>();
@@ -31,13 +32,13 @@ public class PrimaryKeyValidator implements ConstraintValidator<PrimaryKey, Enti
 			List<? extends EntityObject> entities = service.getAll();
 			for (EntityObject entity : entities) {
 				String temp = StringUtils.join(properties, "\t", (Property property) -> {
-					return EntityUtils.getTextValue(entity, property);
+					return EntityUtils.getTextValue(entity, property, null);
 				});
 				
 				primaryKeys.add(temp);
 			}
 		}
 		
-		return !primaryKeys.contains(key);
+		return !primaryKeys.contains(key);*/
 	}
 }

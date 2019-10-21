@@ -24,6 +24,7 @@ import com.pisces.core.primary.propagate.graph.Graph;
 import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.service.EntityService;
+import com.pisces.core.utils.Primary;
 
 public class Propagate {
 	private static int maxId = 0;
@@ -52,7 +53,7 @@ public class Propagate {
 		Map<Sign, Data> datas = cache.get(clazz);
 		Data result =  datas != null ? datas.get(sign) : null;
 		if (result == null) {
-			Class<EntityObject> superClass = Ioc.getEntityClass(clazz, sign);
+			Class<? extends EntityObject> superClass = Primary.get().getSuperClass(clazz);
 			if (superClass != null) {
 				result = Propagate.getData(superClass, sign);
 			}

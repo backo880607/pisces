@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 
 import com.pisces.core.annotation.Relation;
 import com.pisces.core.entity.EntityCoding;
-import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.relation.Type;
 import com.pisces.integration.enums.IMPORT_TYPT;
@@ -25,8 +24,6 @@ public class Scheme extends EntityCoding {
 	private String inName;
 	
 	public static final Sign schemeGroup = sign();
-	@Relation(clazz="DataSource", type=Type.MultiToOne)
-	public static final Sign dataSource = sign();
 	
 	@Relation(clazz="FieldInfo", type=Type.OneToMulti, owner=true)
 	public static final Sign fields = sign();
@@ -82,22 +79,14 @@ public class Scheme extends EntityCoding {
 	}
 
 	public SchemeGroup getSchemeGroup() {
-		return getEntity(schemeGroup);
+		return get(schemeGroup);
 	}
 	
 	public void setSchemeGroup(SchemeGroup schemeGroup) {
-		Ioc.set(this, Scheme.schemeGroup, schemeGroup);
-	}
-	
-	public final DataSource getDataSource() {
-		return getEntity(dataSource);
-	}
-	
-	public void setDataSource(DataSource dataSource) {
-		Ioc.set(this, Scheme.dataSource, dataSource);
+		set(Scheme.schemeGroup, schemeGroup);
 	}
 	
 	public final Collection<FieldInfo> getFields() {
-		return getEntities(fields);
+		return getList(fields);
 	}
 }

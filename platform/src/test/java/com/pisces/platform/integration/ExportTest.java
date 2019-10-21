@@ -36,20 +36,7 @@ public class ExportTest extends PiscesBaseTest {
 	@Autowired
 	private DepartmentService departmentService;
 	
-	private SchemeGroup obtainGroup() {
-		SchemeGroup group = schemeGroupService.get((SchemeGroup temp)->{
-			return temp.getType() == SCHEME_TYPE.Export;
-		});
-		if (group == null) {
-			group = schemeGroupService.create();
-			group.setCode("导出数据");
-			group.setType(SCHEME_TYPE.Export);
-			schemeGroupService.insert(group);
-		}
-		return group;
-	}
-	
-	private void exportDepartment(DataSource dataSource, SchemeGroup group) {
+	private void exportDepartment(SchemeGroup group) {
 		if (departmentService.get() == null) {
 			for (int i = 0; i < 10; ++i) {
 				Department department = departmentService.create();
@@ -59,11 +46,10 @@ public class ExportTest extends PiscesBaseTest {
 		}
 		
 		Scheme scheme = schemeService.get((Scheme temp)->{
-			return temp.getDataSource() == dataSource && temp.getSchemeGroup() == group && temp.getInName().equals(Department.class.getSimpleName());
+			return temp.getSchemeGroup() == group && temp.getInName().equals(Department.class.getSimpleName());
 		});
 		if (scheme == null) {
 			scheme = schemeService.create();
-			scheme.setDataSource(dataSource);
 			scheme.setSchemeGroup(group);
 			scheme.setInName("Department");
 			scheme.setOutName("Department");
@@ -71,29 +57,38 @@ public class ExportTest extends PiscesBaseTest {
 		}
 	}
 	
+	private void execute(DataSource dataSource) {
+		SchemeGroup group = schemeGroupService.get((SchemeGroup temp)->{
+			return temp.getType() == SCHEME_TYPE.Export && temp.getDataSource() == dataSource;
+		});
+		if (group == null) {
+			group = schemeGroupService.create();
+			group.setCode("导出数据");
+			group.setType(SCHEME_TYPE.Export);
+			group.setDataSource(dataSource);
+			schemeGroupService.insert(group);
+		}
+		exportDepartment(group);
+		schemeGroupService.execute(group);
+	}
+	
 	// @Test
 	public void excelTest() {
-		SchemeGroup group = obtainGroup();
-		
 		DsLocaleFile excel = localeFileService.get((DsLocaleFile temp) -> {
 			return temp.getType() == LOCALE_FILE_TYPE.XLS;
 		});
 		if (excel == null) {
 			excel = localeFileService.create();
 			excel.setCode("本地excel");
-			excel.setHost("D:\\Export");
-			excel.setType(LOCALE_FILE_TYPE.XLS);
+			excel.setHost("D:\\Export\\部门.xlsx");
+			excel.setType(LOCALE_FILE_TYPE.XLSX);
 			localeFileService.insert(excel);
 		}
-		exportDepartment(excel, group);
-		
-		schemeGroupService.execute(group);
+		execute(excel);
 	}
 	
 	// @Test
 	public void csvTest() {
-		SchemeGroup group = obtainGroup();
-		
 		DsLocaleFile csv = localeFileService.get((DsLocaleFile temp) -> {
 			return temp.getType() == LOCALE_FILE_TYPE.CSV;
 		});
@@ -104,14 +99,12 @@ public class ExportTest extends PiscesBaseTest {
 			csv.setType(LOCALE_FILE_TYPE.CSV);
 			localeFileService.insert(csv);
 		}
-		exportDepartment(csv, group);
 		
-		schemeGroupService.execute(group);
+		execute(csv);
 	}
 	
 	// @Test
 	public void jsonFileTest() {
-		SchemeGroup group = obtainGroup();
 		DsLocaleFile jsonFile = localeFileService.get((DsLocaleFile temp) -> {
 			return temp.getType() == LOCALE_FILE_TYPE.JSON;
 		});
@@ -122,14 +115,11 @@ public class ExportTest extends PiscesBaseTest {
 			jsonFile.setType(LOCALE_FILE_TYPE.JSON);
 			localeFileService.insert(jsonFile);
 		}
-		exportDepartment(jsonFile, group);
-		
-		schemeGroupService.execute(group);
+		execute(jsonFile);
 	}
 	
 	// @Test
 	public void xmlFileTest() {
-		SchemeGroup group = obtainGroup();
 		DsLocaleFile xmlFile = localeFileService.get((DsLocaleFile temp) -> {
 			return temp.getType() == LOCALE_FILE_TYPE.XML;
 		});
@@ -140,15 +130,12 @@ public class ExportTest extends PiscesBaseTest {
 			xmlFile.setType(LOCALE_FILE_TYPE.XML);
 			localeFileService.insert(xmlFile);
 		}
-		exportDepartment(xmlFile, group);
-			
-		schemeGroupService.execute(group);
+		
+		execute(xmlFile);
 	}
 	
-	@Test
+	// @Test
 	public void mysqlTest() {
-		SchemeGroup group = obtainGroup();
-		
 		DsSql mySql = sqlService.get((DsSql temp) -> {
 			return temp.getType() == SQL_TYPE.MYSQL;
 		});
@@ -161,14 +148,12 @@ public class ExportTest extends PiscesBaseTest {
 			mySql.setPassword("880607");
 			sqlService.insert(mySql);
 		}
-		exportDepartment(mySql, group);
 		
-		schemeGroupService.execute(group);
+		execute(mySql);
 	}
 	
-	// @Test
+	@Test
 	public void sqlServerTest() {
-		SchemeGroup group = obtainGroup();
 		DsSql sqlServer = sqlService.get((DsSql temp) -> {
 			return temp.getType() == SQL_TYPE.SQLSERVER;
 		});
@@ -182,14 +167,11 @@ public class ExportTest extends PiscesBaseTest {
 			sqlServer.setType(SQL_TYPE.SQLSERVER);
 			sqlService.insert(sqlServer);
 		}
-		exportDepartment(sqlServer, group);
-		
-		schemeGroupService.execute(group);
+		execute(sqlServer);
 	}
 	
 	// @Test
 	public void sqliteTest() {
-		SchemeGroup group = obtainGroup();
 		DsSql sqlite = sqlService.get((DsSql temp) -> {
 			return temp.getType() == SQL_TYPE.SQLITE;
 		});
@@ -203,14 +185,11 @@ public class ExportTest extends PiscesBaseTest {
 			sqlite.setType(SQL_TYPE.SQLITE);
 			sqlService.insert(sqlite);
 		}
-		exportDepartment(sqlite, group);
-		
-		schemeGroupService.execute(group);
+		execute(sqlite);
 	}
 	
 	// @Test
 	public void oracleTest() {
-		SchemeGroup group = obtainGroup();
 		DsSql oracle = sqlService.get((DsSql temp) -> {
 			return temp.getType() == SQL_TYPE.ORACLE;
 		});
@@ -224,8 +203,6 @@ public class ExportTest extends PiscesBaseTest {
 			oracle.setType(SQL_TYPE.ORACLE);
 			sqlService.insert(oracle);
 		}
-		exportDepartment(oracle, group);
-		
-		schemeGroupService.execute(group);
+		execute(oracle);
 	}
 }

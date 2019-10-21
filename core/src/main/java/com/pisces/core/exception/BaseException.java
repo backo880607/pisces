@@ -1,5 +1,7 @@
 package com.pisces.core.exception;
 
+import com.pisces.core.entity.Property;
+
 /**
  *  异常基类，所有需要进行多语言提示的异常均由此类派生。
  *  一下列出Java内置的异常，使用此类异常时不应暴露给用户，且不需要进行多语言化。
@@ -33,6 +35,7 @@ public class BaseException extends RuntimeException {
 	
 	private Enum<?> key;
 	private Object[] args;
+	private Property property;
 	
 	public BaseException(Enum<?> key, Object... args) {
 		this.key = key;
@@ -49,5 +52,13 @@ public class BaseException extends RuntimeException {
 
 	public Object[] getArgs() {
 		return args;
+	}
+
+	public Property getProperty() {
+		return property;
+	}
+
+	public void setProperty(Property property) {
+		this.property = property;
 	}
 }

@@ -10,9 +10,9 @@ import javax.persistence.Id;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pisces.core.enums.CREATE_UPDATE_TYPE;
 import com.pisces.core.enums.ENTITY_STATUS;
+import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.Sign;
-import com.pisces.core.utils.DateUtils;
 import com.pisces.core.utils.IDGenerator;
 import com.pisces.core.utils.Primary;
 
@@ -64,8 +64,8 @@ public class EntityObject implements Comparable<EntityObject> {
 		id = IDGenerator.instance.getID();
 		createBy = "";
 		updateBy = "";
-		createDate = DateUtils.INVALID;
-		updateDate = DateUtils.INVALID;
+		createDate = new Date();
+		updateDate = createDate;
 		createType = CREATE_UPDATE_TYPE.SYSTEM;
 		updateType = CREATE_UPDATE_TYPE.SYSTEM;
 		status = ENTITY_STATUS.ENABLE;
@@ -113,13 +113,17 @@ public class EntityObject implements Comparable<EntityObject> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends EntityObject> T getEntity(Sign sign) {
+	public <T extends EntityObject> T get(Sign sign) {
 		return (T)this.relations.get(sign).get();
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends EntityObject> Collection<T> getEntities(Sign sign) {
+	public <T extends EntityObject> Collection<T> getList(Sign sign) {
 		return (Collection<T>)this.relations.get(sign).collection();
+	}
+	
+	public void set(Sign sign, EntityObject relaEntity) {
+		Ioc.set(this, sign, relaEntity);
 	}
 	
 	public Object getUserFields(String name) {

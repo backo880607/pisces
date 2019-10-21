@@ -10,9 +10,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
+import com.pisces.core.entity.BaseDeserializer;
 import com.pisces.core.entity.MultiEnum;
+import com.pisces.core.entity.Property;
 
-public class MultiEnumDeserializer extends JsonDeserializer<MultiEnum<? extends Enum<?>>> implements ContextualDeserializer {
+public class MultiEnumDeserializer extends BaseDeserializer<MultiEnum<? extends Enum<?>>> implements ContextualDeserializer {
 	private Class<? extends MultiEnum<? extends Enum<?>>> clazz;
 
 	@Override
@@ -38,15 +40,15 @@ public class MultiEnumDeserializer extends JsonDeserializer<MultiEnum<? extends 
 		return deser;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public MultiEnum<? extends Enum<?>> getNullValue(DeserializationContext ctxt) throws JsonMappingException {
+	public MultiEnum<? extends Enum<?>> deserialize(Property property, String value) {
 		MultiEnum<? extends Enum<?>> result = null;
 		try {
-			result = clazz.newInstance();
+			result = (MultiEnum<? extends Enum<?>>)property.clazz.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
 		}
-		
+		result.parse(value);
 		return result;
 	}
 }

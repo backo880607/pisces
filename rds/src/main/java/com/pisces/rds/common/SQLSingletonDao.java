@@ -14,6 +14,7 @@ import com.pisces.core.dao.DaoManager;
 import com.pisces.core.dao.impl.DaoImpl;
 import com.pisces.core.dao.impl.SingletonModifyDaoImpl;
 import com.pisces.core.entity.EntityObject;
+import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 
 import tk.mybatis.mapper.common.Mapper;
@@ -134,15 +135,14 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
 			try {
 				this.impl.get().record = entityClass.newInstance();
 				this.impl.get().record.init();
+				this.impl.get().record.setCreateBy(AppUtils.getUsername());
+				this.impl.get().record.setUpdateBy(AppUtils.getUsername());
 			} catch (InstantiationException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
 			mapper.insert(this.impl.get().record);
 		} else {
-			for (T object : objects) {
-				impl.get().record = object;
-				break;
-			}
+			impl.get().record = objects.get(0);
 		}
 		
 		this.impl.get().modified = false;

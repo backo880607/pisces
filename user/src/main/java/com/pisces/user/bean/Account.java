@@ -12,7 +12,6 @@ import org.hibernate.validator.constraints.Length;
 import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
 import com.pisces.core.annotation.Relation;
-import com.pisces.core.entity.EffectTaskType;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.relation.RelationKind;
 import com.pisces.core.relation.Sign;
@@ -28,18 +27,14 @@ public class Account extends EntityObject {
 	private Boolean accountExpired;
 	private Boolean accountLocked;
 	private Boolean credentialsExpired;
-	private Boolean disabled;
 	@Email
 	private String email;
 	@Pattern(regexp = "^1(3|4|5|7|8)\\d{9}$")
     @NotBlank()
     private String telephone;
     private Boolean sex;
-    private EffectTaskType type = new EffectTaskType(EffectTaskType.Impl.Manuf);
     
-    @Relation(clazz = "Tenant", sign = "user", type = Type.MultiToMulti)
-    @PropertyMeta(kind = RelationKind.Set)
-    public static final Sign tenants = sign();
+    public static final Sign department = sign();
     
     @Relation(clazz = "Role", type=Type.MultiToMulti)
     @PropertyMeta(kind = RelationKind.Set)
@@ -54,7 +49,6 @@ public class Account extends EntityObject {
     	accountExpired = false;
     	accountLocked = false;
     	credentialsExpired = false;
-    	disabled = false;
     	email = "";
     	telephone = "";
     	sex = true;
@@ -108,14 +102,6 @@ public class Account extends EntityObject {
 		this.credentialsExpired = credentialsExpired;
 	}
 
-	public Boolean getDisabled() {
-		return disabled;
-	}
-
-	public void setDisabled(Boolean disabled) {
-		this.disabled = disabled;
-	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -140,19 +126,15 @@ public class Account extends EntityObject {
 		this.sex = sex;
 	}
 	
-	public Collection<Tenant> getTenants() {
-		return getEntities(tenants);
+	public Department getDepartment() {
+		return get(department);
+	}
+	
+	public void setDepartment(Department department) {
+		set(Account.department, department);
 	}
 	
 	public Collection<Role> getRoles() {
-		return getEntities(roles);
-	}
-
-	public EffectTaskType getType() {
-		return type;
-	}
-
-	public void setType(EffectTaskType type) {
-		this.type = type;
+		return getList(roles);
 	}
 }

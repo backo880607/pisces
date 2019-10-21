@@ -5,8 +5,10 @@ import java.util.Date;
 
 import javax.persistence.Table;
 
+import com.pisces.core.annotation.Relation;
 import com.pisces.core.entity.EntityCoding;
 import com.pisces.core.relation.Sign;
+import com.pisces.core.relation.Type;
 import com.pisces.core.utils.DateUtils;
 
 @Table(name = "USER_TENANT")
@@ -15,7 +17,8 @@ public class Tenant extends EntityCoding {
 	private Integer maxLoginQty;
 	private Integer maxAccountQty;
 	
-	public static final Sign user = sign();
+	@Relation(clazz = "Department", sign = "tenant", type = Type.OneToMulti)
+	public static final Sign departments = sign();
 	
 	@Override
 	public void init() {
@@ -49,7 +52,7 @@ public class Tenant extends EntityCoding {
 		this.maxAccountQty = maxAccountQty;
 	}
 
-	public Collection<Account> getUser() {
-		return getEntities(user);
+	public Collection<Department> getDepartments() {
+		return getList(departments);
 	}
 }

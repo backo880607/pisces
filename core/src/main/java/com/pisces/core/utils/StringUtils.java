@@ -48,12 +48,12 @@ public class StringUtils {
 	}
 	
 	public static String getHead(String value, String sep) {
-		int index = value.indexOf(sep);
+		final int index = value.indexOf(sep);
 		return index >= 0 ? value.substring(0, index) : "";
 	}
 	
 	public static String getTail(String value, String sep) {
-		int index = value.lastIndexOf(sep);
-		return index >= 0 ? value.substring(index) : "";
+		final int index = value.lastIndexOf(sep);
+		return index >= 0 ? value.substring(index + sep.length()) : "";
 	}
 }

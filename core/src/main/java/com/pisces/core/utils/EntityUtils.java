@@ -1,6 +1,5 @@
 package com.pisces.core.utils;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,21 +17,24 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.pisces.core.annotation.PrimaryKey;
 import com.pisces.core.annotation.PropertyMeta;
-import com.pisces.core.converter.DurationDeserializer;
-import com.pisces.core.converter.DurationSerializer;
+import com.pisces.core.converter.DateSerializer;
 import com.pisces.core.converter.DateTimeDeserializer;
 import com.pisces.core.converter.DateTimeSerializer;
-import com.pisces.core.converter.EntitySerializerModifier;
+import com.pisces.core.converter.DurationDeserializer;
+import com.pisces.core.converter.DurationSerializer;
+import com.pisces.core.converter.EntityListSerializer;
+import com.pisces.core.converter.EntitySerializer;
 import com.pisces.core.converter.NullValueSerializer;
 import com.pisces.core.converter.SignFieldHandler;
 import com.pisces.core.converter.SqlDateJsonDeserializer;
 import com.pisces.core.converter.SqlDateJsonSerializer;
+import com.pisces.core.converter.TimeSerializer;
 import com.pisces.core.entity.DateDur;
+import com.pisces.core.entity.EntityMapper;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.MultiEnum;
 import com.pisces.core.entity.Property;
@@ -203,10 +205,12 @@ public class EntityUtils {
 			property.setIsUnique(meta.unique());
 			property.setModifiable(meta.modifiable());
 			property.setLarge(meta.large());
+			property.setPreci(meta.preci());
 			if (meta.type() != PROPERTY_TYPE.NONE) {
 				property.setType(meta.type());
 			}
 		}
+		
 		if (property.getMethod == null) {
 			throw new NoSuchMethodException(clazz.getName() + "`s Field " + property.getCode() + " has not get method!");
 		}
@@ -314,8 +318,6 @@ public class EntityUtils {
 		PROPERTY_TYPE type = PROPERTY_TYPE.NONE;
 		if (clazz == Boolean.class || clazz == boolean.class) {
 			type = PROPERTY_TYPE.BOOLEAN;
-		} else if (clazz == Character.class || clazz == char.class) {
-			type = PROPERTY_TYPE.CHAR;
 		} else if (clazz == Short.class || clazz == short.class) {
 			type = PROPERTY_TYPE.LONG;
 		} else if (clazz == Integer.class || clazz == int.class) {
@@ -329,7 +331,7 @@ public class EntityUtils {
 		} else if (clazz == String.class) {
 			type = PROPERTY_TYPE.STRING;
 		} else if (clazz == Date.class) {
-			type = PROPERTY_TYPE.DATE;
+			type = PROPERTY_TYPE.DATE_TIME;
 		} else if (clazz == DateDur.class) {
 			type = PROPERTY_TYPE.DURATION;
 		} else if (Enum.class.isAssignableFrom(clazz)) {
@@ -347,7 +349,7 @@ public class EntityUtils {
 	}
 	
 	public static Object getValue(EntityObject entity, Property property) {
-		if (property.getMethod == null) {
+		if (entity == null || property == null || property.getMethod == null) {
 			return null;
 		}
 		
@@ -370,26 +372,8 @@ public class EntityUtils {
 		return value;
 	}
 	
-	
-	public static String getTextValue(EntityObject entity, Property property) {
-		if (property.getType() == PROPERTY_TYPE.ENTITY || property.getType() == PROPERTY_TYPE.LIST) {
-			throw new UnsupportedOperationException();
-		}
-		
-		Object value = getValue(entity, property);
-		if (value == null) {
-			return "";
-		}
-		
-		try {
-			return defaultObjectMapper().writeValueAsString(value);
-		} catch (JsonProcessingException e) {
-			throw new UnsupportedOperationException();
-		}
-	}
-	
 	public static void setValue(EntityObject entity, Property property, Object value) {
-		if (property.setMethod == null || value == null || !property.getModifiable()) {
+		if (entity == null || property == null || property.setMethod == null || value == null || !property.getModifiable()) {
 			return;
 		}
 		
@@ -404,28 +388,26 @@ public class EntityUtils {
 		}
 	}
 	
-	public static Object convertTextValue(Property property, String str) {
-		if (property.getType() == PROPERTY_TYPE.ENTITY || property.getType() == PROPERTY_TYPE.LIST) {
-			throw new UnsupportedOperationException();
-		}
-		
-		try {
-			return defaultObjectMapper().readValue(str, property.clazz);
-		} catch (IOException e) {
-			throw new UnsupportedOperationException();
-		}
-	}
-	
-	public static void setTextValue(EntityObject entity, Property property, String str) {
-		setValue(entity, property, convertTextValue(property, str));
-	}
-	
-	/**
-	 * 获取默认的Jackson序列化Mapper
-	 * @return
+	/*
+	 * public static Object convertTextValue(Property property, String str,
+	 * ObjectMapper mapper) { if (property.getType() == PROPERTY_TYPE.ENTITY ||
+	 * property.getType() == PROPERTY_TYPE.LIST) { throw new
+	 * UnsupportedOperationException(); }
+	 * 
+	 * if (mapper == null) { mapper = defaultObjectMapper(); }
+	 * 
+	 * try { return mapper.readValue(str, property.clazz); } catch (IOException e) {
+	 * throw new UnsupportedOperationException(); } }
 	 */
-	public static ObjectMapper createObjectMapper() {
-		ObjectMapper mapper = new ObjectMapper();
+	
+	/*
+	 * public static void setTextValue(EntityObject entity, Property property,
+	 * String str, ObjectMapper mapper) { setValue(entity, property,
+	 * convertTextValue(property, str, mapper)); }
+	 */
+	
+	public static EntityMapper createEntityMapper() {
+		EntityMapper mapper = new EntityMapper();
 		SimpleModule module = new SimpleModule();
         module.addSerializer(Date.class, new DateTimeSerializer());
         module.addDeserializer(Date.class, new DateTimeDeserializer());
@@ -433,10 +415,14 @@ public class EntityUtils {
         module.addDeserializer(java.sql.Date.class, new SqlDateJsonDeserializer());
         module.addSerializer(DateDur.class, new DurationSerializer());
         module.addDeserializer(DateDur.class, new DurationDeserializer());
-        mapper.addHandler(new SignFieldHandler());
+        mapper.addHandler(new SignFieldHandler(mapper));
         mapper.getSerializerProvider().setNullValueSerializer(new NullValueSerializer());
-        mapper.setSerializerFactory(mapper.getSerializerFactory().withSerializerModifier(new EntitySerializerModifier()));
+        mapper.bind();
         mapper.registerModule(module);
+        mapper.register(PROPERTY_TYPE.ENTITY, new EntitySerializer());
+        mapper.register(PROPERTY_TYPE.LIST, new EntityListSerializer());
+        mapper.register(PROPERTY_TYPE.DATE, new DateSerializer());
+        mapper.register(PROPERTY_TYPE.TIME, new TimeSerializer());
         mapper.setDefaultSetterInfo(JsonSetter.Value.construct(Nulls.SKIP, Nulls.SKIP));
         return mapper;
 	}
@@ -446,7 +432,7 @@ public class EntityUtils {
 		if (defaultMapper.get() == null) {
 			synchronized (EntityUtils.class) {
 				if (defaultMapper.get() == null) {
-					defaultMapper.set(createObjectMapper());
+					defaultMapper.set(createEntityMapper());
 				}
 			}
 		}

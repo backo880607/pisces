@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.service.EntityService;
 import com.pisces.core.service.ServiceManager;
@@ -31,7 +30,7 @@ public class DaoHelper {
 							continue;
 						}
 						EntityObject relaEntity = relaService.getById(id);
-						Ioc.set(entity, entryData.getKey(), relaEntity);
+						entity.set(entryData.getKey(), relaEntity);
 					}
 				}
 			}

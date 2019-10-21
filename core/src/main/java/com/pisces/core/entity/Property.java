@@ -54,7 +54,7 @@ public class Property extends EntityCoding implements Serializable {
 		inherent = false;
 		isUnique = false;
 		modifiable = true;
-		preci = 7;
+		preci = 2;
 		tips = "";
 		expression = "";
 		primaryKey = false;

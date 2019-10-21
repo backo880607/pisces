@@ -1,10 +1,14 @@
 package com.pisces.integration.helper;
 
+import com.pisces.core.entity.EntityMapper;
+import com.pisces.core.utils.EntityUtils;
+
 public class DataConfig {
 	private String sepField;
 	private String sepEntity;
 	private String replaceField = "▲";
 	private String replaceEntity = "◆";
+	private EntityMapper mapper = EntityUtils.createEntityMapper();
 	
 	public String getSepField() {
 		return sepField;
@@ -36,5 +40,13 @@ public class DataConfig {
 	
 	public void setReplaceEntity(String replaceEntity) {
 		this.replaceEntity = replaceEntity;
+	}
+
+	public EntityMapper getMapper() {
+		return mapper;
+	}
+
+	public void setMapper(EntityMapper mapper) {
+		this.mapper = mapper;
 	}
 }

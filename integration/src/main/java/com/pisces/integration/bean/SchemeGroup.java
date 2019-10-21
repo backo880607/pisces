@@ -16,6 +16,9 @@ public class SchemeGroup extends EntityCoding {
 	@NotNull
 	private SCHEME_TYPE type;
 	
+	@Relation(clazz="DataSource", type=Type.MultiToOne)
+	public static final Sign dataSource = sign();
+	
 	@Relation(clazz="Scheme", sign="schemeGroup", type=Type.OneToMulti, owner=true)
 	public static final Sign schemes = sign();
 	
@@ -34,6 +37,14 @@ public class SchemeGroup extends EntityCoding {
 	}
 	
 	public final Collection<Scheme> getSchemes() {
-		return this.getEntities(schemes);
+		return this.getList(schemes);
+	}
+	
+	public final DataSource getDataSource() {
+		return get(dataSource);
+	}
+	
+	public void setDataSource(DataSource dataSource) {
+		set(SchemeGroup.dataSource, dataSource);
 	}
 }

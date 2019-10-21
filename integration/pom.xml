@@ -31,8 +31,8 @@
       <version>${rds.version}</version>
 	</dependency>
 	<dependency>
-      <groupId>com.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
+      <groupId>net.sf.supercsv</groupId>
+      <artifactId>super-csv</artifactId>
     </dependency>
   </dependencies>
 

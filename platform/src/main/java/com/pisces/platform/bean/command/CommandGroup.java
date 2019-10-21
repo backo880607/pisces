@@ -33,6 +33,6 @@ public class CommandGroup extends EntityObject {
 	}
 	
 	public Collection<Command> getCommands() {
-		return getEntities(commands);
+		return getList(commands);
 	}
 }

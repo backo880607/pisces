@@ -13,14 +13,13 @@ import com.pisces.core.service.ServiceManager;
 import com.pisces.core.utils.Primary;
 
 public class Ioc {
-	
 	//private static native int getRelationType(Class<?> cls, int sign);
 	//private static native int getRelationReverseSign(Class<?> cls, int sign);
 	//private static native Class<?> getEntityClass(Class<?> cls, int sign);
 	//public static native Class<?> getEntityClassByName(Class<?> cls, String sign);
 
 	public static <T extends EntityObject> T get(EntityObject entity, Sign sign) {
-		return entity.getEntity(sign);
+		return entity.get(sign);
 	}
 	
 	public static <T extends EntityObject> T get(EntityObject entity, Predicate<T> filter, Sign sign,
@@ -57,17 +56,16 @@ public class Ioc {
 	}
 	
 	public static <T extends EntityObject> Collection<T> getList(EntityObject entity, Sign sign) {
-		return entity.getEntities(sign);
+		return entity.getList(sign);
 	}
 	
 	public static <T extends EntityObject> Collection<T> getList(EntityObject entity, Sign sign, Sign... args) {
 		return getList(entity, null, sign, args);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static <T extends EntityObject> Collection<T> getList(EntityObject entity, Predicate<T> filter, Sign sign,
 			Sign... args) {
-		Collection<EntityObject> result = new ArrayList<>();
+		Collection<T> result = new ArrayList<>();
 		Collection<EntityObject> relaEntities = getList(entity, sign);
 		for (EntityObject relaEntity : relaEntities) {
 			getListImpl(result, relaEntity, filter, args, 0);
@@ -89,11 +87,11 @@ public class Ioc {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static <T extends EntityObject> void getListImpl(Collection<EntityObject> result, EntityObject entity, Predicate<T> filter,
+	private static <T extends EntityObject> void getListImpl(Collection<T> result, EntityObject entity, Predicate<T> filter,
 			Sign[] args, int index) {
 		if (index >= args.length) {
 			if (filter == null || filter.test((T) entity)) {
-				result.add(entity);
+				result.add((T)entity);
 			}
 		} else {
 			Collection<EntityObject> relaEntities = getList(entity, args[index]);
@@ -111,21 +109,55 @@ public class Ioc {
 		}
 	}
 	
+	public static <T extends EntityObject> Collection<T> lastList(EntityObject entity, Sign... args) {
+		Collection<T> result = new ArrayList<T>();
+		lastListImpl(result, entity, null, args, 0);
+		return result;
+	}
+	
+	public static <T extends EntityObject> Collection<T> lastList(EntityObject entity, Predicate<T> filter, Sign... args) {
+		Collection<T> result = new ArrayList<T>();
+		lastListImpl(result, entity, filter, args, 0);
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private final static <T extends EntityObject> boolean lastListImpl(Collection<T> result, EntityObject entity, Predicate<T> filter,
+			Sign[] args, int index) {
+		if (index >= args.length) {
+			index = 0;
+		}
+
+		boolean bNotLast = true;
+		Collection<EntityObject> relaEntities = getList(entity, args[index]);
+		for (EntityObject relaEntity : relaEntities) {
+			if (lastListImpl(result, relaEntity, filter, args, index + 1)) {
+				result.add((T)relaEntity);
+				bNotLast = false;
+			}
+		}
+		return index == 0 && bNotLast;
+	}
+	
 	public static void set(EntityObject entity, Sign sign, EntityObject relaEntity) {
-		if (entity == null || relaEntity == null || sign == null) {
+		if (entity == null || sign == null) {
+			return;
+		}
+		if (relaEntity == null) {
+			remove(entity, sign);
 			return;
 		}
 		final Sign reverse = Primary.get().getRelationReverse(entity.getClass(), sign);
 		switch (Primary.get().getRelationType(entity.getClass(), sign)) {
 		case OneToOne:
-			clear(entity, sign);
-			clear(relaEntity, reverse);
+			remove(entity, sign);
+			remove(relaEntity, reverse);
 			break;
 		case OneToMulti:
-			clear(relaEntity, reverse);
+			remove(relaEntity, reverse);
 			break;
 		case MultiToOne:
-			clear(entity, sign);
+			remove(entity, sign);
 			break;
 		case MultiToMulti:
 			break;
@@ -142,32 +174,24 @@ public class Ioc {
 		}
 	}
 	
-	public static void clear(EntityObject entity, Sign sign) {
+	public static void remove(EntityObject entity, Sign sign) {
 		if (entity == null || sign == null) {
 			return;
 		}
+		
 		Sign reverse = Primary.get().getRelationReverse(entity.getClass(), sign);
 		if (reverse != null) {
-			for (EntityObject relaEntity : entity.getEntities(sign)) {
+			for (EntityObject relaEntity : entity.getList(sign)) {
 				relaEntity.getRelations().get(reverse).remove(entity);
 			}
 		}
 		entity.getRelations().get(sign).clear();
 	}
 	
-	public static void remove(EntityObject entity, Sign sign) {
-		Sign reverse = Primary.get().getRelationReverse(entity.getClass(), sign);
-		if (reverse != null) {
-			for (EntityObject relaEntity : entity.getEntities(sign)) {
-				if (relaEntity != null) {
-					relaEntity.getRelations().get(reverse).remove(entity);
-				}
-			}
-		}
-		entity.getRelations().get(sign).clear();
-	}
-	
 	public static void remove(EntityObject entity, Sign sign, EntityObject relaEntity) {
+		if (entity == null || sign == null || relaEntity == null) {
+			return;
+		}
 		Sign reverse = Primary.get().getRelationReverse(entity.getClass(), sign);
 		if (reverse != null) {
 			relaEntity.getRelations().get(reverse).remove(entity);
@@ -203,15 +227,6 @@ public class Ioc {
 				}
 			}
 		}
-	}
-	
-	public static <T extends EntityObject> Class<T> getEntityClass(EntityObject entity, Sign sign) {
-		return getEntityClass(entity.getClass(), sign);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static <T extends EntityObject> Class<T> getEntityClass(Class<? extends EntityObject> clazz, Sign sign) {
-		return (Class<T>) Primary.get().getRelationClass(clazz, sign);
 	}
 	
 	public static <T extends EntityObject> void recursion(EntityObject entity, Predicate<T> fun, Sign... args) {

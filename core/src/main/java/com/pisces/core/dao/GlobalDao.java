@@ -17,6 +17,7 @@ public class GlobalDao<T extends EntityObject> implements BaseDao<T> {
 		Class<T> clazz = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		try {
 			record = clazz.newInstance();
+			record.init();
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}

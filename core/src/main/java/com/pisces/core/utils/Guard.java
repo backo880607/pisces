@@ -78,7 +78,7 @@ public class Guard {
 	}
 	
 	public static long value(Date arg) {
-		return arg != null ? arg.getTime() : DateUtils.MIN.getTime();
+		return arg != null ? arg.getTime() : DateUtils.INVALID.getTime();
 	}
 	
 	public static long value(Date arg, long def) {

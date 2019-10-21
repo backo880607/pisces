@@ -25,9 +25,6 @@ public abstract class SQLProvider {
 		case BOOLEAN:
 			jdbcType = JdbcType.BIT;
 			break;
-		case CHAR:
-			jdbcType = JdbcType.CHAR;
-			break;
 		case LONG:
 			jdbcType = JdbcType.BIGINT;
 			break;
@@ -47,10 +44,10 @@ public abstract class SQLProvider {
 			jdbcType = JdbcType.VARCHAR;
 			break;
 		case ENUM:
-			jdbcType = JdbcType.INTEGER;
+			jdbcType = JdbcType.VARCHAR;
 			break;
 		case MULTI_ENUM:
-			jdbcType = JdbcType.INTEGER;
+			jdbcType = JdbcType.VARCHAR;
 			break;
 		case STRING:
 			jdbcType = large ? JdbcType.LONGVARCHAR : JdbcType.VARCHAR;

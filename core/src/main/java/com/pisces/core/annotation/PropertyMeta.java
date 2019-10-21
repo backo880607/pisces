@@ -14,6 +14,7 @@ public @interface PropertyMeta {
 	String name() default "";
 	boolean unique() default false;
 	boolean modifiable() default true;
+	short preci() default 2;
 	// 控制对外界是否可见，不可见的不会创建Property
 	// 若也不想进行持久化，请用transient修饰符。
 	boolean visiable() default true;

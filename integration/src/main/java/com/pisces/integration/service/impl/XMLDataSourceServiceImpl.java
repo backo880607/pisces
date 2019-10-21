@@ -3,7 +3,6 @@ package com.pisces.integration.service.impl;
 import java.util.Collection;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.entity.Property;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
@@ -13,8 +12,7 @@ import com.pisces.integration.helper.DataConfig;
 abstract class XMLDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegister<T> {
 
 	@Override
-	public DataConfig getDataConfig() {
-		return null;
+	public void modifyConfig(DataConfig config) {
 	}
 
 	@Override
@@ -76,10 +74,5 @@ abstract class XMLDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegist
 	@Override
 	public void afterWriteTable(Scheme scheme) throws Exception {
 		
-	}
-
-	@Override
-	public String obtainValue(EntityObject entity, Property property) {
-		return null;
 	}
 }

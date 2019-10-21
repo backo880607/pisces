@@ -12,10 +12,11 @@ import com.pisces.core.utils.EntityUtils;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
+import com.pisces.integration.bean.SchemeGroup;
 
 public abstract class IOHelper {
-	protected DataSourceAdapter adapter;
 	private DataConfig config;
+	protected DataSourceAdapter adapter;
 	protected PropertyService propertyService;
 	
 	public IOHelper() {
@@ -29,12 +30,15 @@ public abstract class IOHelper {
 		return this.config;
 	}
 	
-	public abstract void execute(Collection<Scheme> schemes);
+	public abstract void execute(SchemeGroup schemeGroup);
 	
 	protected void switchDataSourceService(DataSource dataSource) {
-		this.adapter = AdapterManager.getAdapter(dataSource);
-		if (this.adapter != null) {
-			this.config = this.adapter.getDataConfig();
+		adapter = AdapterManager.getAdapter(dataSource);
+		if (adapter != null) {
+			if (config == null) {
+				config = new DataConfig();
+			}
+			adapter.modifyConfig(config);
 		} else {
 			throw new UnsupportedOperationException("datasource " + dataSource.getName() + " not implement service class!");
 		}
@@ -65,9 +69,5 @@ public abstract class IOHelper {
 				throw new UnsupportedOperationException("invalid field " + field.getExternName() + " in table " + scheme.getOutName());
 			}
 		}
-	}
-	
-	protected void write(EntityObject entity, Property property, String value) {
-		EntityUtils.setTextValue(entity, property, value);
 	}
 }

@@ -5,7 +5,6 @@ import java.util.Collection;
 import org.springframework.stereotype.Service;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.entity.Property;
 import com.pisces.core.service.EntityServiceImpl;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
@@ -19,8 +18,7 @@ import com.pisces.platform.service.system.BackupDataService;
 public class BackupDataServiceImpl extends EntityServiceImpl<BackupData, BackupDataDao> implements BackupDataService {
 
 	@Override
-	public DataConfig getDataConfig() {
-		return null;
+	public void modifyConfig(DataConfig config) {
 	}
 
 	@Override
@@ -82,10 +80,5 @@ public class BackupDataServiceImpl extends EntityServiceImpl<BackupData, BackupD
 	@Override
 	public void afterWriteTable(Scheme scheme) throws Exception {
 		
-	}
-
-	@Override
-	public String obtainValue(EntityObject entity, Property property) {
-		return null;
 	}
 }

@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.entity.Property;
 import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.DsLocaleFile;
 import com.pisces.integration.bean.FieldInfo;
@@ -33,8 +32,7 @@ public abstract class DsExcelServiceImpl<T extends Enum<T>> extends AdapterRegis
 	protected abstract Workbook createBook(File file) throws Exception;
 	
 	@Override
-	public DataConfig getDataConfig() {
-		return null;
+	public void modifyConfig(DataConfig config) {
 	}
 
 	@Override
@@ -174,10 +172,5 @@ public abstract class DsExcelServiceImpl<T extends Enum<T>> extends AdapterRegis
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-	
-	@Override
-	public String obtainValue(EntityObject entity, Property property) {
-		return null;
 	}
 }

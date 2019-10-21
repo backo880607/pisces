@@ -7,7 +7,6 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.reflection.wrapper.BeanWrapper;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.relation.Ioc;
 import com.pisces.core.relation.RefBase;
 import com.pisces.core.relation.Sign;
 import com.pisces.core.utils.IDGenerator;
@@ -34,7 +33,7 @@ public class EntityBeanWrapper extends BeanWrapper {
 	public Object get(PropertyTokenizer prop) {
 		Sign sign = Primary.get().getRelationSign(this.entityClazz, prop.getName());
 		if (sign != null) {
-			Collection<EntityObject> relaEntities = Ioc.getList(this.entity, sign);
+			Collection<EntityObject> relaEntities = this.entity.getList(sign);
 			return StringUtils.join(relaEntities, ",", (EntityObject temp) -> {
 				return temp.getId().toString();
 			});

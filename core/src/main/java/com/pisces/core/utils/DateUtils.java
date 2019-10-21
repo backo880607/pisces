@@ -58,6 +58,8 @@ public class DateUtils {
 		return ZoneTime;
 	}
 	
+	public static boolean isValid(Date date) { return date != null && date != DateUtils.INVALID; }
+	
 	public static String format(Date date, String format) {
 		if (date == null || date.getTime() == 0 || date == DateUtils.INVALID) {
 			return "";

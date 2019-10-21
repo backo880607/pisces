@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import com.pisces.core.dao.BaseDao;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.relation.Ioc;
 import com.pisces.core.utils.AppUtils;
+import com.pisces.core.utils.DateUtils;
 import com.pisces.core.utils.IExpression;
 import com.pisces.core.utils.PageParam;
 import com.pisces.core.utils.Primary;
@@ -92,7 +94,15 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 		}
 		
 		sort(result, param.getOrderBy());
-		final int begin = (param.getPageNum() - 1) * param.getPageSize();
+		if (param.getPageSize() <= 0) {
+			return result;
+		}
+		
+		int begin = (param.getPageNum() - 1) * param.getPageSize();
+		if (begin < 0) {
+			begin = 0;
+		}
+		
 		final int end = Math.min(begin + param.getPageSize(), result.size());
 		return result.subList(begin, end);
 	}
@@ -131,12 +141,12 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 
 	@Override
 	public int insert(T entity) {
-		if (entity.getCreateBy() == null) {
+		if (StringUtils.isEmpty(entity.getCreateBy())) {
 			entity.setCreateBy(AppUtils.getUsername());
 		}
 		entity.setUpdateBy(AppUtils.getUsername());
 		
-		if (entity.getCreateDate() == null) {
+		if (!DateUtils.isValid(entity.getCreateDate())) {
 			entity.setCreateDate(new Date());
 		}
 		entity.setUpdateDate(new Date());
@@ -146,12 +156,12 @@ public abstract class EntityServiceImpl<T extends EntityObject, D extends BaseDa
 	@Override
 	public int insertList(List<T> entities) {
 		for (T entity : entities) {
-			if (entity.getCreateBy() == null) {
+			if (StringUtils.isEmpty(entity.getCreateBy())) {
 				entity.setCreateBy(AppUtils.getUsername());
 			}
 			entity.setUpdateBy(AppUtils.getUsername());
 			
-			if (entity.getCreateDate() == null) {
+			if (!DateUtils.isValid(entity.getCreateDate())) {
 				entity.setCreateDate(new Date());
 			}
 			entity.setUpdateDate(new Date());

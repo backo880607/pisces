@@ -1,27 +1,14 @@
 package com.pisces.user.bean;
 
-import com.pisces.core.entity.EntityCoding;
-
 import javax.persistence.Table;
 
-import com.pisces.core.entity.EffectTaskType;
+import com.pisces.core.entity.EntityCoding;
 
 @Table(name = "USER_DATA_SET")
 public class DataSet extends EntityCoding {
-	private EffectTaskType type;
 	
 	@Override
 	public void init() {
 		super.init();
-		type = new EffectTaskType(EffectTaskType.Impl.Manuf);
 	}
-
-	public EffectTaskType getType() {
-		return type;
-	}
-
-	public void setType(EffectTaskType type) {
-		this.type = type;
-	}
-	
 }

@@ -31,11 +31,11 @@ class SchemeGroupServiceImpl extends EntityServiceImpl<SchemeGroup, SchemeGroupD
 	
 	private void executeImport(SchemeGroup schemeGroup) {
 		ImportHelper helper = new ImportHelper();
-		helper.execute(schemeGroup.getSchemes());
+		helper.execute(schemeGroup);
 	}
 	
 	private void executeExport(SchemeGroup schemeGroup) {
 		ExportHelper helper = new ExportHelper();
-		helper.execute(schemeGroup.getSchemes());
+		helper.execute(schemeGroup);
 	}
 }

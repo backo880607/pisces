@@ -49,7 +49,7 @@
   	
   	<java-jwt.version>3.2.0</java-jwt.version>
   	<jjwt.version>0.7.0</jjwt.version>
-  	<opencsv.version>3.3</opencsv.version>
+  	<super-csv.version>2.4.0</super-csv.version>
   	<quartz.version>2.3.0</quartz.version>
   	<swagger2.version>2.2.2</swagger2.version>
   	<swagger-ui.version>2.2.2</swagger-ui.version>
@@ -108,9 +108,9 @@
           <version>${jjwt.version}</version>
       	</dependency>
       	<dependency>
-          <groupId>com.opencsv</groupId>
-          <artifactId>opencsv</artifactId>
-          <version>${opencsv.version}</version>
+          <groupId>net.sf.supercsv</groupId>
+          <artifactId>super-csv</artifactId>
+          <version>${super-csv.version}</version>
       	</dependency>
       	<dependency>
       	  <groupId>org.quartz-scheduler</groupId>

@@ -18,8 +18,10 @@ import com.pisces.core.entity.Property;
 import com.pisces.core.enums.ENTITY_STATUS;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
+import com.pisces.integration.bean.DataSource;
 import com.pisces.integration.bean.FieldInfo;
 import com.pisces.integration.bean.Scheme;
+import com.pisces.integration.bean.SchemeGroup;
 
 public class ImportHelper extends IOHelper {
 	private static Validator validator = null;
@@ -36,11 +38,14 @@ public class ImportHelper extends IOHelper {
 	}
 
 	@Override
-	public void execute(Collection<Scheme> schemes) {
-		if (propertyService == null) {
-			throw new UnsupportedOperationException();
+	public void execute(SchemeGroup schemeGroup) {
+		DataSource dataSource = schemeGroup.getDataSource();
+		if (dataSource == null) {
+			throw new UnsupportedOperationException("missing datasource configuration in Scheme " + schemeGroup.getName());
 		}
-		List<Scheme> targetSchemes = new LinkedList<Scheme>(schemes);
+		switchDataSourceService(dataSource);
+
+		List<Scheme> targetSchemes = new LinkedList<Scheme>(schemeGroup.getSchemes());
 		Iterator<Scheme> iter = targetSchemes.iterator();
 		while (iter.hasNext()) {
 			Scheme scheme = iter.next();
@@ -49,12 +54,8 @@ public class ImportHelper extends IOHelper {
 				continue;
 			}
 			
-			if (scheme.getDataSource() == null) {
-				throw new UnsupportedOperationException("missing datasource configuration in Scheme " + scheme.getName());
-			}
 			try {
-				switchDataSourceService(scheme.getDataSource());
-				if (!adapter.validConnection(scheme.getDataSource(), scheme.getOutName(), false)) {
+				if (!adapter.validConnection(dataSource, scheme.getOutName(), false)) {
 					iter.remove();
 					continue;
 				}
@@ -69,7 +70,7 @@ public class ImportHelper extends IOHelper {
 				if (adapter != null) {
 					adapter.close();
 				}
-				throw new DataSourceException("datasource " + scheme.getDataSource().getName() + " connection failed!");
+				throw new DataSourceException("datasource " + dataSource.getName() + " connection failed!");
 			} finally {
 				if (adapter != null) {
 					adapter.close();
@@ -79,13 +80,12 @@ public class ImportHelper extends IOHelper {
 		
 		for (Scheme scheme : targetSchemes) {
 			try {
-				switchDataSourceService(scheme.getDataSource());
-				adapter.open(scheme.getDataSource(), scheme.getOutName(), false);
+				adapter.open(dataSource, scheme.getOutName(), false);
 				Collection<FieldInfo> fields = scheme.getFields();
 				if (fields.isEmpty()) {
 					fields = adapter.getFields();
 				}
-				if (adapter.executeQuery(scheme.getDataSource(), scheme.getOutName(), fields)) {
+				if (adapter.executeQuery(dataSource, scheme.getOutName(), fields)) {
 					Class<? extends EntityObject> clazz = EntityUtils.getEntityClass(scheme.getInName());
 					while (adapter.step()) {
 						EntityObject entity = createEntity(clazz);
@@ -102,7 +102,7 @@ public class ImportHelper extends IOHelper {
 							}
 							
 							Property property = AppUtils.getPropertyService().get(clazz, field.getName());
-							write(entity, property, value);
+							//EntityUtils.setTextValue(entity, property, value, getMapper());
 							++index;
 						}
 						
