@@ -129,7 +129,7 @@ public class PropertyDao implements BaseDao<Property> {
 
 	@Override
 	public int insert(Property record) {
-		mapper.insert(record);
+		//mapper.insert(record);
 		impl.get().insert(record);
 		return 1;
 	}
@@ -150,7 +150,7 @@ public class PropertyDao implements BaseDao<Property> {
 			throw new UnsupportedOperationException("update a not existed property class:" + record.getBelongName() + " property:" + record.getCode());
 		}
 		
-		mapper.update(record);
+		//mapper.update(record);
 		if (oldRecord != record) {
 			EntityUtils.copyIgnoreNull(record, oldRecord);
 		}
@@ -177,7 +177,7 @@ public class PropertyDao implements BaseDao<Property> {
 				throw new UnsupportedOperationException("can`t delete a inherent property class:" + record.getBelongName() + " property:" + record.getCode());
 			}
 			
-			mapper.delete(oldRecord);
+			//mapper.delete(oldRecord);
 			properties.remove(record.getCode());
 			return 1; 
 		}
