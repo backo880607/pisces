@@ -1,4 +1,4 @@
-package com.pisces.integration.service.impl;
+package com.pisces.integration.service.impl.localefile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +19,7 @@ import com.pisces.integration.bean.Scheme;
 import com.pisces.integration.helper.AdapterRegister;
 import com.pisces.integration.helper.DataConfig;
 
-public abstract class DsExcelServiceImpl<T extends Enum<T>> extends AdapterRegister<T> {
+public abstract class DsExcelService<T extends Enum<T>> extends AdapterRegister<T> {
 	private File file;
 	private Workbook book;
 	private Sheet sheet;

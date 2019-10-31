@@ -1,15 +1,13 @@
 package com.pisces.core.primary.expression.calculate;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueBoolean;
 
 public class BooleanCalculate implements Calculate {
 	private boolean value;
 
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
-		return new ValueBoolean(value);
+	public Object GetValue(EntityObject entity) {
+		return value;
 	}
 
 	@Override

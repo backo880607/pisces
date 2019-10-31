@@ -1,27 +1,31 @@
 package com.pisces.core.primary.expression.calculate;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.OperType;
 import com.pisces.core.primary.expression.function.FunctionManager;
-import com.pisces.core.primary.expression.value.ValueAbstract;
 
 public class OperTypeCalculate implements Calculate {
-	Function<List<ValueAbstract>, ValueAbstract> fun;
+	BiFunction<Object, Object, Object> fun;
+	BiFunction<Class<?>, Class<?>, Class<?>> returnClass;
 	
 	public OperTypeCalculate(OperType operType) {
 		this.fun = FunctionManager.instance.getFunction(operType);
+		this.returnClass = FunctionManager.instance.getReturnClass(operType);
 	}
 	
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
+	public Object GetValue(EntityObject entity) {
 		throw new UnsupportedOperationException();
 	}
 	
-	public ValueAbstract GetValue(List<ValueAbstract> params, Object obj) {
-		return fun.apply(params);
+	public Object GetValue(Object param1, Object param2, EntityObject entity) {
+		Object value = fun.apply(param1, param2);
+		if (value == null) {
+			throw new NullPointerException();
+		}
+		return value;
 	}
 	
 	@Override
@@ -31,6 +35,10 @@ public class OperTypeCalculate implements Calculate {
 
 	@Override
 	public Class<?> getReturnClass() {
-		return null;
+		throw new UnsupportedOperationException();
+	}
+	
+	public Class<?> getReturnClass(Class<?> lClass, Class<?> rClass) {
+		return returnClass.apply(lClass, rClass);
 	}
 }

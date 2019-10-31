@@ -1,7 +1,6 @@
 package com.pisces.core.primary.expression;
 
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -13,32 +12,21 @@ import com.pisces.core.primary.expression.calculate.BracketCalculate;
 import com.pisces.core.primary.expression.calculate.Calculate;
 import com.pisces.core.primary.expression.calculate.DateTimeCalculate;
 import com.pisces.core.primary.expression.calculate.DoubleCalculate;
+import com.pisces.core.primary.expression.calculate.EntityCalculate;
 import com.pisces.core.primary.expression.calculate.EnumClaculate;
-import com.pisces.core.primary.expression.calculate.PropertyCalculate;
 import com.pisces.core.primary.expression.calculate.FunctionCalculate;
 import com.pisces.core.primary.expression.calculate.LongCalculate;
-import com.pisces.core.primary.expression.calculate.EntityCalculate;
 import com.pisces.core.primary.expression.calculate.OperTypeCalculate;
+import com.pisces.core.primary.expression.calculate.PropertyCalculate;
 import com.pisces.core.primary.expression.calculate.ReverseCalculate;
 import com.pisces.core.primary.expression.calculate.TextCalculate;
-import com.pisces.core.primary.expression.value.Type;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueBoolean;
-import com.pisces.core.primary.expression.value.ValueDouble;
-import com.pisces.core.primary.expression.value.ValueHelp;
-import com.pisces.core.primary.expression.value.ValueInt;
-import com.pisces.core.primary.expression.value.ValueText;
+import com.pisces.core.primary.expression.function.BaseFunction;
 import com.pisces.core.utils.IExpression;
 
 public class Expression implements IExpression {
 	public ExpressionNode root = null;
 	public boolean hasField = false;
 	
-	/**
-	 * 解析字符串表达式
-	 * @param str
-	 * @return
-	 */
 	public boolean Parse(String str) {
 		if (str == null || str.isEmpty()) {
 			return false;
@@ -53,39 +41,25 @@ public class Expression implements IExpression {
 		return getReturnClass() != null;
 	}
 	
-	/**
-	 * 计算表达式值
-	 * @return
-	 */
 	@Override
 	public Object getValue() {
 		return this.getValue(null);
 	}
 	
-	/**
-	 * 计算表达式值，涉及对象的计算
-	 * @param Id
-	 * @return
-	 */
 	@Override
 	public Object getValue(EntityObject entity) {
-		ValueAbstract valueAbstract = this.getValueAbstract(entity);
-		return valueAbstract != null ? valueAbstract.getValue() : null;
+		try {
+			return this.getValueImpl(entity);
+		} catch (Exception e) {
+		}
+		return null;
 	}
 	
-	/**
-	 * 计算表达式结果是否为真
-	 * @return
-	 */
 	@Override
 	public boolean getBoolean() {
 		return this.getBoolean(null);
 	}
 	
-	/**
-	 * 计算表达式结果是否为真，涉及对象计算
-	 * @return
-	 */
 	@Override
 	public boolean getBoolean(EntityObject entity) {
 		Object value = this.getValue(entity);
@@ -99,10 +73,6 @@ public class Expression implements IExpression {
 		return (Boolean)value;
 	}
 	
-	/**
-	 * 计算表达式结果为字符串
-	 * @return
-	 */
 	@Override
 	public String getString() {
 		return this.getString(null);
@@ -110,38 +80,33 @@ public class Expression implements IExpression {
 	
 	@Override
 	public String getString(EntityObject entity) {
-		ValueAbstract valueAbstract = this.getValueAbstract(entity);
-		if (valueAbstract != null) {
-			ValueText text = valueAbstract.toText();
-			if (text != null) {
-				return text.value;
-			}
-		}
-		return "";
+		Object value = this.getValue(entity);
+		return value != null ? BaseFunction.funToStr(value, null) : ""; 
 	}
 	
-	public ValueAbstract getValueAbstract(EntityObject entity) {
+	public Object getValueImpl(EntityObject entity) {
 		if (this.root == null) {
-			return null;
+			throw new NullPointerException();
 		}
-		
-		return this.getValue(this.root, entity);
+		return this.getValueImpl(this.root, entity);
 	}
 	
-	private ValueAbstract getValue(ExpressionNode node, EntityObject entity) {
+	private Object getValueImpl(ExpressionNode node, EntityObject entity) {
 		if (node.type == OperType.DATA) {
 			return node.calculate.GetValue(entity);
 		}
 		
-		List<ValueAbstract> params = new ArrayList<>();
+		Object lValue = null;
 		if (node.lchild != null) {
-			params.add(this.getValue(node.lchild, entity));
-		}
-		if (node.rchild != null) {
-			params.add(this.getValue(node.rchild, entity));
+			lValue = this.getValueImpl(node.lchild, entity);
 		}
 		
-		return node.<OperTypeCalculate>getCalculate().GetValue(params, entity);
+		Object rValue = null;
+		if (node.rchild != null) {
+			rValue = this.getValueImpl(node.rchild, entity);
+		}
+		
+		return node.<OperTypeCalculate>getCalculate().GetValue(lValue, rValue, entity);
 	}
 	
 	public Class<?> getReturnClass() {
@@ -156,23 +121,15 @@ public class Expression implements IExpression {
 			return node.calculate.getReturnClass();
 		}
 		
-		List<ValueAbstract> params = new ArrayList<>();
+		Class<?> lClass = null;
 		if (node.lchild != null) {
-			Class<?> param1 = this.getReturnClassImpl(node.lchild);
-			if (param1 == null) {
-				return null;
-			}
-			params.add(ValueHelp.get(param1));
+			lClass = this.getReturnClassImpl(node.lchild);
 		}
+		Class<?> rClass = null;
 		if (node.rchild != null) {
-			Class<?> param2 = this.getReturnClassImpl(node.rchild);
-			if (param2 == null) {
-				return null;
-			}
-			params.add(ValueHelp.get(param2));
+			rClass = this.getReturnClassImpl(node.rchild);
 		}
-		
-		return node.<OperTypeCalculate>getCalculate().GetValue(params, null).getReturnClass();
+		return node.<OperTypeCalculate>getCalculate().getReturnClass(lClass, rClass);
 	}
 	
 	public Entry<Integer, ExpressionNode> Create(String str, int index, boolean bFun) {
@@ -368,12 +325,12 @@ public class Expression implements IExpression {
 				++index;
 			} while (index < str.length() && Character.isDigit(str.charAt(index)));
 			DoubleCalculate calculate = new DoubleCalculate();
-			calculate.value = new ValueDouble(Double.valueOf(str.substring(temp, index)));
+			calculate.value = Double.valueOf(str.substring(temp, index));
 			return new AbstractMap.SimpleEntry<Integer, Calculate>(index, calculate);
 		}
 		
 		LongCalculate calculate = new LongCalculate();
-		calculate.value = new ValueInt(Long.valueOf(str.substring(temp, index)));
+		calculate.value = Long.valueOf(str.substring(temp, index));
 		return new AbstractMap.SimpleEntry<Integer, Calculate>(index, calculate);
 	}
 	
@@ -427,11 +384,6 @@ public class Expression implements IExpression {
 		return new AbstractMap.SimpleEntry<Integer, Calculate>(-1, null);
 	}
 	
-	/**
-	 * 刷选对象集合
-	 * @param entities
-	 * @return
-	 */
 	@Override
 	public <T extends EntityObject> void filter(List<T> entities) {
 		Iterator<T> iter = entities.iterator();
@@ -443,26 +395,24 @@ public class Expression implements IExpression {
 		}
 	}
 	
-	/**
-	 * 比较两对象
-	 * @param entity
-	 * @return
-	 */
 	@Override
 	public int compare(EntityObject o1, EntityObject o2) {
-		ValueAbstract value1 = this.getValueAbstract(o1);
-		ValueAbstract value2 = this.getValueAbstract(o2);
-		if (value1.getType() == Type.None) {
-			return value2.getType() == Type.None ? 0 : -1; 
+		Object value1 = this.getValueImpl(o1);
+		Object value2 = this.getValueImpl(o2);
+		if (value1 == null) {
+			if (value2 == null) {
+				return o1.getId() < o2.getId() ? -1 : 1;
+			}
+			return -1;
 		}
 		
-		if (value2.getType() == Type.None) {
+		if (value2 == null) {
 			return 1;
 		}
 		
-		if (((ValueBoolean)value1.equal(value2)).value) {
-			return 0;
+		if ((boolean)BaseFunction.equal(value1, value2)) {
+			return o1.getId() < o2.getId() ? -1 : 1;
 		}
-		return ((ValueBoolean)value1.less(value2)).value ? -1 : 1;
+		return (boolean)BaseFunction.less(value1, value2) ? -1 : 1;
 	}
 }

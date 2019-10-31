@@ -2,21 +2,17 @@ package com.pisces.core.primary.expression.calculate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.Expression;
 import com.pisces.core.primary.expression.ExpressionNode;
 import com.pisces.core.primary.expression.function.FunctionManager;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueBoolean;
-import com.pisces.core.primary.expression.value.ValueList;
-import com.pisces.core.primary.expression.value.ValueListAbstract;
-import com.pisces.core.primary.expression.value.ValueObject;
-import com.pisces.core.relation.RefBase;
-import com.pisces.core.relation.RefList;
+
 
 public class FunctionCalculate implements Calculate {
 	FunctionManager.Data data;
@@ -26,9 +22,9 @@ public class FunctionCalculate implements Calculate {
 	boolean isIF;
 	
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
+	public Object GetValue(EntityObject entity) {
 		Class<?> returnClass = getReturnClass();
-		List<ValueAbstract> params = new ArrayList<>();
+		List<Object> params = new ArrayList<>();
 		if (paramExps.isEmpty()) {
 			return FunctionManager.instance.invoke(data, params, returnClass);
 		}
@@ -36,48 +32,48 @@ public class FunctionCalculate implements Calculate {
 		//int index = 1;
 		Iterator<Expression> iter = paramExps.iterator();
 		Expression exp = iter.next();
-		ValueAbstract paramValue = exp.getValueAbstract(entity);
+		Object paramValue = exp.getValueImpl(entity);
 		if (this.isLastChain) {
 			return funLastChain(paramValue, paramExps.get(1));
 		} else if (this.isIF) {
-			if (((ValueBoolean)paramValue).value) {
+			if (((boolean)paramValue)) {
 				Expression firstExp = paramExps.get(1);
-				return firstExp.getValueAbstract(entity);
+				return firstExp.getValueImpl(entity);
 			}
 			
 			Expression secondExp = paramExps.get(2);
-			return secondExp.getValueAbstract(entity);
+			return secondExp.getValueImpl(entity);
 		}
 		
 		params.add(paramValue);
-		if (RefBase.class.isAssignableFrom(paramValue.getClass())) {
+		if (Collection.class.isAssignableFrom(paramValue.getClass())) {
 			@SuppressWarnings("unchecked")
 			Collection<EntityObject> objects = (Collection<EntityObject>)paramValue;
 			while (iter.hasNext()) {
 				//++index;
 				exp = iter.next();
-				if (!exp.hasField) {
-					params.add(exp.getValueAbstract(null));
-					continue;
+				if (exp.hasField) {
+					Map<Long, Object> values = new HashMap<>();
+					for (EntityObject temp : objects) {
+						values.put(temp.getId(), exp.getValueImpl(temp));
+					}
+					
+					params.add(values);
+				} else {
+					params.add(exp.getValueImpl(null));
 				}
-				ValueListAbstract abstracts = new ValueListAbstract();
-				for (EntityObject temp : objects) {
-					abstracts.value.put(temp.getId(), exp.getValueAbstract(temp));
-				}
-				
-				params.add(abstracts);
 			}
 		} else {
 			while (iter.hasNext()) {
 				//++index;
 				exp = iter.next();
-				params.add(exp.getValueAbstract(entity));
+				params.add(exp.getValueImpl(entity));
 			}
 		}
 		
-		ValueAbstract result = FunctionManager.instance.invoke(data, params, returnClass);
+		Object result = FunctionManager.instance.invoke(data, params, returnClass);
 		if (this.fieldCalc != null && EntityObject.class.isAssignableFrom(result.getClass())) {
-			return this.fieldCalc.GetValue(((ValueObject)result).value);
+			return this.fieldCalc.GetValue((EntityObject)result);
 		}
 		return result;
 	}
@@ -153,24 +149,25 @@ public class FunctionCalculate implements Calculate {
 		return this.paramExps.get(this.data.returnBy - 1).getReturnClass();
 	}
 	
-	private ValueAbstract funLastChain(Object param, Expression exp) {
+	private Collection<EntityObject> funLastChain(Object param, Expression exp) {
 		if (EntityObject.class.isAssignableFrom(param.getClass())) {
 			return null;
 		}
 		EntityObject entity = (EntityObject)param;
-		RefBase result = new RefList();
+		Collection<EntityObject> result = new ArrayList<EntityObject>();
 		funLastChainImpl(entity, exp, result);
-		return new ValueList(result);
+		return result;
 	}
 	
-	private void funLastChainImpl(EntityObject entity, Expression exp, RefBase result) {
+	private void funLastChainImpl(EntityObject entity, Expression exp, Collection<EntityObject> result) {
 		Object above = exp.getValue(entity);
 		if (above == null) {
 			result.add(entity);
 			return;
 		}
-		if (RefBase.class.isAssignableFrom(above.getClass())) {
-			RefBase value = (RefBase)above;
+		if (Collection.class.isAssignableFrom(above.getClass())) {
+			@SuppressWarnings("unchecked")
+			Collection<EntityObject> value = (Collection<EntityObject>)above;
 			if (value.isEmpty()) {
 				result.add(entity);
 			} else {

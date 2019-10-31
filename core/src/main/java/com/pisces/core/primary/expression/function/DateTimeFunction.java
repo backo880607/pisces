@@ -1,19 +1,14 @@
 package com.pisces.core.primary.expression.function;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.pisces.core.annotation.ELFunction;
+import com.pisces.core.annotation.ELParm;
 import com.pisces.core.entity.DateDur;
-import com.pisces.core.primary.expression.value.ValueDateTime;
 import com.pisces.core.utils.DateUtils;
 
-/**
- * 日期与时间类函数
- * @author niuhaitao
- *
- */
 class DateTimeFunction {
 	static void register(FunctionManager manager) {
 	}
@@ -21,23 +16,11 @@ class DateTimeFunction {
 	 * 日期函数，年，月，日
 	 * @param params
 	 * @return
+	 * @throws ParseException 
 	 */
-	static Date funDate(Object param) {
-		Date date = null;
-		if (param.getClass() == String.class) {
-			SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			try {
-				date = formater.parse((String)param);
-			} catch (ParseException e) {
-				return null;
-			}
-		} else {
-			date = ((ValueDateTime)param).value;
-		}
-		if (date == null) {
-			return null;
-		}
-		
+	@ELFunction()
+	static Date funDate(@ELParm(clazz = {String.class, Date.class}) Object param) throws ParseException {
+		Date date = param.getClass() == String.class ? DateUtils.parse((String)param) : (Date)param;
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		// 将时分秒,毫秒域清零
@@ -46,37 +29,17 @@ class DateTimeFunction {
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		return calendar.getTime();
-		
-		/*int year = (int)((ValueInt)params.get(0)).value;
-		int month = (int)((ValueInt)params.get(1)).value;
-		int day = (int)((ValueInt)params.get(2)).value;
-		
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(year, month - 1, day);
-		return new ValueDateTime(calendar.getTime());*/
 	}
 	
 	/**
 	 * 时间函数，时，分，秒
 	 * @param params
 	 * @return
+	 * @throws ParseException 
 	 */
-	static Date funTime(Object param) {
-		Date date = null;
-		if (param.getClass() == String.class) {
-			SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			try {
-				date = formater.parse((String)param);
-			} catch (ParseException e) {
-				return null;
-			}
-		} else {
-			date = (Date)param;
-		}
-		
-		if (date == null) {
-			return null;
-		}
+	@ELFunction
+	static Date funTime(@ELParm(clazz = {String.class, Date.class}) Object param) throws ParseException {
+		Date date = param.getClass() == String.class ? DateUtils.parse((String)param) : (Date)param;
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		// 将年月日域清零
@@ -85,14 +48,6 @@ class DateTimeFunction {
 		calendar.set(Calendar.DAY_OF_MONTH, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		return calendar.getTime();
-		
-		/*int hour = (int)((ValueInt)params.get(0)).value;
-		int minute = (int)((ValueInt)params.get(1)).value;
-		int second = (int)((ValueInt)params.get(2)).value;
-		
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(1970, 0, 1, hour, minute, second);
-		return new ValueDateTime(calendar.getTime());*/
 	}
 	
 	/**
@@ -100,7 +55,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funGetDateTime(Date date) {
+	@ELFunction
+	static Long funGetDateTime(Date date) {
 		return date.getTime();
 	}
 	
@@ -109,7 +65,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funYear(Date date) {
+	@ELFunction
+	static Integer funYear(Date date) {
 		return DateUtils.year(date);
 	}
 	
@@ -118,7 +75,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funMonth(Date date) {
+	@ELFunction
+	static Integer funMonth(Date date) {
 		return DateUtils.month(date);
 	}
 	
@@ -127,7 +85,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funDay(Date date) {
+	@ELFunction
+	static Integer funDay(Date date) {
 		return DateUtils.day(date);
 	}
 	
@@ -136,7 +95,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funHour(Date date) {
+	@ELFunction
+	static Integer funHour(Date date) {
 		return DateUtils.hour(date);
 	}
 	
@@ -145,7 +105,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funMinute(Date date) {
+	@ELFunction
+	static Integer funMinute(Date date) {
 		return DateUtils.minute(date);
 	}
 	
@@ -154,7 +115,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funSecond(Date date) {
+	@ELFunction
+	static Integer funSecond(Date date) {
 		return DateUtils.second(date);
 	}
 	
@@ -163,6 +125,7 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
+	@ELFunction
 	static Date funNow() {
 		return new Date();
 	}
@@ -172,7 +135,8 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funDayOfWeek(Date date) {
+	@ELFunction
+	static Integer funDayOfWeek(Date date) {
 		return DateUtils.dayOfWeek(date);
 	}
 	
@@ -181,26 +145,9 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
-	static long funWeekOfYear(Date date) {
+	@ELFunction
+	static Integer funWeekOfYear(Date date) {
 		return DateUtils.weekOfYear(date);
-	}
-	
-	/**
-	 * 返回指定的天数
-	 * @param params
-	 * @return
-	 */
-	static Date funYears(long days) {
-		return new Date(days * DateUtils.PER_DAY);
-	}
-	
-	/**
-	 * 返回指定的天数
-	 * @param params
-	 * @return
-	 */
-	static Date funDays(long days) {
-		return new Date(days * DateUtils.PER_DAY);
 	}
 	
 	/**
@@ -208,6 +155,7 @@ class DateTimeFunction {
 	 * @param params
 	 * @return
 	 */
+	@ELFunction
 	static String funFormatDuration(int dur) {
 		StringBuffer strExtraString = new StringBuffer();
 		int i = dur / 86400;
@@ -231,6 +179,7 @@ class DateTimeFunction {
 		return strExtraString.toString();
 	}
 	
+	@ELFunction
 	static DateDur funDuration(String param) {
 		return new DateDur(param);
 	}

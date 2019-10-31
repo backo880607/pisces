@@ -47,6 +47,10 @@ public class DateDur {
 		setValue(value);
 	}
 	
+	public DateDur(int time) {
+		setTime(time);
+	}
+	
 	public void setValue(String value) {
 		this.value = value == null ? "" : value;
 		this.time = 0;

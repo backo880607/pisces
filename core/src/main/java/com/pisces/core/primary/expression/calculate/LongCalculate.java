@@ -1,14 +1,12 @@
 package com.pisces.core.primary.expression.calculate;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueInt;
 
 public class LongCalculate implements Calculate {
-	public ValueInt value;
+	public long value;
 	
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
+	public Object GetValue(EntityObject entity) {
 		return value;
 	}
 	

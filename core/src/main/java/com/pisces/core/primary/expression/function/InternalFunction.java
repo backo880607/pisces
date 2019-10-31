@@ -2,304 +2,100 @@ package com.pisces.core.primary.expression.function;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.pisces.core.annotation.ELFunction;
 import com.pisces.core.annotation.ELParm;
-import com.pisces.core.config.CoreMessage;
-import com.pisces.core.exception.ExpressionException;
-import com.pisces.core.primary.expression.value.*;
-import com.pisces.core.relation.RefBase;
+import com.pisces.core.entity.EntityObject;
+import com.pisces.core.utils.DateUtils;
 
-import ch.qos.logback.core.util.Duration;
-
-class InternalFunction {
+class InternalFunction extends BaseFunction {
 	static void register(FunctionManager manager) {
-		manager.registerUserFunction(InternalFunction.class);
-	}
-
-	/**
-	 * 加法
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract add(List<ValueAbstract> params) {
-		return params.get(0).add(params.get(1));
+		manager.registerInnerFunction(InternalFunction.class);
 	}
 	
-	/**
-	 * 减法
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract sub(List<ValueAbstract> params) {
-		return params.get(0).sub(params.get(1));
-	}
-	
-	/**
-	 * 乘法
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract multiply(List<ValueAbstract> params) {
-		return params.get(0).multiply(params.get(1));
-	}
-	
-	/**
-	 * 除法
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract division(List<ValueAbstract> params) {
-		return params.get(0).division(params.get(1));
-	}
-	
-	/**
-	 * 大于
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract greater(List<ValueAbstract> params) {
-		return params.get(0).greater(params.get(1));
-	}
-	
-	/**
-	 * 大于等于
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract greaterEqual(List<ValueAbstract> params) {
-		return params.get(0).greaterEqual(params.get(1));
-	}
-	
-	/**
-	 * 小于
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract less(List<ValueAbstract> params) {
-		return params.get(0).less(params.get(1));
-	}
-	
-	/**
-	 * 小于等于
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract lessEqual(List<ValueAbstract> params) {
-		return params.get(0).lessEqual(params.get(1));
-	}
-	
-	/**
-	 * 等于
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract equal(List<ValueAbstract> params) {
-		return params.get(0).equal(params.get(1));
-	}
-	
-	/**
-	 * 不等于
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract notEqual(List<ValueAbstract> params) {
-		return params.get(0).notEqual(params.get(1));
-	}
-	
-	/**
-	 * 且
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract and(List<ValueAbstract> params) {
-		if (params.get(0).getType() != Type.BOOLEAN ||
-			params.get(1).getType() != Type.BOOLEAN) {
-			throw new ExpressionException(CoreMessage.NotSupportOperation, params.get(0) + " && " + params.get(1));
-		}
-		boolean result = ((ValueBoolean)params.get(0)).value && ((ValueBoolean)params.get(1)).value;
-		return new ValueBoolean(result);
-	}
-	
-	/**
-	 * 或
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract or(List<ValueAbstract> params) {
-		ValueAbstract param1 = params.get(0);
-		ValueAbstract param2 = params.get(1);
-		if (param1.getType() != Type.BOOLEAN || 
-			param2.getType() != Type.BOOLEAN) {
-			throw new ExpressionException(CoreMessage.NotSupportOperation, params.get(0) + " || " + params.get(1));
-		}
-		
-		boolean result = ((ValueBoolean)param1).value || ((ValueBoolean)param2).value;
-		return new ValueBoolean(result);
-	}
-	
-	/**
-	 * 非
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract not(List<ValueAbstract> params) {
-		if (params.get(0).getType() != Type.BOOLEAN) {
-			throw new ExpressionException(CoreMessage.NotSupportOperation, " ! " + params.get(0));
-		}
-		return new ValueBoolean(!((ValueBoolean)params.get(1)).value);
-	}
-	
-	/**
-	 * 转换为String
-	 * @param params
-	 * @return
-	 */
-	@ELFunction
-	public static String toStr(Object param) {
-		return ValueHelp.get(param).toText().value;
-	}
-	
-	/**
-	 * 转换为Int
-	 * @param params
-	 * @return
-	 */
-	@ELFunction
-	public static Long toInt(@ELParm(clazz = {Boolean.class, Date.class, Double.class, Duration.class, Enum.class, Long.class, String.class}) Object param) {
-		return ValueHelp.get(param).toInt().value;
-	}
-	
-	/**
-	 * 转换为Double
-	 * @param params
-	 * @return
-	 */
-	@ELFunction
-	public static Double toDouble(@ELParm(clazz = {Boolean.class, Date.class, Double.class, Duration.class, Enum.class, Long.class, String.class}) Object param) {
-		return ValueHelp.get(param).toDouble().value;
-	}
-	
-	/**
-	 * 第一参数内容是否包含第二参数内容
-	 * @param params
-	 * @return
-	 */
 	@ELFunction
 	public static Boolean include(String param1, String param2) {
 		return param1.indexOf(param2) >= 0;
 	}
 	
-	/**
-	 * 第一参数内容是否包含第二参数内容
-	 * @param params
-	 * @return
-	 */
 	@ELFunction
 	public static Boolean startsWith(String param1, String param2) {
 		return param1.startsWith(param2);
 	}
 	
-	/**
-	 * 第一参数内容是否包含第二参数内容
-	 * @param params
-	 * @return
-	 */
 	@ELFunction
 	public static Boolean endsWith(String param1, String param2) {
 		return param1.endsWith(param2);
 	}
 	
-	/**
-	 * 是否为整型
-	 * @param params
-	 * @return
-	 */
-	@ELFunction
+	@ELFunction(flexible = true)
 	public static Boolean isInt(Object param) {
 		return param.getClass() == Long.class;
 	}
 	
-	/**
-	 * 是否为浮点型
-	 * @param params
-	 * @return
-	 */
-	@ELFunction
+	@ELFunction(flexible = true)
 	public static Boolean isDouble(Object param) {
 		return param.getClass() == Double.class;
 	}
 	
-	/**
-	 * 是否为数字
-	 * @param params
-	 * @return
-	 */
 	@ELFunction
 	public static Boolean isDigit(Object param) {
 		return param.getClass() == Long.class || param.getClass() == Double.class;
 	}
 	
-	/**
-	 * 是否为日期类型
-	 * @param params
-	 * @return
-	 */
 	@ELFunction
 	public static Boolean isDateTime(Object param) {
 		return param.getClass() == Date.class;
 	}
 	
-	/**
-	 * 是否为布尔型
-	 * @param params
-	 * @return
-	 */
 	@ELFunction
 	public static Boolean isBool(Object param) {
 		return param.getClass() == Boolean.class;
 	}
 	
-	/**
-	 * 是否为字符串
-	 * @param params
-	 * @return
-	 */
 	@ELFunction
 	public static Boolean isStr(Object param) {
 		return param.getClass() == String.class;
 	}
 	
-	/**
-	 * 是否为空
-	 * @param params
-	 * @return
-	 */
+	@SuppressWarnings("unchecked")
 	@ELFunction
-	public static Boolean isEmpty(String value) {
-		return value.isEmpty();
+	public static Boolean isEmpty(@ELParm(nullable = true) Object value) {
+		boolean result = true;
+		if (value == null) {
+			result = true;
+		} else if (value.getClass() == String.class) {
+			result = ((String)value).isEmpty();
+		} else if (value.getClass() == Date.class) {
+			result = ((Date)value).equals(DateUtils.INVALID);
+		} else if (value.getClass() == Collection.class) {
+			result = ((Collection<EntityObject>)value).isEmpty();
+		}
+		return result;
 	}
 	
-	/**
-	 * 取最大值
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract max(List<ValueAbstract> params) {
-		ValueAbstract result = null;
-		if (params.get(0).getType() == Type.List) {
-			result = ObjectFunction.funGetSortedList(params.get(0), params.get(1), params.get(2));
-			RefBase entities = (RefBase)result.getValue();
-			return ((ValueListAbstract)params.get(1)).value.get(entities.last().getId());
+	@SuppressWarnings("unchecked")
+	@ELFunction(flexible = true)
+	public static Object max(Object param1, Object param2, Object... values) {
+		Object result = null;
+		if (param1.getClass() == Collection.class) {
+			if (param2.getClass() == Map.class) {
+				Map<Long, Object> fieldValues = (Map<Long, Object>)param2;
+				Map<Long, Object> filter = null;
+				if (values.length > 0) {
+					filter = (Map<Long, Object>)values[0];
+				}
+				
+				Collection<EntityObject> entities = EntityFunction.funGetSortedList((Collection<EntityObject>)param1, fieldValues, false, filter);
+				return entities.isEmpty() ? null : fieldValues.get(entities.iterator().next().getId());
+			}
 		} else {
-			for (ValueAbstract context : params) {
-				if (result == null) {
+			result = (boolean)less(param1, param2) ? param2 : param1;
+			for (Object context : values) {
+				if ((boolean)less(result, context)) {
 					result = context;
-				} else {
-					if (result.less(context).value) {
-						result = context;
-					}
 				}
 			}
 		}
@@ -307,25 +103,26 @@ class InternalFunction {
 		return result;
 	}
 	
-	/**
-	 * 取最小值
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract min(List<ValueAbstract> params) {
-		ValueAbstract result = null;
-		if (params.get(0).getType() == Type.List) {
-			result = ObjectFunction.funGetSortedList(params.get(0), params.get(1), params.get(2));
-			RefBase entities = (RefBase)result.getValue();
-			return ((ValueListAbstract)params.get(1)).value.get(entities.first().getId());
+	@SuppressWarnings("unchecked")
+	@ELFunction(flexible = true)
+	static Object min(Object param1, Object param2, Object... values) {
+		Object result = null;
+		if (param1.getClass() == Collection.class) {
+			if (param2.getClass() == Map.class) {
+				Map<Long, Object> fieldValues = (Map<Long, Object>)param2;
+				Map<Long, Object> filter = null;
+				if (values.length > 0) {
+					filter = (Map<Long, Object>)values[0];
+				}
+				
+				Collection<EntityObject> entities = EntityFunction.funGetSortedList((Collection<EntityObject>)param1, fieldValues, true, filter);
+				return entities.isEmpty() ? null : fieldValues.get(entities.iterator().next().getId());
+			}
 		} else {
-			for (ValueAbstract context : params) {
-				if (result == null) {
+			result = (boolean)greater(param1, param2) ? param2 : param1;
+			for (Object context : values) {
+				if ((boolean)greater(result, context)) {
 					result = context;
-				} else {
-					if (result.greater(context).value) {
-						result = context;
-					}
 				}
 			}
 		}
@@ -333,90 +130,70 @@ class InternalFunction {
 		return result;
 	}
 	
-	/**
-	 * 返回对象集合中对象的个数。
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract count(ValueAbstract param1, ValueAbstract param2) {
+	@ELFunction
+	static int count(Collection<EntityObject> entities, Map<Long, Object> filter) {
 		int count = 0;
-		if (param2 == null) {
-			count = ((ValueList)param1).value.size();
+		if (filter == null) {
+			count = entities.size();
 		} else {
-			Collection<ValueAbstract> values = ((ValueListAbstract)param2).value.values();
-			for (ValueAbstract context : values) {
-				if (context.getType() == Type.BOOLEAN && ((ValueBoolean)context).value) {
+			for (Entry<Long, Object> context : filter.entrySet()) {
+				if (context.getValue().getClass() == Boolean.class && (boolean)context.getValue()) {
 					++count;
 				}
 			}
 		}
 		
-		return new ValueInt(count);
+		return count;
 	}
 	
-	/**
-	 * 返回平均值，第一参数为对象列表，则对对象集合求平均值。
-	 * @param params
-	 * @return
-	 */
 	@ELFunction(flexible = true)
-	static ValueAbstract funAverage(List<ValueAbstract> params) {
-		Collection<ValueAbstract> values = params;
-		if (params.get(0).getType() == Type.List) {
-			ValueAbstract param2 = params.get(1);
-			if (param2.getType() == Type.ListAbstract) {
-				values = ((ValueListAbstract)param2).value.values();
+	static Object funAverage(Object param1, Object param2, Object... values) {
+		Object result = null;
+		if (param1.getClass() == Collection.class) {
+			if (param2.getClass() == Map.class) {
+				@SuppressWarnings("unchecked")
+				Map<Long, Object> context = (Map<Long, Object>)param2;
+				for (Entry<Long, Object> entry : context.entrySet()) {
+					result = result == null ? entry.getValue() : plus(result, entry.getValue());
+				}			
+
+				result = division(result, context.size());
 			}
-		}
-		
-		ValueAbstract result = null;
-		final int count = values.size();
-		for (ValueAbstract context : values) {
-			if (result == null) {
-				result = context;
-			} else {
-				result = result.add(context);
+		} else {
+			result = plus(param1, param2);
+			for (Object context : values) {
+				result = plus(result, context);
 			}
+			result = division(result, 2 + values.length);
 		}
-		
-		return result != null ? result.division(new ValueInt(count)) : null;
+		return result;
 	}
 	
-	/**
-	 * 求和，第一参数为对象列表，则对对象集合求和。
-	 * @param params
-	 * @return
-	 */
+	@SuppressWarnings("unchecked")
 	@ELFunction(flexible = true)
-	static ValueAbstract funSum(List<ValueAbstract> params) {
-		Collection<ValueAbstract> values = params;
-		if (params.get(0).getType() == Type.List) {
-			ValueAbstract param2 = params.get(1);
-			if (param2.getType() == Type.ListAbstract) {
-				values = ((ValueListAbstract)param2).value.values();
+	static Object funSum(Object param1, Object param2, Object... values) {
+		Object result = null;
+		if (param1.getClass() == Collection.class) {
+			if (param2.getClass() == Map.class) {
+				for (Entry<Long, Object> entry : ((Map<Long, Object>)param2).entrySet()) {
+					result = result == null ? entry.getValue() : plus(result, entry.getValue());
+				}
 			}
-		}
-		ValueAbstract result = null;
-		for (ValueAbstract context : values) {
-			if (result == null) {
-				result = context;
-			} else {
-				result = result.add(context);
+		} else {
+			result = plus(param1, param2);
+			for (Object context : values) {
+				result = plus(result, context);
 			}
 		}
 		
 		return result;
 	}
 	
-	/**
-	 * Guard函数，如果第一参数为null则返回第二参数，否则返回第一参数。
-	 * @param params
-	 * @return
-	 */
-	static ValueAbstract guard(ValueAbstract param1, ValueAbstract param2) {
+	@ELFunction
+	static Object guard(@ELParm(nullable = true) Object param1, Object param2) {
 		if (param1 == null) {
 			return param2;
-		} else if (param1.getType() == Type.TEXT && ((ValueText)param1).value.isEmpty()) {
+		} else if (param1.getClass() == String.class && ((String)param1).isEmpty()) {
 			return param2;
 		}
 		

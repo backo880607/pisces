@@ -6,7 +6,7 @@ import com.pisces.core.annotation.ELParm;
 class MathFunction {
 	
 	static void register(FunctionManager manager) {
-		manager.registerUserFunction(MathFunction.class);
+		manager.registerInnerFunction(MathFunction.class);
 	}
 	
 	/**
@@ -14,10 +14,12 @@ class MathFunction {
 	 * @param params
 	 * @return
 	 */
-	@ELFunction()
-	public static Double funAbs(@ELParm(clazz = {Long.class, Double.class}) Object param) {
-		double value = param.getClass() == Long.class ? (Long)param : (Double)param;
-		return Math.abs(value);
+	@ELFunction(returnBy = 1)
+	public static Object funAbs(@ELParm(clazz = {Long.class, Double.class}) Object param) {
+		if (param.getClass() == Long.class) {
+			return Math.abs((long)param);
+		}
+		return Math.abs((double)param);
 	}
 	
 	/**

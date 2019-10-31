@@ -1,14 +1,12 @@
 package com.pisces.core.primary.expression.calculate;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueDouble;
 
 public class DoubleCalculate implements Calculate {
-	public ValueDouble value;
+	public double value;
 	
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
+	public Object GetValue(EntityObject entity) {
 		return value;
 	}
 	

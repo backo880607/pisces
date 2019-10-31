@@ -388,24 +388,6 @@ public class EntityUtils {
 		}
 	}
 	
-	/*
-	 * public static Object convertTextValue(Property property, String str,
-	 * ObjectMapper mapper) { if (property.getType() == PROPERTY_TYPE.ENTITY ||
-	 * property.getType() == PROPERTY_TYPE.LIST) { throw new
-	 * UnsupportedOperationException(); }
-	 * 
-	 * if (mapper == null) { mapper = defaultObjectMapper(); }
-	 * 
-	 * try { return mapper.readValue(str, property.clazz); } catch (IOException e) {
-	 * throw new UnsupportedOperationException(); } }
-	 */
-	
-	/*
-	 * public static void setTextValue(EntityObject entity, Property property,
-	 * String str, ObjectMapper mapper) { setValue(entity, property,
-	 * convertTextValue(property, str, mapper)); }
-	 */
-	
 	public static EntityMapper createEntityMapper() {
 		EntityMapper mapper = new EntityMapper();
 		SimpleModule module = new SimpleModule();

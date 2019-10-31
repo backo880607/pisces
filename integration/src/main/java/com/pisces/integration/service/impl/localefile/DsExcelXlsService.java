@@ -1,4 +1,4 @@
-package com.pisces.integration.service.impl;
+package com.pisces.integration.service.impl.localefile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +12,7 @@ import com.pisces.integration.bean.DsLocaleFile;
 import com.pisces.integration.enums.LOCALE_FILE_TYPE;
 
 @Service
-public class DsExcelXlsServiceImpl extends DsExcelServiceImpl<LOCALE_FILE_TYPE> {
+public class DsExcelXlsService extends DsExcelService<LOCALE_FILE_TYPE> {
 	private static final String EXTENSION = "xls";
 	
 	@Override

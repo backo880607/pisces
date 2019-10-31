@@ -1,4 +1,4 @@
-package com.pisces.integration.service.impl;
+package com.pisces.integration.service.impl.localefile;
 
 import java.io.File;
 import java.io.FileInputStream;

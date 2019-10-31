@@ -5,14 +5,13 @@ import java.util.Map.Entry;
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.Expression;
 import com.pisces.core.primary.expression.ExpressionNode;
-import com.pisces.core.primary.expression.value.ValueAbstract;
 
 public class BracketCalculate implements Calculate {
 	private Expression value = new Expression();
 
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
-		return this.value.getValueAbstract(entity);
+	public Object GetValue(EntityObject entity) {
+		return this.value.getValueImpl(entity);
 	}
 
 	@Override

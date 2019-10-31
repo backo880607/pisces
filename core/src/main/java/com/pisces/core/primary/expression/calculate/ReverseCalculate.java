@@ -1,18 +1,16 @@
 package com.pisces.core.primary.expression.calculate;
 
+import java.util.Collection;
 import java.util.TreeMap;
 
 import com.pisces.core.entity.EntityObject;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueList;
-import com.pisces.core.relation.RefBase;
 
 public class ReverseCalculate implements Calculate {
-	private TreeMap<EntityObject, RefBase> value = new TreeMap<>();
+	private TreeMap<EntityObject, Collection<EntityObject>> value = new TreeMap<>();
 	
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
-		return new ValueList(this.value.get(entity));
+	public Object GetValue(EntityObject entity) {
+		return this.value.get(entity);
 	}
 
 	@Override

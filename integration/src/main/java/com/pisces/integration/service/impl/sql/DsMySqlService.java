@@ -1,4 +1,4 @@
-package com.pisces.integration.service.impl;
+package com.pisces.integration.service.impl.sql;
 
 import org.springframework.stereotype.Service;
 
@@ -6,9 +6,9 @@ import com.pisces.integration.enums.SQL_TYPE;
 import com.pisces.rds.provider.base.MySqlProvider;
 
 @Service
-class DsMySqlServiceImpl extends SqlDataSourceServiceImpl<SQL_TYPE> {
+class DsMySqlService extends SqlDataSourceService<SQL_TYPE> {
 
-	public DsMySqlServiceImpl() {
+	public DsMySqlService() {
 		super(new MySqlProvider());
 	}
 

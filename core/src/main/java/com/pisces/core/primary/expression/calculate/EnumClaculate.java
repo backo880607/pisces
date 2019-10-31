@@ -2,14 +2,12 @@ package com.pisces.core.primary.expression.calculate;
 
 import com.pisces.core.entity.EntityObject;
 import com.pisces.core.primary.expression.EnumHelper;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueEnum;
 
 public class EnumClaculate implements Calculate {
-	private ValueEnum value;
+	private Enum<?> value;
 	
 	@Override
-	public ValueAbstract GetValue(EntityObject entity) {
+	public Object GetValue(EntityObject entity) {
 		return value;
 	}
 
@@ -38,7 +36,7 @@ public class EnumClaculate implements Calculate {
 			for (Object tso : enumCls.getEnumConstants()) {
 				Enum<?> ts = (Enum<?>)tso;
 				if (ts.name().equalsIgnoreCase(name)) {
-					this.value = new ValueEnum(ts);
+					this.value = ts;
 					return index;
 				}
 			}
@@ -48,6 +46,6 @@ public class EnumClaculate implements Calculate {
 
 	@Override
 	public Class<?> getReturnClass() {
-		return Enum.class;
+		return this.value.getClass();
 	}
 }

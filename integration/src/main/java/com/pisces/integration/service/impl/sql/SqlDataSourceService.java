@@ -1,4 +1,4 @@
-package com.pisces.integration.service.impl;
+package com.pisces.integration.service.impl.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,7 +27,7 @@ import com.pisces.rds.provider.base.SQLProvider;
 
 import tk.mybatis.mapper.entity.EntityColumn;
 
-abstract class SqlDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegister<T> {
+abstract class SqlDataSourceService<T extends Enum<T>> extends AdapterRegister<T> {
 	private SQLProvider provider;
 	private Connection conn;
 	private Statement stmt;
@@ -38,7 +38,7 @@ abstract class SqlDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegist
 	@Autowired
 	private PropertyService propertyService;
 	
-	public SqlDataSourceServiceImpl(SQLProvider provider) {
+	public SqlDataSourceService(SQLProvider provider) {
 		this.provider = provider;
 	}
 	

@@ -2,7 +2,7 @@ package com.pisces.core.primary.expression.calculate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collection;
 import java.util.List;
 
 import com.pisces.core.config.CoreMessage;
@@ -10,18 +10,6 @@ import com.pisces.core.entity.EntityObject;
 import com.pisces.core.entity.Property;
 import com.pisces.core.enums.PROPERTY_TYPE;
 import com.pisces.core.exception.ExpressionException;
-import com.pisces.core.primary.expression.value.InvalidEnum;
-import com.pisces.core.primary.expression.value.ValueAbstract;
-import com.pisces.core.primary.expression.value.ValueBoolean;
-import com.pisces.core.primary.expression.value.ValueDateTime;
-import com.pisces.core.primary.expression.value.ValueDouble;
-import com.pisces.core.primary.expression.value.ValueDuration;
-import com.pisces.core.primary.expression.value.ValueEnum;
-import com.pisces.core.primary.expression.value.ValueInt;
-import com.pisces.core.primary.expression.value.ValueList;
-import com.pisces.core.primary.expression.value.ValueText;
-import com.pisces.core.relation.RefBase;
-import com.pisces.core.relation.RefList;
 import com.pisces.core.utils.AppUtils;
 import com.pisces.core.utils.EntityUtils;
 
@@ -30,67 +18,36 @@ public class PropertyCalculate implements Calculate {
 	private List<Property> paths = new ArrayList<>();
 	private boolean isList = false;
 	
-	private ValueAbstract convertValue(Object value) {
+	private Object convertValue(Object value) {
 		if (value == null) {
-			switch (property.getType()) {
-			case BOOLEAN:
-				return new ValueBoolean(false);
-			case LONG:
-				return new ValueInt(0);
-			case DOUBLE:
-				return new ValueDouble(0.0);
-			case DATE:
-				return new ValueDateTime(new Date(0), property.getType());
-			case DURATION:
-				return new ValueDuration("");
-			case ENUM:
-				return new ValueEnum(InvalidEnum.NONE);
-			case STRING:
-				return new ValueText("");
-			case ENTITY:
-			case LIST:
-			default:
-				break;
-			}
-		} else {
-			switch (property.getType()) {
-			case BOOLEAN:
-				return new ValueBoolean((boolean)value);
-			case LONG:
-				return new ValueInt((long)value);
-			case DOUBLE:
-				return new ValueDouble((double)value);
-			case DATE:
-			case TIME:
-			case DATE_TIME:
-				return new ValueDateTime((Date)value, property.getType());
-			case DURATION:
-				return new ValueDuration((String)value);
-			case ENUM:
-				return new ValueEnum((Enum<?>)value);
-			case STRING:
-				return new ValueText((String)value);
-			case ENTITY:
-				break;
-			case LIST:
-				return new ValueList((RefBase)value);
-			default:
-				break;
-			}
+			throw new NullPointerException();
+		}
+		switch (property.getType()) {
+		case BOOLEAN:
+			return (boolean)value;
+		case LONG:
+			return (long)value;
+		case DOUBLE:
+			return (double)value;
+		case DATE:
+		case TIME:
+		case DATE_TIME:
+		case DURATION:
+		case ENUM:
+		case MULTI_ENUM:
+		case STRING:
+		case ENTITY:
+		case LIST:
+			return value;
+		default:
+			break;
 		}
 		
 		throw new UnsupportedOperationException(this.property.getType() + " is not supported!");
 	}
 	
-	/**
-	 * 取级联对象列表实现
-	 * 
-	 * @param result
-	 * @param entity
-	 * @param args
-	 * @param index
-	 */
-	private static void getListImpl(List<EntityObject> result, EntityObject entity, List<Property> paths, int index) {
+	@SuppressWarnings("unchecked")
+	private static void getListImpl(Collection<EntityObject> result, EntityObject entity, List<Property> paths, int index) {
 		if (index >= paths.size()) {
 			result.add(entity);
 		} else {
@@ -100,7 +57,7 @@ public class PropertyCalculate implements Calculate {
 					if (paths.get(index).getType() == PROPERTY_TYPE.ENTITY) {
 						getListImpl(result, (EntityObject)relaEntity, paths, index + 1);
 					} else if (paths.get(index).getType() == PROPERTY_TYPE.LIST) {
-						for (EntityObject rela : (RefBase)relaEntity) {
+						for (EntityObject rela : (Collection<EntityObject>)relaEntity) {
 							getListImpl(result, rela, paths, index + 1);
 						}
 					}
@@ -111,10 +68,11 @@ public class PropertyCalculate implements Calculate {
 		}
 	}
 	
-	private RefBase GetListValue(EntityObject entity) {
-		List<EntityObject> entities = new ArrayList<>();
+	@SuppressWarnings("unchecked")
+	private Collection<EntityObject> GetListValue(EntityObject entity) {
+		Collection<EntityObject> entities = new ArrayList<>();
 		getListImpl(entities, entity, this.paths, 0);
-		RefBase result = new RefList();
+		Collection<EntityObject> result = new ArrayList<EntityObject>();
 		for (EntityObject curEntity : entities) {
 			Object val = EntityUtils.getValue(curEntity, this.property);
 			if (val == null) {
@@ -123,15 +81,15 @@ public class PropertyCalculate implements Calculate {
 			if (this.property.getType() == PROPERTY_TYPE.ENTITY) {
 				result.add((EntityObject)val);
 			} else if (this.property.getType() == PROPERTY_TYPE.LIST) {
-				result.addAll(((RefBase)val).collection());
+				result.addAll((Collection<EntityObject>)val);
 			}
 		}
 		return result;
 	}
 	
-	public ValueAbstract GetValue(EntityObject entity) {
+	public Object GetValue(EntityObject entity) {
 		if (this.isList) {
-			return new ValueList(GetListValue(entity));
+			return GetListValue(entity);
 		}
 		EntityObject relaEntity = entity;
 		for (Property path : this.paths) {
@@ -194,12 +152,6 @@ public class PropertyCalculate implements Calculate {
 			if (this.property == null) {
 				throw new ExpressionException(CoreMessage.InvalidProperty, propertyClazz.getName(), name);
 			}
-			if (this.property.getType() == PROPERTY_TYPE.ENTITY) {
-				//throw new ExpressionException("last property: " + name + " cannot be object");
-			}
-			if (this.property.getType() == PROPERTY_TYPE.LIST) {
-				this.isList = true;
-			}
 			
 			return index;
 		}
@@ -209,6 +161,6 @@ public class PropertyCalculate implements Calculate {
 
 	@Override
 	public Class<?> getReturnClass() {
-		return this.property.getType() != PROPERTY_TYPE.LIST ? this.property.clazz : RefBase.class;
+		return this.property.getType() != PROPERTY_TYPE.LIST ? this.property.clazz : Collection.class;
 	}
 }

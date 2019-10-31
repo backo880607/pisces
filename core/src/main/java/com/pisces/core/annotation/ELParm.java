@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ELParm {
 	Class<?>[] clazz() default {};
+	boolean nullable() default false;
 }

@@ -9,7 +9,7 @@ import com.pisces.integration.bean.Scheme;
 import com.pisces.integration.helper.AdapterRegister;
 import com.pisces.integration.helper.DataConfig;
 
-abstract class XMLDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegister<T> {
+public abstract class JsonDataSourceService<T extends Enum<T>> extends AdapterRegister<T> {
 
 	@Override
 	public void modifyConfig(DataConfig config) {
@@ -53,26 +53,21 @@ abstract class XMLDataSourceServiceImpl<T extends Enum<T>> extends AdapterRegist
 
 	@Override
 	public void beforeWriteTable(Scheme scheme, Collection<FieldInfo> fields) throws Exception {
-		
 	}
 
 	@Override
 	public void beforeWriteEntity(EntityObject entity) throws Exception {
-		
 	}
 
 	@Override
 	public void write(int index, String data) throws Exception {
-		
 	}
 
 	@Override
 	public void afterWriteEntity(EntityObject entity) throws Exception {
-		
 	}
 
 	@Override
 	public void afterWriteTable(Scheme scheme) throws Exception {
-		
 	}
 }
