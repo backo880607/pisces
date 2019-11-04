@@ -237,13 +237,20 @@
   </dependencies>
   
   <scm>
-    <!-- git项目地址可以用SSH -->    
-    <connection>scm:git:git@github.com:backo880607/pisces.git</connection>
-    <developerConnection>scm:git:git@github.com:backo880607/pisces.git</developerConnection>
     <!-- git项目浏览器里的地址 -->   
-    <url>http://localhost:9001/repository/pisces-dev-releases/</url>
-    <tag>HEAD</tag>
+    <url>https://github.com/backo880607/pisces</url>
+    <!-- git项目地址可以用SSH -->    
+    <connection>scm:git:https://github.com/backo880607/pisces.git</connection>
+    <developerConnection>scm:git:git@github.com:backo880607/pisces.git</developerConnection>
   </scm>
+  <developers>
+    <developer>
+      <email>jason.niu@estsh.com</email>
+      <name>jason</name>
+      <url>https://github.com/backo880607</url>
+      <id>backo880607</id>
+    </developer>
+  </developers>
   
   <build>
 	  <plugins>
