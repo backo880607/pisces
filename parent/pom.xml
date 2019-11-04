@@ -238,8 +238,8 @@
   
   <scm>
     <!-- git项目地址可以用SSH  也可以用 HTTPS的 -->    
-    <connection>scm:git:git@github.com:backo880607/pisces.git</connection>
-    <developerConnection>scm:git:git@github.com:backo880607/pisces.git</developerConnection>
+    <connection>scm:git:https://github.com/backo880607/pisces.git</connection>
+    <developerConnection>scm:git:https://github.com/backo880607/pisces.git</developerConnection>
     <!-- git项目浏览器里的地址 -->   
     <url>http://localhost:9001/repository/pisces-dev-releases/</url>
   </scm>
