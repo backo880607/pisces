@@ -4,7 +4,7 @@
   <parent>
   	<groupId>com.pisces</groupId>
   	<artifactId>parent</artifactId>
-  	<version>0.0.1-SNAPSHOT</version>
+  	<version>0.1.1-SNAPSHOT</version>
   	<relativePath>../parent/pom.xml</relativePath> <!-- lookup parent from repository -->
   </parent>
 
@@ -15,11 +15,11 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-    <user.version>0.0.1-SNAPSHOT</user.version>
-    <integration.version>0.0.1-SNAPSHOT</integration.version>
-    <language.version>0.0.1-SNAPSHOT</language.version>
-    <report.version>0.0.1-SNAPSHOT</report.version>
-    <nosql.version>0.0.1-SNAPSHOT</nosql.version>
+    <user.version>${project.version}</user.version>
+    <integration.version>${project.version}</integration.version>
+    <language.version>${project.version}</language.version>
+    <report.version>${project.version}</report.version>
+    <nosql.version>${project.version}</nosql.version>
   </properties>
 
   <dependencies>

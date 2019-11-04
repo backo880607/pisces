@@ -4,7 +4,7 @@
   <parent>
 	<groupId>com.pisces</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<relativePath>../parent/pom.xml</relativePath> <!-- lookup parent from repository -->
   </parent>
 
@@ -15,8 +15,8 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-  	<web.version>0.0.1-SNAPSHOT</web.version>
-	<rds.version>0.0.1-SNAPSHOT</rds.version>
+  	<web.version>${project.version}</web.version>
+	<rds.version>${project.version}</rds.version>
   </properties>
 
   <dependencies>

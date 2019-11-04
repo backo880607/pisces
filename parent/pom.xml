@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.pisces</groupId>
   <artifactId>parent</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>pisces parent</name>
   <url>http://maven.apache.org</url>
@@ -250,6 +250,23 @@
 			  </goals>
 			</execution>
 		  </executions>
+		</plugin>
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-release-plugin</artifactId>
+		  <configuration>
+		    <releaseProfiles>prod</releaseProfiles>
+		    <autoVersionSubmodules>true</autoVersionSubmodules>
+		    <tagBase>https://github.com/backo880607/pisces.git</tagBase>
+		    <tagNameFormat>v@{project.version}</tagNameFormat>
+		  </configuration>
+		</plugin>
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-scm-plugin</artifactId>
+		  <configuration>
+		    <connectionType>developerConnection</connectionType>
+		  </configuration>
 		</plugin>
 	  </plugins>
   </build>
