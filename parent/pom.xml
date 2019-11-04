@@ -308,6 +308,7 @@
 		    <autoVersionSubmodules>true</autoVersionSubmodules>
 		    <tagBase>https://github.com/backo880607/pisces.git</tagBase>
 		    <tagNameFormat>v@{project.version}</tagNameFormat>
+		    <arguments>-DskipTests</arguments>
 		  </configuration>
 		</plugin>
 		<plugin>
