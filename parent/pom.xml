@@ -73,6 +73,11 @@
 	  	  <scope>import</scope>
 	  	</dependency>
 	  	<dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>core</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
+	  	<dependency>
 	  	  <groupId>com.alibaba</groupId>
 	  	  <artifactId>druid-spring-boot-starter</artifactId>
 	  	  <version>${alibaba.druid.version}</version>
