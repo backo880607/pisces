@@ -244,14 +244,6 @@
     <url>https://github.com/backo880607/pisces</url>
     <tag>HEAD</tag>
   </scm>
-  <developers>
-    <developer>
-      <email>jason.niu@estsh.com</email>
-      <name>jason</name>
-      <url>https://github.com/backo880607</url>
-      <id>backo880607</id>
-    </developer>
-  </developers>
   
   <build>
 	  <plugins>
