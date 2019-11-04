@@ -77,6 +77,41 @@
 	  	  <artifactId>core</artifactId>
 	  	  <version>${project.version}</version>
 	    </dependency>
+	    <dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>rds</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
+	    <dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>nosql</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
+	    <dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>web</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
+	    <dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>language</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
+	    <dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>user</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
+	    <dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>integration</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
+	    <dependency>
+	  	  <groupId>com.pisces</groupId>
+	  	  <artifactId>report</artifactId>
+	  	  <version>${project.version}</version>
+	    </dependency>
 	  	<dependency>
 	  	  <groupId>com.alibaba</groupId>
 	  	  <artifactId>druid-spring-boot-starter</artifactId>

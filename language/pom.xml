@@ -15,20 +15,16 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-  	<rds.version>${project.version}</rds.version>
-  	<web.version>${project.version}</web.version>
   </properties>
 
   <dependencies>
     <dependency>
   	  <groupId>com.pisces</groupId>
 	  <artifactId>rds</artifactId>
-	  <version>${rds.version}</version>
 	</dependency>
 	<dependency>
   	  <groupId>com.pisces</groupId>
 	  <artifactId>web</artifactId>
-	  <version>${web.version}</version>
 	</dependency>
   </dependencies>
 </project>

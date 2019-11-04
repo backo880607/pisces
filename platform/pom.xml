@@ -15,38 +15,28 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-    <user.version>${project.version}</user.version>
-    <integration.version>${project.version}</integration.version>
-    <language.version>${project.version}</language.version>
-    <report.version>${project.version}</report.version>
-    <nosql.version>${project.version}</nosql.version>
   </properties>
 
   <dependencies>
 	<dependency>
   	  <groupId>com.pisces</groupId>
 	  <artifactId>user</artifactId>
-	  <version>${user.version}</version>
 	</dependency>
 	<dependency>
   	  <groupId>com.pisces</groupId>
 	  <artifactId>integration</artifactId>
-	  <version>${integration.version}</version>
 	</dependency>
 	<dependency>
   	  <groupId>com.pisces</groupId>
 	  <artifactId>language</artifactId>
-	  <version>${language.version}</version>
 	</dependency>
 	<dependency>
 	  <groupId>com.pisces</groupId>
 	  <artifactId>nosql</artifactId>
-	  <version>${nosql.version}</version>
 	</dependency>
 	<dependency>
 	  <groupId>com.pisces</groupId>
 	  <artifactId>report</artifactId>
-	  <version>${report.version}</version>
 	</dependency>
   </dependencies>
 </project>
