@@ -236,6 +236,29 @@
     </dependency>
   </dependencies>
   
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <!-- 开发者信息 -->
+  <developers>
+    <developer>
+      <name>jason.niu</name>
+      <url>http://blog.yuqiyu.com</url>
+      <email>backo@163.com</email>
+      <organization>Google</organization>
+      <organizationUrl>http://www.google.com</organizationUrl>
+      <roles>
+        <role>owner</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+    
   <scm>
     <!-- git项目地址可以用SSH -->    
     <connection>scm:git:https://github.com/backo880607/pisces.git</connection>
@@ -246,6 +269,7 @@
   </scm>
   
   <build>
+      <finalName>${project.artifactId}-${project.version}</finalName>
 	  <plugins>
 		<!-- Compiler -->
 		<plugin>
@@ -318,6 +342,11 @@
 		  <configuration>
 		    <connectionType>developerConnection</connectionType>
 		  </configuration>
+		</plugin>
+		<!-- 对发布的包进行数字签名 -->
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-gpg-plugin</artifactId>
 		</plugin>
 	  </plugins>
   </build>
