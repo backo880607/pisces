@@ -12,7 +12,7 @@
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
 
-  <name>pisces-core</name>
+  <name>core</name>
 
   <properties>
   </properties>
