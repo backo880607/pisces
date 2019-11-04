@@ -241,7 +241,7 @@
     <connection>scm:git:https://github.com/backo880607/pisces.git</connection>
     <developerConnection>scm:git:https://github.com/backo880607/pisces.git</developerConnection>
     <!-- git项目浏览器里的地址 -->   
-    <url>https://github.com/backo880607/pisces/tree/master</url>
+    <url>http://localhost:9001/repository/pisces-dev-releases/</url>
   </scm>
   
   <build>
