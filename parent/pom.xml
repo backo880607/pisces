@@ -46,7 +46,7 @@
   	<pagehelper-spring-boot-starter.version>1.2.7</pagehelper-spring-boot-starter.version>
   	<oracle.version>10.2.0.4.0</oracle.version>
   	
-  	<retrofit.version>2.3.0</retrofit.version>
+  	<retrofit.version>2.5.0</retrofit.version>
   	
   	<java-jwt.version>3.2.0</java-jwt.version>
   	<jjwt.version>0.7.0</jjwt.version>
