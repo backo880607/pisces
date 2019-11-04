@@ -237,11 +237,12 @@
   </dependencies>
   
   <scm>
-    <!-- git项目地址可以用SSH  也可以用 HTTPS的 -->    
-    <connection>scm:git:https://github.com/backo880607/pisces.git</connection>
-    <developerConnection>scm:git:https://github.com/backo880607/pisces.git</developerConnection>
+    <!-- git项目地址可以用SSH -->    
+    <connection>scm:git:git@github.com:backo880607/pisces.git</connection>
+    <developerConnection>scm:git:git@github.com:backo880607/pisces.git</developerConnection>
     <!-- git项目浏览器里的地址 -->   
     <url>http://localhost:9001/repository/pisces-dev-releases/</url>
+    <tag>HEAD</tag>
   </scm>
   
   <build>
@@ -304,10 +305,6 @@
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-release-plugin</artifactId>
 		  <configuration>
-		    <!--git用户名-->
-            <username>backo880607</username>
-            <!--git密码-->
-            <password>niu880607haitao</password>
 		    <releaseProfiles>prod</releaseProfiles>
 		    <autoVersionSubmodules>true</autoVersionSubmodules>
 		    <tagBase>https://github.com/backo880607/pisces.git</tagBase>
