@@ -307,7 +307,7 @@
 		  <configuration>
 		    <releaseProfiles>prod</releaseProfiles>
 		    <autoVersionSubmodules>true</autoVersionSubmodules>
-		    <tagBase>https://github.com/backo880607/pisces.git</tagBase>
+		    <tagBase>https://github.com/backo880607/pisces/tree/master</tagBase>
 		    <tagNameFormat>v@{project.version}</tagNameFormat>
 		    <arguments>-DskipTests</arguments>
 		  </configuration>
@@ -326,12 +326,12 @@
   <!-- mvn deploy的发布地址 -->
   <distributionManagement>
     <repository>
-	  <id>nexus-releases</id>
+	  <id>releases</id>
       <name>Nexus Release Repository</name>
       <url>http://localhost:9001/repository/pisces-dev-releases/</url>
 	</repository>
 	<snapshotRepository>
-	  <id>nexus-snapshots</id>
+	  <id>snapshots</id>
       <name>Nexus Snapshot Repository</name>
       <url>http://localhost:9001/repository/pisces-dev-snapshots/</url>
 	  <uniqueVersion>true</uniqueVersion>
