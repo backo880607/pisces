@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <parent>
+	  <groupId>com.pisces.platform</groupId>
+	  <artifactId>parent</artifactId>
+	  <version>0.1.1-SNAPSHOT</version>
+	</parent>
+  <modelVersion>4.0.0</modelVersion>
+  
+  <artifactId>nosql</artifactId>
+  <packaging>jar</packaging>
+  
+  <name>nosql</name>
+  <url>http://maven.apache.org</url>
+  
+  <properties>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+	  <groupId>com.pisces.platform</groupId>
+	  <artifactId>core</artifactId>
+	</dependency>
+	<dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-mongodb</artifactId>
+    </dependency>
+
+   <!--  <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-neo4j</artifactId>
+    </dependency>
+    neo4j二进制驱动，默认http(s)协议
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-ogm-bolt-driver</artifactId>
+    </dependency> -->
+  </dependencies>
+	
+</project>

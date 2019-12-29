@@ -1,0 +1,52 @@
+package com.pisces.platform.core.converter;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
+import com.pisces.platform.core.entity.BaseDeserializer;
+import com.pisces.platform.core.entity.MultiEnum;
+import com.pisces.platform.core.entity.Property;
+
+import java.io.IOException;
+
+public class MultiEnumDeserializer extends BaseDeserializer<MultiEnum<? extends Enum<?>>> implements ContextualDeserializer {
+    private Class<? extends MultiEnum<? extends Enum<?>>> clazz;
+
+    @Override
+    public final MultiEnum<? extends Enum<?>> deserialize(JsonParser p, DeserializationContext ctxt)
+            throws IOException {
+        MultiEnum<? extends Enum<?>> result;
+        try {
+            result = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new InvalidTypeIdException(p, e.getMessage(), null, clazz.getName());
+        }
+        result.parse(p.getText());
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) {
+        Class<? extends MultiEnum<? extends Enum<?>>> rawCls = (Class<? extends MultiEnum<? extends Enum<?>>>) ctxt.getContextualType().getRawClass();
+        MultiEnumDeserializer deser = new MultiEnumDeserializer();
+        deser.clazz = rawCls;
+        return deser;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public MultiEnum<? extends Enum<?>> deserialize(Property property, String value) {
+        MultiEnum<? extends Enum<?>> result = null;
+        try {
+            result = (MultiEnum<? extends Enum<?>>) property.clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+        }
+        result.parse(value);
+        return result;
+    }
+}
