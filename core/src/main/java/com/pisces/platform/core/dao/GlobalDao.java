@@ -56,7 +56,7 @@ public class GlobalDao<T extends EntityObject> implements BaseDao<T> {
     }
 
     @Override
-    public int insertList(Collection<T> recordList) {
+    public int insertList(List<T> recordList) {
         throw new UnsupportedOperationException("insert global entity is not allowed");
     }
 

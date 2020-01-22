@@ -72,7 +72,7 @@ public class SQLSingletonDao<T extends EntityObject> extends SqlSessionDaoSuppor
     }
 
     @Override
-    public int insertList(Collection<T> recordList) {
+    public int insertList(List<T> recordList) {
         throw new UnsupportedOperationException("insert Singleton entity is not allowed");
     }
 

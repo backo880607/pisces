@@ -75,7 +75,7 @@ public class RedisDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public int insertList(Collection<T> recordList) {
+	public int insertList(List<T> recordList) {
 		Map<Long, T> records = new HashMap<>();
 		for (T record : recordList) {
 			records.put(record.getId(), record);

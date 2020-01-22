@@ -80,7 +80,7 @@ public class MemoryDao<T extends EntityObject> implements BaseDao<T> {
     }
 
     @Override
-    public int insertList(Collection<T> recordList) {
+    public int insertList(List<T> recordList) {
         for (T record : recordList) {
             insert(record);
         }

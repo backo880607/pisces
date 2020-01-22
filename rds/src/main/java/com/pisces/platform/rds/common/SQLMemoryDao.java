@@ -1,20 +1,19 @@
 package com.pisces.platform.rds.common;
 
+import com.github.pagehelper.PageInfo;
 import com.pisces.platform.core.dao.BaseDao;
 import com.pisces.platform.core.dao.DaoManager;
 import com.pisces.platform.core.dao.impl.DaoImpl;
 import com.pisces.platform.core.dao.impl.MemoryModifyDaoImpl;
 import com.pisces.platform.core.entity.EntityObject;
 import com.pisces.platform.core.utils.EntityUtils;
+import com.pisces.platform.rds.provider.Transmit;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport implements BaseDao<T> {
@@ -98,7 +97,7 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
     }
 
     @Override
-    public int insertList(Collection<T> recordList) {
+    public int insertList(List<T> recordList) {
         for (T record : recordList) {
             insert(record);
         }
@@ -116,9 +115,7 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
             EntityUtils.copyIgnoreNull(record, oldRecord);
         }
 
-        if (!oldRecord.getCreated()) {
-            oldRecord.setModified(true);
-        }
+        oldRecord.setModified(true);
         return 1;
     }
 
@@ -146,11 +143,11 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 
     @Override
     public int deleteByPrimaryKey(Object key) {
-        if (impl.get().records.remove(key) != null) {
+        T oldRecord = impl.get().records.remove(key);
+        if (oldRecord != null && !oldRecord.getCreated()) {
             impl.get().deleteds.add((Long) key);
-            return 1;
         }
-        return 0;
+        return oldRecord != null ? 1 : 0;
     }
 
     @Override
@@ -172,29 +169,12 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 
     @Override
     public void sync() {
-        List<T> creates = new ArrayList<>();
-        List<T> modifies = new ArrayList<>();
-        for (Entry<Long, T> entry : impl.get().records.entrySet()) {
-            T record = entry.getValue();
-            if (record.getCreated()) {
-                creates.add(record);
-            } else if (record.getModified()) {
-                modifies.add(record);
+        if (Transmit.instance.add(mapper, impl.get().records, impl.get().deleteds)) {
+            impl.get().deleteds.clear();
+            for (Map.Entry<Long, T> entry : impl.get().records.entrySet()) {
+                entry.getValue().setCreated(false);
+                entry.getValue().setModified(false);
             }
-        }
-
-        if (!impl.get().deleteds.isEmpty()) {
-            this.mapper.deleteByPrimaryKeys(impl.get().deleteds);
-        }
-
-        if (!creates.isEmpty()) {
-            this.mapper.insertList(creates);
-        }
-
-        for (Entry<Long, T> entry : impl.get().records.entrySet()) {
-            T record = entry.getValue();
-            record.setCreated(false);
-            record.setModified(false);
         }
     }
 

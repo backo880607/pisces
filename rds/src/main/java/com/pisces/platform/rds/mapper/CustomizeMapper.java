@@ -19,9 +19,6 @@ public interface CustomizeMapper<T> {
     @SelectProvider(type = CustomizeProvider.class, method = "dynamicSQL")
     List<T> selectByIds(Collection<Long> idList);
 
-    @InsertProvider(type = CustomizeProvider.class, method = "dynamicSQL")
-    int insertList(Collection<T> recordList);
-
     @UpdateProvider(type = CustomizeProvider.class, method = "dynamicSQL")
     int update(T record);
 

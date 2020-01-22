@@ -19,7 +19,7 @@ public interface BaseDao<T extends EntityObject> {
 
     int insert(T record);
 
-    int insertList(Collection<T> recordList);
+    int insertList(List<T> recordList);
 
     int update(T record);
 

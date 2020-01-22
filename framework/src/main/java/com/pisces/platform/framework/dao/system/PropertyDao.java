@@ -129,7 +129,7 @@ public class PropertyDao implements BaseDao<Property> {
 	}
 
 	@Override
-	public int insertList(Collection<Property> recordList) {
+	public int insertList(List<Property> recordList) {
 		mapper.insertList(recordList);
 		for (Property property : recordList) {
 			impl.get().insert(property);

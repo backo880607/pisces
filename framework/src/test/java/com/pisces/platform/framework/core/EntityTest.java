@@ -5,6 +5,7 @@ import com.pisces.platform.core.entity.Property;
 import com.pisces.platform.core.service.PropertyService;
 import com.pisces.platform.core.utils.EntityUtils;
 import com.pisces.platform.framework.PiscesBaseTest;
+import com.pisces.platform.rds.provider.Transmit;
 import com.pisces.platform.user.bean.Account;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,5 +48,6 @@ public class EntityTest extends PiscesBaseTest {
 		Property strPro = propertyService.get(Account.class, "username");
 		String strValue = mapper.getTextValue(nht, strPro);
 		Assert.assertEquals("niuhaitao", strValue);
+		Transmit.instance.stop();
 	}
 }

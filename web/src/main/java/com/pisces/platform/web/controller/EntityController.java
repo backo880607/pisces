@@ -43,8 +43,8 @@ public abstract class EntityController<T extends EntityObject, S extends EntityS
 
     @GetMapping(value = "getByPage")
     @ExceptionMessage(clazz = WebMessage.class, name = "GET")
-    public ResponseData getByPage(@RequestParam(required = true) int pageNum, @RequestParam(required = true) int pageSize,
-                                  @RequestParam(required = true) String orderBy, @RequestParam(required = true) String filter) {
+    public ResponseData getByPage(@RequestParam int pageNum, @RequestParam int pageSize,
+                                  @RequestParam String orderBy, @RequestParam String filter) {
         PageParam param = new PageParam();
         param.setPageNum(pageNum);
         param.setPageSize(pageSize);

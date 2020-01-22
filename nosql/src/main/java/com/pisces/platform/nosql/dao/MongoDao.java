@@ -58,7 +58,7 @@ public class MongoDao<T extends EntityObject> implements BaseDao<T> {
 	}
 
 	@Override
-	public int insertList(Collection<T> recordList) {
+	public int insertList(List<T> recordList) {
 		return 0;
 	}
 

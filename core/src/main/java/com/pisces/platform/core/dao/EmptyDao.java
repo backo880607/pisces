@@ -39,7 +39,7 @@ public class EmptyDao<T extends EntityObject> implements BaseDao<T> {
     }
 
     @Override
-    public int insertList(Collection<T> recordList) {
+    public int insertList(List<T> recordList) {
         throw new UnsupportedOperationException("insert empty dao is not allowed");
     }
 

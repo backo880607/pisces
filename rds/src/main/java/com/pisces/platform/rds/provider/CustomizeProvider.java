@@ -29,6 +29,7 @@ public class CustomizeProvider extends BaseProvider {
             notChecked = false;
             ms.getConfiguration().setObjectWrapperFactory(new EntityWrapperFactory());
             ms.getConfiguration().setObjectFactory(new MybatisEntityFactory());
+            Transmit.instance.start();
             return;
         }
         Class<?> entityClazz = getEntityClass(ms);
@@ -128,26 +129,26 @@ public class CustomizeProvider extends BaseProvider {
         return sql.toString();
     }
 
-    public String insertList(MappedStatement ms) {
-        final Class<?> entityClazz = getEntityClass(ms);
-        StringBuilder sql = new StringBuilder();
-        sql.append(SqlHelper.insertIntoTable(entityClazz, tableName(entityClazz)));
-        sql.append(SqlHelper.insertColumns(entityClazz, false, false, false));
-        sql.append(" VALUES ");
-        sql.append("<foreach collection=\"list\" item=\"record\" separator=\",\" >");
-        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
-        //获取全部列
-        Set<EntityColumn> columnList = EntityHelper.getColumns(entityClazz);
-        //当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
-        for (EntityColumn column : columnList) {
-            if (column.isInsertable()) {
-                sql.append(column.getColumnHolder("record") + ",");
-            }
-        }
-        sql.append("</trim>");
-        sql.append("</foreach>");
-        return sql.toString();
-    }
+//    public String insertList(MappedStatement ms) {
+//        final Class<?> entityClazz = getEntityClass(ms);
+//        StringBuilder sql = new StringBuilder();
+//        sql.append(SqlHelper.insertIntoTable(entityClazz, tableName(entityClazz)));
+//        sql.append(SqlHelper.insertColumns(entityClazz, false, false, false));
+//        sql.append(" VALUES ");
+//        sql.append("<foreach collection=\"list\" item=\"record\" separator=\",\" >");
+//        sql.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
+//        //获取全部列
+//        Set<EntityColumn> columnList = EntityHelper.getColumns(entityClazz);
+//        //当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
+//        for (EntityColumn column : columnList) {
+//            if (column.isInsertable()) {
+//                sql.append(column.getColumnHolder("record") + ",");
+//            }
+//        }
+//        sql.append("</trim>");
+//        sql.append("</foreach>");
+//        return sql.toString();
+//    }
 
     public String update(MappedStatement ms) {
         Class<?> entityClass = getEntityClass(ms);
