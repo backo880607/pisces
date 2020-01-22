@@ -35,7 +35,6 @@ public class BaseException extends RuntimeException {
 
     private Enum<?> key;
     private Object[] args;
-    private Property property;
 
     public BaseException(Enum<?> enumKey, Object... argements) {
         this.key = enumKey;
@@ -52,13 +51,5 @@ public class BaseException extends RuntimeException {
 
     public Object[] getArgs() {
         return args;
-    }
-
-    public Property getProperty() {
-        return property;
-    }
-
-    public void setProperty(Property value) {
-        this.property = value;
     }
 }

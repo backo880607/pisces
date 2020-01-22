@@ -11,4 +11,5 @@ public enum CoreMessage {
     TooManyParams,
     InvalidParamType,
     LessParams,
+    CycleError
 }
