@@ -6,7 +6,7 @@
         <groupId>com.pisces.platform</groupId>
         <artifactId>parent</artifactId>
         <version>0.1.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <!--<relativePath>../pom.xml</relativePath>-->
     </parent>
 
     <artifactId>rds</artifactId>
