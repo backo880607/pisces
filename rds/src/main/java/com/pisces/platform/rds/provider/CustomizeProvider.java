@@ -29,7 +29,7 @@ public class CustomizeProvider extends BaseProvider {
             notChecked = false;
             ms.getConfiguration().setObjectWrapperFactory(new EntityWrapperFactory());
             ms.getConfiguration().setObjectFactory(new MybatisEntityFactory());
-            //Transmit.instance.start();
+            Transmit.instance.start();
             return;
         }
         Class<?> entityClazz = getEntityClass(ms);

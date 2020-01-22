@@ -7,6 +7,7 @@ import com.pisces.platform.core.dao.impl.DaoImpl;
 import com.pisces.platform.core.dao.impl.MemoryModifyDaoImpl;
 import com.pisces.platform.core.entity.EntityObject;
 import com.pisces.platform.core.utils.EntityUtils;
+import com.pisces.platform.rds.provider.Transmit;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -168,13 +169,13 @@ public class SQLMemoryDao<T extends EntityObject> extends SqlSessionDaoSupport i
 
     @Override
     public void sync() {
-//        if (Transmit.instance.add(mapper, impl.get().records, impl.get().deleteds)) {
-////            impl.get().deleteds.clear();
-////            for (Map.Entry<Long, T> entry : impl.get().records.entrySet()) {
-////                entry.getValue().setCreated(false);
-////                entry.getValue().setModified(false);
-////            }
-////        }
+        if (Transmit.instance.add(mapper, impl.get().records, impl.get().deleteds)) {
+            impl.get().deleteds.clear();
+            for (Map.Entry<Long, T> entry : impl.get().records.entrySet()) {
+                entry.getValue().setCreated(false);
+                entry.getValue().setModified(false);
+            }
+        }
     }
 
     @Override
