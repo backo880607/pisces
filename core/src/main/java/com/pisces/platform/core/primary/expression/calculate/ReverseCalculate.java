@@ -43,7 +43,6 @@ public class ReverseCalculate implements Calculate {
 
     @Override
     public Class<?> getReturnClass() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

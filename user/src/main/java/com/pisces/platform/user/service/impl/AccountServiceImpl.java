@@ -3,6 +3,7 @@ package com.pisces.platform.user.service.impl;
 import com.pisces.platform.core.exception.ExistedException;
 import com.pisces.platform.core.service.EntityServiceImpl;
 import com.pisces.platform.user.bean.Account;
+import com.pisces.platform.user.bean.Role;
 import com.pisces.platform.user.config.UserMessage;
 import com.pisces.platform.user.dao.AccountDao;
 import com.pisces.platform.user.service.AccountService;
@@ -30,37 +31,43 @@ class AccountServiceImpl extends EntityServiceImpl<Account, AccountDao> implemen
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        String password = "";
-        String role = "";
-        if (username.equalsIgnoreCase("root")) {
-        	password = passwordEncoder.encode("880607");
-        	role = "root";
-        } else if (env == "dev") {
-        	password = passwordEncoder.encode("880607");
-        	role = "admin";
+        String password;
+        List<String> roles = new ArrayList<>();
+        if (env.equals("dev")) {
+        	password = passwordEncoder.encode("123456");
+        	roles.add("admin");
         } else {
         	Example example = new Example(Account.class);
         	example.createCriteria().andEqualTo("username", username);
         	Account account = getDao().selectOneByExample(example);
         	if (account == null) {
-        		throw new UsernameNotFoundException(username);
-        	}
-        	password = account.getPassword();
-        	role = "admin";
+        		if (username.equals("root")) {
+					password = passwordEncoder.encode("123456");
+				} else {
+					throw new UsernameNotFoundException(username);
+				}
+        	} else {
+				password = account.getPassword();
+			}
+
+			if (username.equals("root")) {
+				roles.add("root");
+			} else {
+				for (Role role : account.getRoles()) {
+					roles.add(role.getCode());
+				}
+			}
         }
         
-		List<SimpleGrantedAuthority> authList = getAuthorities(role);
+		List<SimpleGrantedAuthority> authList = getAuthorities(roles);
 		User user = new User(username, password, authList);
 		return user;
 	}
 
-	private List<SimpleGrantedAuthority> getAuthorities(String role) {
+	private List<SimpleGrantedAuthority> getAuthorities(List<String> roles) {
 		List<SimpleGrantedAuthority> authList = new ArrayList<>();
-		
-		if (role != null && role.trim().length() > 0) {
-			if (role.equals("root")) {
-				authList.add(new SimpleGrantedAuthority("ROLE_ROOT"));
-			}
+		for (String role : roles) {
+			authList.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
 		}
 		return authList;
 	}

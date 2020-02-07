@@ -12,46 +12,61 @@ import java.util.Date;
 
 @Table(name = "USER_TENANT")
 public class Tenant extends EntityCoding {
-	private Date endDate;
-	private Integer maxLoginQty;
-	private Integer maxAccountQty;
-	
-	@Relation(clazz = "Department", sign = "tenant", type = Type.OneToMulti)
-	public static final Sign departments = sign();
-	
-	@Override
-	public void init() {
-		super.init();
-		endDate = DateUtils.MAX;
-		maxLoginQty = 5;
-		maxAccountQty = 5;
-	}
-	
-	public Date getEndDate() {
-		return endDate;
-	}
+    private Date endDate;
+    private Integer maxLoginQty;
+    private Integer maxAccountQty;
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+    @Relation(clazz = "Department", sign = "tenant", type = Type.OneToMulti, owner = true)
+    public static final Sign departments = sign();
+    public static final Sign parent = sign();
+    @Relation(clazz = "Tenant", sign = "parent", type = Type.OneToMulti, owner = true)
+    public static final Sign children = sign();
 
-	public Integer getMaxLoginQty() {
-		return maxLoginQty;
-	}
+    @Override
+    public void init() {
+        super.init();
+        endDate = DateUtils.MAX;
+        maxLoginQty = 5;
+        maxAccountQty = 5;
+    }
 
-	public void setMaxLoginQty(Integer maxLoginQty) {
-		this.maxLoginQty = maxLoginQty;
-	}
+    public Date getEndDate() {
+        return endDate;
+    }
 
-	public Integer getMaxAccountQty() {
-		return maxAccountQty;
-	}
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
-	public void setMaxAccountQty(Integer maxAccountQty) {
-		this.maxAccountQty = maxAccountQty;
-	}
+    public Integer getMaxLoginQty() {
+        return maxLoginQty;
+    }
 
-	public Collection<Department> getDepartments() {
-		return getList(departments);
-	}
+    public void setMaxLoginQty(Integer maxLoginQty) {
+        this.maxLoginQty = maxLoginQty;
+    }
+
+    public Integer getMaxAccountQty() {
+        return maxAccountQty;
+    }
+
+    public void setMaxAccountQty(Integer maxAccountQty) {
+        this.maxAccountQty = maxAccountQty;
+    }
+
+    public Collection<Department> getDepartments() {
+        return getList(departments);
+    }
+
+    public Tenant getParent() {
+        return get(parent);
+    }
+
+    public void setParent(Tenant tenant) {
+        set(parent, tenant);
+    }
+
+    public Collection<Tenant> getChildren() {
+        return getList(children);
+    }
 }

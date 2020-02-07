@@ -11,8 +11,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-/** */
-
 /**
  * 最核心的地方，就是提供某个资源对应的权限定义，即getAttributes方法返回的结果。 此类在初始化时，应该取到所有资源及其对应角色的定义。
  */
@@ -25,6 +23,11 @@ public class CustomInvocationSecurityMetadataSource extends DefaultFilterInvocat
     }
 
     private void loadResourceDefine() {
+        List<ConfigAttribute> adminAuth = new ArrayList<>();
+        adminAuth.add(new SecurityConfig("ROLE_ADMIN"));
+        adminAuth.add(new SecurityConfig("ROLE_ROOT"));
+        resourceMap.put(new AntPathRequestMatcher("/admin/**"), adminAuth);
+
         List<ConfigAttribute> authorities = new ArrayList<>();
         authorities.add(new SecurityConfig("ROLE_ROOT"));
         AntPathRequestMatcher matcher = new AntPathRequestMatcher("/**");
