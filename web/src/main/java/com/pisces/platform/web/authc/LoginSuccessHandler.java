@@ -27,7 +27,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         AppUtils.login(authentication.getName());
         final String token = JwtTokenHelper.generateToken(authentication.getName(), authentication.getAuthorities());
         clearAuthenticationAttributes(request);
-        response.addHeader("token", "Bearer " + token);
+        response.addHeader("Authorization", "Bearer " + token);
     }
 
     protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication, String token)

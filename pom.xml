@@ -38,6 +38,12 @@
         <maven-scm-plugin.version>1.9.5</maven-scm-plugin.version>
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
 
+        <!--docker插件-->
+        <!-- docker私服地址,Harbor配置完默认地址就是80,默认不带端口号。但是我这里是81 -->
+        <docker.repository>192.168.118.136</docker.repository>
+        <!--项目名,需要和Harbor中的项目名称保持一致 -->
+        <docker.registry.name>pisces</docker.registry.name>
+
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-io.version>2.6</commons-io.version>
@@ -184,22 +190,26 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- <dependency>
+        <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.springframework.cloud</groupId>
-          <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.springframework.cloud</groupId>
-          <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency> -->
-        <!-- <dependency>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-        </dependency> -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
@@ -301,7 +311,7 @@
     </profiles>
 
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
+        <finalName>${project.artifactId}-${project.version}-${profileActive}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -388,6 +398,7 @@
                     <releaseProfiles>prod</releaseProfiles>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <generateReleasePoms>false</generateReleasePoms>
                     <arguments>-DskipTests</arguments>
                 </configuration>
             </plugin>
@@ -400,10 +411,36 @@
                 </configuration>
             </plugin>
             <!-- 对发布的包进行数字签名 -->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-gpg-plugin</artifactId>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <!--必须配置dockerHost标签（除非配置系统环境变量DOCKER_HOST）-->
+                    <dockerHost>http://${docker.repository}:2375</dockerHost>
+                    <serverId>docker-registry</serverId>
+                    <registryUrl>http://${docker.repository}</registryUrl>
+                    <imageName>${docker.repository}/${docker.registry.name}/${project.artifactId}:${project.version}</imageName>
+                    <!--强制覆盖上次推送的重名tag镜像-->
+                    <forceTags>true</forceTags>
+                    <!--  给进行打上tag-->
+                    <imageTags>
+                        <imageTag>${project.version}</imageTag>
+                    </imageTags>
+                    <baseImage>java:8</baseImage>
+                    <workdir>/</workdir>
+                    <cmd>["java", "-version"]</cmd>
+                    <entryPoint>["java", "-jar", "${project.build.finalName}.jar"]</entryPoint>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+            <!-- Docker maven plugin -->
         </plugins>
     </build>
 

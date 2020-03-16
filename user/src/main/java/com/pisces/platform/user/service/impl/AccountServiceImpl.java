@@ -35,7 +35,7 @@ class AccountServiceImpl extends EntityServiceImpl<Account, AccountDao> implemen
         List<String> roles = new ArrayList<>();
         if (env.equals("dev")) {
         	password = passwordEncoder.encode("123456");
-        	roles.add("admin");
+        	roles.add("root");
         } else {
         	Example example = new Example(Account.class);
         	example.createCriteria().andEqualTo("username", username);

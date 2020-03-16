@@ -1,8 +1,10 @@
 package com.pisces.platform.core.entity;
 
 import com.pisces.platform.core.annotation.PrimaryKey;
+import com.pisces.platform.core.validator.InsertGroup;
+import com.pisces.platform.core.validator.UpdateGroup;
 
-@PrimaryKey(fields = {"code"})
+@PrimaryKey(fields = {"code"}, groups = {InsertGroup.class, UpdateGroup.class})
 public class EntityCoding extends EntityObject {
     private String code;
     private String name;

@@ -8,5 +8,4 @@ import org.springframework.context.annotation.PropertySource;
 @EnableConfigurationProperties(CoreProperties.class)
 @PropertySource(ignoreResourceNotFound = true, value = "classpath:core.properties")
 public class CoreAutoConfiguration {
-
 }

@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 @Configuration
 @EnableWebSecurity
@@ -50,12 +51,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable() // 使用jwt，这里不需要csrf
+        http.cors().and().csrf().disable() // 使用jwt，这里不需要csrf
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).accessDeniedHandler(accessDeniedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and() // 基于token，所以不需要session
                 .httpBasic().and()
                 .authorizeRequests()
-                //.requestMatchers(EndpointRequest.to("health", "info")).permitAll()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/**").hasRole("ROOT")
                 .antMatchers("/dba/**").access("hasRole('ADMIN') and hasRole('DBA')")

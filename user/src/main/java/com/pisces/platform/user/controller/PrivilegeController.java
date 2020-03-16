@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/Privilege")
+@RequestMapping("/admin/user/Privilege")
 public class PrivilegeController extends EntityController<Privilege, PrivilegeService> {
 
 }

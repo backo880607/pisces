@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/DataSet")
+@RequestMapping("/admin/user/DataSet")
 public class DataSetController extends EntityController<DataSet, DataSetService> {
 	@RequestMapping("register")
 	@ExceptionMessage(clazz = UserMessage.class, name = "REGISTER")

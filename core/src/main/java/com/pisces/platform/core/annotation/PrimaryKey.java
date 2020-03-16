@@ -18,7 +18,7 @@ public @interface PrimaryKey {
 
     String message() default "{WebMessage.CREATE}";
 
-    Class<?>[] groups() default {InsertGroup.class};
+    Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 }
