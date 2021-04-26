@@ -37,7 +37,7 @@
   	<spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
   	
   	<commons-collections.version>3.2.2</commons-collections.version>
-  	<commons-io.version>2.6</commons-io.version>
+  	<commons-io.version>2.7</commons-io.version>
   	
   	<persistence.version>1.0</persistence.version>
   	<alibaba.druid.version>1.1.9</alibaba.druid.version>
